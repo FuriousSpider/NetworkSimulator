@@ -1,0 +1,31 @@
+.layout {
+    -fx-background-color: silver;
+}
+
+.centerLayout {
+    -fx-background-color: silver;
+    -fx-border-color: grey;
+    -fx-border-radius: 4px;
+    -fx-border-width: 1px;
+    -fx-border-insets: 4px;
+}
+
+.topLayout {
+    -fx-padding: 8px;
+    -fx-background-color: silver;
+    -fx-pref-height: 24px;
+}
+
+.bottomLayout {
+    -fx-background-color: silver;
+    -fx-pref-height: 50px;
+}
+
+.rightLayout {
+    -fx-background-color: silver;
+    -fx-pref-width: 200px;
+    -fx-border-color: grey;
+    -fx-border-radius: 4px;
+    -fx-border-width: 1px;
+    -fx-border-insets: 4px;
+}
