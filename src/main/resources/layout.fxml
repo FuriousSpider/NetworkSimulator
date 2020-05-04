@@ -19,9 +19,14 @@
         </HBox>
     </top>
     <right>
-        <VBox styleClass="rightLayout">
-
-        </VBox>
+        <StackPane styleClass="rightLayout">
+            <GridPane fx:id="elementInfo">
+                <Label text="Device info" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+                <Label text="Device type: " GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+                <Label fx:id="elementInfoDeviceType" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+                <Button onAction="#handleRemoveElementButtonClick" text="Remove" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+            </GridPane>
+        </StackPane>
     </right>
     <bottom>
         <HBox styleClass="bottomLayout">

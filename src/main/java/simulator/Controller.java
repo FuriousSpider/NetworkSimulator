@@ -1,10 +1,11 @@
 package simulator;
 
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Label;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import simulator.element.*;
 import util.Values;
@@ -14,45 +15,53 @@ import java.net.URL;
 import java.util.ResourceBundle;
 
 public class Controller implements Initializable {
-    @FXML
-    private Pane canvasPane;
-
+    @FXML private Pane canvasPane;
+    @FXML private GridPane elementInfo;
+    @FXML private Label elementInfoDeviceType;
     private Engine engine;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         CanvasPane canvas = new CanvasPane(canvasPane.getWidth(), canvasPane.getHeight());
         canvasPane.getChildren().add(canvas);
-        engine = new Engine(canvas.getCanvas().getGraphicsContext2D());
+        engine = new Engine(this, canvas.getCanvas().getGraphicsContext2D());
 
         canvas.getCanvas().setOnMouseDragged(this::canvasMouseDragged);
         canvas.getCanvas().setOnMousePressed(this::canvasMousePressed);
         canvas.getCanvas().setOnMouseReleased(this::canvasMouseReleased);
+
+        hideElementInfo();
     }
 
     @FXML
-    private void handleEndDeviceButtonClick(ActionEvent event) {
+    private void handleEndDeviceButtonClick() {
         engine.addDevice(new EndDevice(Values.ELEMENT_DEFAULT_POSITION, Values.ELEMENT_DEFAULT_POSITION));
     }
 
     @FXML
-    private void handleHubButtonClick(ActionEvent event) {
+    private void handleHubButtonClick() {
         engine.addDevice(new Hub(Values.ELEMENT_DEFAULT_POSITION, Values.ELEMENT_DEFAULT_POSITION));
     }
 
     @FXML
-    private void handleSwitchButtonClick(ActionEvent event) {
+    private void handleSwitchButtonClick() {
         engine.addDevice(new Switch(Values.ELEMENT_DEFAULT_POSITION, Values.ELEMENT_DEFAULT_POSITION));
     }
 
     @FXML
-    private void handleRouterButtonClick(ActionEvent event) {
+    private void handleRouterButtonClick() {
         engine.addDevice(new Router(Values.ELEMENT_DEFAULT_POSITION, Values.ELEMENT_DEFAULT_POSITION));
     }
 
     @FXML
-    private void handleFirewallButtonClick(ActionEvent event) {
+    private void handleFirewallButtonClick() {
         engine.addDevice(new Firewall(Values.ELEMENT_DEFAULT_POSITION, Values.ELEMENT_DEFAULT_POSITION));
+    }
+
+    @FXML
+    private void handleRemoveElementButtonClick() {
+        engine.removeSelectedElement();
+        hideElementInfo();
     }
 
     private void canvasMousePressed(MouseEvent mouseEvent) {
@@ -71,5 +80,14 @@ public class Controller implements Initializable {
         if (mouseEvent.getButton() == MouseButton.PRIMARY) {
             engine.deselectElement();
         }
+    }
+
+    public void showElementInfo(Element selectedElement) {
+        elementInfo.setVisible(true);
+        elementInfoDeviceType.setText(selectedElement.getDeviceType());
+    }
+
+    public void hideElementInfo() {
+        elementInfo.setVisible(false);
     }
 }

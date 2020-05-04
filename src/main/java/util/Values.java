@@ -6,6 +6,7 @@ public class Values {
 
     public static int ELEMENT_SIZE = 50;
     public static int ELEMENT_DEFAULT_POSITION = 100;
+    public static int ELEMENT_STROKE = 1;
 
     public static int ENGINE_MILLISECONDS_PAUSE = 30;
 }
