@@ -3,8 +3,11 @@ package simulator;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import simulator.element.*;
@@ -15,6 +18,7 @@ import java.net.URL;
 import java.util.ResourceBundle;
 
 public class Controller implements Initializable {
+    @FXML private BorderPane root;
     @FXML private Pane canvasPane;
     @FXML private GridPane elementInfo;
     @FXML private Label elementInfoDeviceType;
@@ -29,6 +33,7 @@ public class Controller implements Initializable {
         canvas.getCanvas().setOnMouseDragged(this::canvasMouseDragged);
         canvas.getCanvas().setOnMousePressed(this::canvasMousePressed);
         canvas.getCanvas().setOnMouseReleased(this::canvasMouseReleased);
+        root.setOnKeyPressed(this::keyPressed);
 
         hideElementInfo();
     }
@@ -61,7 +66,6 @@ public class Controller implements Initializable {
     @FXML
     private void handleRemoveElementButtonClick() {
         engine.removeSelectedElement();
-        hideElementInfo();
     }
 
     private void canvasMousePressed(MouseEvent mouseEvent) {
@@ -79,6 +83,14 @@ public class Controller implements Initializable {
     private void canvasMouseReleased(MouseEvent mouseEvent) {
         if (mouseEvent.getButton() == MouseButton.PRIMARY) {
             engine.deselectElement();
+        }
+    }
+
+    private void keyPressed(KeyEvent keyEvent) {
+        if (keyEvent.getCode() == KeyCode.DELETE) {
+            engine.removeSelectedElement();
+        } else if (keyEvent.getCode() == KeyCode.ESCAPE) {
+            engine.dropSelection();
         }
     }
 

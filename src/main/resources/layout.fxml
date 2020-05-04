@@ -6,7 +6,7 @@
 <?import javafx.scene.text.Text?>
 <?import java.net.URL?>
 
-<BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="simulator.Controller" styleClass="layout">
+<BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="simulator.Controller" styleClass="layout" fx:id="root">
     <stylesheets>
         <URL value="@Styles.css"/>
     </stylesheets>

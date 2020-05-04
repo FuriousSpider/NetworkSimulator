@@ -59,10 +59,16 @@ public class Engine {
         shouldUpdate = true;
     }
 
+    public void dropSelection() {
+        selectedElement = null;
+        lastSelectedElement = null;
+        controller.hideElementInfo();
+    }
+
     public void removeSelectedElement() {
         elementList.remove(lastSelectedElement);
         lastSelectedElement = null;
-        deselectElement();
+        controller.hideElementInfo();
     }
 
     public void moveElement(int x, int y) {
