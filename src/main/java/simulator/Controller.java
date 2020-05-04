@@ -3,9 +3,10 @@ package simulator;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.image.Image;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
+import simulator.element.*;
 import util.Values;
 import view.CanvasPane;
 
@@ -15,42 +16,60 @@ import java.util.ResourceBundle;
 public class Controller implements Initializable {
     @FXML
     private Pane canvasPane;
-    private GraphicsContext ctx;
+
+    private Engine engine;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         CanvasPane canvas = new CanvasPane(canvasPane.getWidth(), canvasPane.getHeight());
         canvasPane.getChildren().add(canvas);
-        ctx = canvas.getCanvas().getGraphicsContext2D();
+        engine = new Engine(canvas.getCanvas().getGraphicsContext2D());
+
+        canvas.getCanvas().setOnMouseDragged(this::canvasMouseDragged);
+        canvas.getCanvas().setOnMousePressed(this::canvasMousePressed);
+        canvas.getCanvas().setOnMouseReleased(this::canvasMouseReleased);
     }
 
     @FXML
     private void handleEndDeviceButtonClick(ActionEvent event) {
-        Image image = new Image("/endDevice.png");
-        ctx.drawImage(image, 10, 10, Values.DEVICE_SIZE, Values.DEVICE_SIZE);
+        engine.addDevice(new EndDevice(Values.ELEMENT_DEFAULT_POSITION, Values.ELEMENT_DEFAULT_POSITION));
     }
 
     @FXML
     private void handleHubButtonClick(ActionEvent event) {
-        Image image = new Image("/hub.png");
-        ctx.drawImage(image, 10, 10, Values.DEVICE_SIZE, Values.DEVICE_SIZE);
+        engine.addDevice(new Hub(Values.ELEMENT_DEFAULT_POSITION, Values.ELEMENT_DEFAULT_POSITION));
     }
 
     @FXML
     private void handleSwitchButtonClick(ActionEvent event) {
-        Image image = new Image("/switch.png");
-        ctx.drawImage(image, 10, 10, Values.DEVICE_SIZE, Values.DEVICE_SIZE);
+        engine.addDevice(new Switch(Values.ELEMENT_DEFAULT_POSITION, Values.ELEMENT_DEFAULT_POSITION));
     }
 
     @FXML
     private void handleRouterButtonClick(ActionEvent event) {
-        Image image = new Image("/router.png");
-        ctx.drawImage(image, 10, 10, Values.DEVICE_SIZE, Values.DEVICE_SIZE);
+        engine.addDevice(new Router(Values.ELEMENT_DEFAULT_POSITION, Values.ELEMENT_DEFAULT_POSITION));
     }
 
     @FXML
     private void handleFirewallButtonClick(ActionEvent event) {
-        Image image = new Image("/firewall.png");
-        ctx.drawImage(image, 10, 10, Values.DEVICE_SIZE, Values.DEVICE_SIZE);
+        engine.addDevice(new Firewall(Values.ELEMENT_DEFAULT_POSITION, Values.ELEMENT_DEFAULT_POSITION));
+    }
+
+    private void canvasMousePressed(MouseEvent mouseEvent) {
+        if (mouseEvent.getButton() == MouseButton.PRIMARY) {
+            engine.selectElement((int) mouseEvent.getX(), (int) mouseEvent.getY());
+        }
+    }
+
+    private void canvasMouseDragged(MouseEvent mouseEvent) {
+        if (mouseEvent.getButton() == MouseButton.PRIMARY) {
+            engine.moveElement((int) mouseEvent.getX(), (int) mouseEvent.getY());
+        }
+    }
+
+    private void canvasMouseReleased(MouseEvent mouseEvent) {
+        if (mouseEvent.getButton() == MouseButton.PRIMARY) {
+            engine.deselectElement();
+        }
     }
 }
