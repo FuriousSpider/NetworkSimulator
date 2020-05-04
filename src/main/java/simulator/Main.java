@@ -1,6 +1,6 @@
 package simulator;
 
-import Util.Values;
+import util.Values;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;

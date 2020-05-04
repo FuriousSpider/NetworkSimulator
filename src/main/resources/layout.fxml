@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Text?>
 <?import java.net.URL?>
 
@@ -10,11 +10,8 @@
     <stylesheets>
         <URL value="@Styles.css"/>
     </stylesheets>
-
     <center>
-        <VBox styleClass="centerLayout">
-
-        </VBox>
+        <StackPane fx:id="canvasPane"/>
     </center>
     <top>
         <HBox styleClass="topLayout">
@@ -28,7 +25,41 @@
     </right>
     <bottom>
         <HBox styleClass="bottomLayout">
-            <Text text="Hello"/>
+            <Button onAction="#handleEndDeviceButtonClick">
+                <graphic>
+                    <ImageView>
+                        <Image url="@endDevice.png"/>
+                    </ImageView>
+                </graphic>
+            </Button>
+            <Button onAction="#handleHubButtonClick">
+                <graphic>
+                    <ImageView>
+                        <Image url="@hub.png"/>
+                    </ImageView>
+                </graphic>
+            </Button>
+            <Button onAction="#handleSwitchButtonClick">
+                <graphic>
+                    <ImageView>
+                        <Image url="@switch.png"/>
+                    </ImageView>
+                </graphic>
+            </Button>
+            <Button onAction="#handleRouterButtonClick">
+                <graphic>
+                    <ImageView>
+                        <Image url="@router.png"/>
+                    </ImageView>
+                </graphic>
+            </Button>
+            <Button onAction="#handleFirewallButtonClick">
+                <graphic>
+                    <ImageView>
+                        <Image url="@firewall.png"/>
+                    </ImageView>
+                </graphic>
+            </Button>
         </HBox>
     </bottom>
 </BorderPane>
