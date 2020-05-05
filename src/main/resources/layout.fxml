@@ -5,7 +5,6 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Text?>
 <?import java.net.URL?>
-
 <BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="simulator.Controller" styleClass="layout" fx:id="root">
     <stylesheets>
         <URL value="@Styles.css"/>
@@ -24,7 +23,8 @@
                 <Label text="Device info" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
                 <Label text="Device type: " GridPane.columnIndex="0" GridPane.rowIndex="1"/>
                 <Label fx:id="elementInfoDeviceType" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
-                <Button onAction="#handleRemoveElementButtonClick" text="Remove" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+                <Button onAction="#handleConnectElementsButtonClick" text="Connect" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+                <Button onAction="#handleRemoveElementButtonClick" text="Remove" GridPane.columnIndex="0" GridPane.rowIndex="3"/>
             </GridPane>
         </StackPane>
     </right>

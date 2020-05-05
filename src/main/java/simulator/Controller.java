@@ -72,6 +72,11 @@ public class Controller implements Initializable {
         engine.removeSelectedElement();
     }
 
+    @FXML
+    private void handleConnectElementsButtonClick() {
+        engine.onConnectClicked();
+    }
+
     private void canvasMousePressed(MouseEvent mouseEvent) {
         engine.onMousePressed((int) mouseEvent.getX(), (int) mouseEvent.getY());
         if (mouseEvent.getButton() == MouseButton.PRIMARY) {
@@ -99,6 +104,8 @@ public class Controller implements Initializable {
             engine.removeSelectedElement();
         } else if (keyEvent.getCode() == KeyCode.ESCAPE) {
             engine.dropSelection();
+        } else if (keyEvent.getCode() == KeyCode.C) {
+            engine.onConnectClicked();
         }
     }
 

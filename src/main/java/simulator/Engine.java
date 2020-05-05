@@ -15,8 +15,10 @@ public class Engine {
     private final Controller controller;
     private final GraphicsContext ctx;
     private final List<Element> elementList;
+    private final List<Pair<Integer, Integer>> connectionList;
+    private Integer elementToConnect;
+    private Element presentlyClickedElement;
     private Element selectedElement;
-    private Element lastSelectedElement;
     private boolean shouldUpdate;
     private static boolean closeTask;
     private Pair<Integer, Integer> mousePosition;
@@ -25,9 +27,13 @@ public class Engine {
         this.controller = controller;
         this.ctx = context;
         this.elementList = new ArrayList<>();
+        this.connectionList = new ArrayList<>();
+        this.elementToConnect = null;
+        this.presentlyClickedElement = null;
+        this.selectedElement = null;
         this.shouldUpdate = false;
         closeTask = false;
-        mousePosition = null;
+        this.mousePosition = null;
 
         setCtxConfig();
         startEngine();
@@ -38,46 +44,76 @@ public class Engine {
         ctx.setLineWidth(2.0);
     }
 
+    private Element getElementById(int id) {
+        for (Element element : elementList) {
+            if (element.getId() == id) {
+                return element;
+            }
+        }
+        return null;
+    }
+
     public void addDevice(Element element) {
         this.elementList.add(0, element);
         shouldUpdate = true;
     }
 
     public void selectElement(int x, int y) {
-        for (Element element : elementList) {
-            if (x >= element.getX() && x <= element.getX() + Values.ELEMENT_SIZE && y >= element.getY() && y <= element.getY() + Values.ELEMENT_SIZE) {
-                if (selectedElement != element) {
-                    selectedElement = element;
-                    lastSelectedElement = selectedElement;
-                    controller.showElementInfo(selectedElement);
+        if (elementToConnect != null) {
+            connectTo(x, y);
+        } else {
+            for (Element element : elementList) {
+                if (x >= element.getX() && x <= element.getX() + Values.ELEMENT_SIZE && y >= element.getY() && y <= element.getY() + Values.ELEMENT_SIZE) {
+                    if (presentlyClickedElement != element) {
+                        presentlyClickedElement = element;
+                        selectedElement = presentlyClickedElement;
+                        controller.showElementInfo(selectedElement);
+                    }
+                    break;
                 }
-                break;
             }
+            shouldUpdate = true;
         }
-        shouldUpdate = true;
     }
 
     public void deselectElement() {
-        selectedElement = null;
+        presentlyClickedElement = null;
         shouldUpdate = true;
     }
 
     public void dropSelection() {
-        selectedElement = null;
-        lastSelectedElement = null;
-        controller.hideElementInfo();
+        if (elementToConnect != null) {
+            elementToConnect = null;
+        } else {
+            presentlyClickedElement = null;
+            selectedElement = null;
+            controller.hideElementInfo();
+        }
     }
 
     public void removeSelectedElement() {
-        elementList.remove(lastSelectedElement);
-        lastSelectedElement = null;
+        removeConnections();
+        elementList.remove(selectedElement);
+        selectedElement = null;
         controller.hideElementInfo();
     }
 
+    private void removeConnections() {
+        List<Pair<Integer, Integer>> connectionsToRemove = new ArrayList<>();
+        for (Pair<Integer, Integer> pair : connectionList) {
+            if (selectedElement.getId() == pair.getKey() || selectedElement.getId() == pair.getValue()) {
+                connectionsToRemove.add(pair);
+            }
+        }
+        if (!connectionsToRemove.isEmpty()) {
+            connectionList.removeAll(connectionsToRemove);
+        }
+    }
+
     public void moveElement(int x, int y) {
-        if (selectedElement != null && mousePosition != null) {
-            selectedElement.setX(selectedElement.getX() + (x - mousePosition.getKey()));
-            selectedElement.setY(selectedElement.getY() + (y - mousePosition.getValue()));
+        if (presentlyClickedElement != null && mousePosition != null) {
+            presentlyClickedElement.setX(presentlyClickedElement.getX() + (x - mousePosition.getKey()));
+            presentlyClickedElement.setY(presentlyClickedElement.getY() + (y - mousePosition.getValue()));
             mousePosition = new Pair<>(x, y);
         }
     }
@@ -100,6 +136,34 @@ public class Engine {
         }
     }
 
+    public void onConnectClicked() {
+        if (selectedElement != null) {
+            elementToConnect = selectedElement.getId();
+        }
+    }
+
+    private void connectTo(int x, int y) {
+        for (Element element : elementList) {
+            if (x >= element.getX() && x <= element.getX() + Values.ELEMENT_SIZE && y >= element.getY() && y <= element.getY() + Values.ELEMENT_SIZE) {
+                if (!elementToConnect.equals(element.getId())) {
+                    if (!connectionAlreadyExists(elementToConnect, element.getId())) {
+                        connectionList.add(new Pair<>(elementToConnect, element.getId()));
+                    }
+                    elementToConnect = null;
+                }
+            }
+        }
+    }
+
+    private boolean connectionAlreadyExists(Integer id1, int id2) {
+        for (Pair<Integer, Integer> pair : connectionList) {
+            if ((id1.equals(pair.getKey()) && id2 == pair.getValue()) || (id1.equals(pair.getValue()) && id2 == pair.getKey())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public static void stopEngine() {
         closeTask = true;
     }
@@ -113,8 +177,19 @@ public class Engine {
                     ctx.clearRect(0, 0, ctx.getCanvas().getWidth(), ctx.getCanvas().getHeight());
                     List<Element> reversedList = new ArrayList<>(elementList);
                     Collections.reverse(reversedList);
+                    for (Pair<Integer, Integer> pair : connectionList) {
+                        Element element1 = getElementById(pair.getKey());
+                        Element element2 = getElementById(pair.getValue());
+                        if (element1 != null && element2 != null) {
+                            ctx.strokeLine(
+                                    element1.getX() + (Values.ELEMENT_SIZE / 2.0),
+                                    element1.getY() + (Values.ELEMENT_SIZE / 2.0),
+                                    element2.getX() + (Values.ELEMENT_SIZE / 2.0),
+                                    element2.getY() + (Values.ELEMENT_SIZE / 2.0));
+                        }
+                    }
                     for (Element element : reversedList) {
-                        if (element == lastSelectedElement) {
+                        if (element == selectedElement) {
                             ctx.strokeRect(
                                     element.getX() - Values.ELEMENT_STROKE,
                                     element.getY() - Values.ELEMENT_STROKE,
