@@ -3,6 +3,7 @@ package simulator;
 import javafx.concurrent.Task;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Paint;
+import javafx.util.Pair;
 import simulator.element.Element;
 import util.Values;
 
@@ -18,6 +19,7 @@ public class Engine {
     private Element lastSelectedElement;
     private boolean shouldUpdate;
     private static boolean closeTask;
+    private Pair<Integer, Integer> mousePosition;
 
     public Engine(Controller controller, GraphicsContext context) {
         this.controller = controller;
@@ -25,6 +27,7 @@ public class Engine {
         this.elementList = new ArrayList<>();
         this.shouldUpdate = false;
         closeTask = false;
+        mousePosition = null;
 
         setCtxConfig();
         startEngine();
@@ -72,10 +75,28 @@ public class Engine {
     }
 
     public void moveElement(int x, int y) {
-        if (selectedElement != null) {
-            selectedElement.setX(x - Values.ELEMENT_SIZE / 2);
-            selectedElement.setY(y - Values.ELEMENT_SIZE / 2);
-            shouldUpdate = true;
+        if (selectedElement != null && mousePosition != null) {
+            selectedElement.setX(selectedElement.getX() + (x - mousePosition.getKey()));
+            selectedElement.setY(selectedElement.getY() + (y - mousePosition.getValue()));
+            mousePosition = new Pair<>(x, y);
+        }
+    }
+
+    public void onMousePressed(int x, int y) {
+        mousePosition = new Pair<>(x, y);
+    }
+
+    public void onMouseReleased() {
+        mousePosition = null;
+    }
+
+    public void moveAll(int x, int y) {
+        if (mousePosition != null) {
+            for (Element element : elementList) {
+                element.setX(element.getX() + (x - mousePosition.getKey()));
+                element.setY(element.getY() + (y - mousePosition.getValue()));
+            }
+            mousePosition = new Pair<>(x, y);
         }
     }
 
@@ -84,7 +105,7 @@ public class Engine {
     }
 
     private void startEngine() {
-        Task task = new Task<Void>() {
+        Task<Void> task = new Task<>() {
             @Override
             protected Void call() throws Exception {
                 while (!closeTask) {

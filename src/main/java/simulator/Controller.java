@@ -18,10 +18,14 @@ import java.net.URL;
 import java.util.ResourceBundle;
 
 public class Controller implements Initializable {
-    @FXML private BorderPane root;
-    @FXML private Pane canvasPane;
-    @FXML private GridPane elementInfo;
-    @FXML private Label elementInfoDeviceType;
+    @FXML
+    private BorderPane root;
+    @FXML
+    private Pane canvasPane;
+    @FXML
+    private GridPane elementInfo;
+    @FXML
+    private Label elementInfoDeviceType;
     private Engine engine;
 
     @Override
@@ -69,6 +73,7 @@ public class Controller implements Initializable {
     }
 
     private void canvasMousePressed(MouseEvent mouseEvent) {
+        engine.onMousePressed((int) mouseEvent.getX(), (int) mouseEvent.getY());
         if (mouseEvent.getButton() == MouseButton.PRIMARY) {
             engine.selectElement((int) mouseEvent.getX(), (int) mouseEvent.getY());
         }
@@ -77,10 +82,13 @@ public class Controller implements Initializable {
     private void canvasMouseDragged(MouseEvent mouseEvent) {
         if (mouseEvent.getButton() == MouseButton.PRIMARY) {
             engine.moveElement((int) mouseEvent.getX(), (int) mouseEvent.getY());
+        } else if (mouseEvent.getButton() == MouseButton.MIDDLE) {
+            engine.moveAll((int) mouseEvent.getX(), (int) mouseEvent.getY());
         }
     }
 
     private void canvasMouseReleased(MouseEvent mouseEvent) {
+        engine.onMouseReleased();
         if (mouseEvent.getButton() == MouseButton.PRIMARY) {
             engine.deselectElement();
         }
