@@ -10,11 +10,14 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
 import simulator.element.*;
+import simulator.view.ConnectionRowView;
 import util.Values;
 import view.CanvasPane;
 
 import java.net.URL;
+import java.util.List;
 import java.util.ResourceBundle;
 
 public class Controller implements Initializable {
@@ -24,6 +27,8 @@ public class Controller implements Initializable {
     private Pane canvasPane;
     @FXML
     private GridPane elementInfo;
+    @FXML
+    private VBox connectionsInfo;
     @FXML
     private Label elementInfoDeviceType;
     private Engine engine;
@@ -116,5 +121,28 @@ public class Controller implements Initializable {
 
     public void hideElementInfo() {
         elementInfo.setVisible(false);
+    }
+
+    public void showConnectionList(int selectedId, List<Connection> connectionList) {
+        connectionsInfo.getChildren().clear();
+        for (Connection connection : connectionList) {
+            int id;
+            if (selectedId != connection.getFirstId()) {
+                id = connection.getFirstId();
+            } else {
+                id = connection.getSecondId();
+            }
+            ConnectionRowView connectionRowView = new ConnectionRowView(id, engine.getElementById(id).getDeviceType(), connection.getColor());
+            connectionRowView.setOnDeleteClickListener(this::onDeleteConnection);
+            connectionsInfo.getChildren().add(connectionRowView);
+        }
+    }
+
+    public void hideConnectionList() {
+        connectionsInfo.setVisible(false);
+    }
+
+    private void onDeleteConnection(int id) {
+        engine.removeConnection(id);
     }
 }

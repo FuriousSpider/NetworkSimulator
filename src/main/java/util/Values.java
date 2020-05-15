@@ -9,4 +9,7 @@ public class Values {
     public static int ELEMENT_STROKE = 1;
 
     public static int ENGINE_MILLISECONDS_PAUSE = 30;
+
+    public static double LABEL_COLOR_MIN_HEIGHT = 20.0;
+    public static double LABEL_COLOR_MIN_WIDHT = 50.0;
 }

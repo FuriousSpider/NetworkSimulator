@@ -10,7 +10,7 @@
         <URL value="@Styles.css"/>
     </stylesheets>
     <center>
-        <StackPane fx:id="canvasPane"/>
+        <StackPane fx:id="canvasPane" styleClass="centerLayout"/>
     </center>
     <top>
         <HBox styleClass="topLayout">
@@ -18,15 +18,18 @@
         </HBox>
     </top>
     <right>
-        <StackPane styleClass="rightLayout">
-            <GridPane fx:id="elementInfo">
-                <Label text="Device info" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
-                <Label text="Device type: " GridPane.columnIndex="0" GridPane.rowIndex="1"/>
-                <Label fx:id="elementInfoDeviceType" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
-                <Button onAction="#handleConnectElementsButtonClick" text="Connect" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
-                <Button onAction="#handleRemoveElementButtonClick" text="Remove" GridPane.columnIndex="0" GridPane.rowIndex="3"/>
-            </GridPane>
-        </StackPane>
+        <VBox styleClass="rightLayout">
+            <StackPane>
+                <GridPane fx:id="elementInfo">
+                    <Label text="Device info" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+                    <Label text="Device type: " GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+                    <Label fx:id="elementInfoDeviceType" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+                    <Button onAction="#handleConnectElementsButtonClick" text="Connect" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+                    <Button onAction="#handleRemoveElementButtonClick" text="Remove" GridPane.columnIndex="0" GridPane.rowIndex="3"/>
+                </GridPane>
+            </StackPane>
+            <VBox fx:id="connectionsInfo"/>
+        </VBox>
     </right>
     <bottom>
         <HBox styleClass="bottomLayout">

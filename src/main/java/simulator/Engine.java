@@ -2,8 +2,10 @@ package simulator;
 
 import javafx.concurrent.Task;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.util.Pair;
+import simulator.element.Connection;
 import simulator.element.Element;
 import util.Values;
 
@@ -15,7 +17,7 @@ public class Engine {
     private final Controller controller;
     private final GraphicsContext ctx;
     private final List<Element> elementList;
-    private final List<Pair<Integer, Integer>> connectionList;
+    private final List<Connection> connectionList;
     private Integer elementToConnect;
     private Element presentlyClickedElement;
     private Element selectedElement;
@@ -44,7 +46,7 @@ public class Engine {
         ctx.setLineWidth(2.0);
     }
 
-    private Element getElementById(int id) {
+    public Element getElementById(int id) {
         for (Element element : elementList) {
             if (element.getId() == id) {
                 return element;
@@ -68,6 +70,7 @@ public class Engine {
                         presentlyClickedElement = element;
                         selectedElement = presentlyClickedElement;
                         controller.showElementInfo(selectedElement);
+                        controller.showConnectionList(selectedElement.getId(), getSelectedElementConnections());
                     }
                     break;
                 }
@@ -88,6 +91,7 @@ public class Engine {
             presentlyClickedElement = null;
             selectedElement = null;
             controller.hideElementInfo();
+            controller.hideConnectionList();
         }
     }
 
@@ -96,13 +100,25 @@ public class Engine {
         elementList.remove(selectedElement);
         selectedElement = null;
         controller.hideElementInfo();
+        controller.hideConnectionList();
+    }
+
+    public void removeConnection(int id) {
+        for (Connection connection : connectionList) {
+            if ((connection.getFirstId() == id && connection.getSecondId() == selectedElement.getId()) || (connection.getSecondId() == id && connection.getFirstId() == selectedElement.getId())) {
+                connectionList.remove(connection);
+                break;
+            }
+        }
+        controller.showConnectionList(selectedElement.getId(), getSelectedElementConnections());
     }
 
     private void removeConnections() {
-        List<Pair<Integer, Integer>> connectionsToRemove = new ArrayList<>();
-        for (Pair<Integer, Integer> pair : connectionList) {
-            if (selectedElement.getId() == pair.getKey() || selectedElement.getId() == pair.getValue()) {
-                connectionsToRemove.add(pair);
+        if (selectedElement == null) return;
+        List<Connection> connectionsToRemove = new ArrayList<>();
+        for (Connection connection : connectionList) {
+            if (selectedElement.getId() == connection.getFirstId() || selectedElement.getId() == connection.getSecondId()) {
+                connectionsToRemove.add(connection);
             }
         }
         if (!connectionsToRemove.isEmpty()) {
@@ -147,21 +163,32 @@ public class Engine {
             if (x >= element.getX() && x <= element.getX() + Values.ELEMENT_SIZE && y >= element.getY() && y <= element.getY() + Values.ELEMENT_SIZE) {
                 if (!elementToConnect.equals(element.getId())) {
                     if (!connectionAlreadyExists(elementToConnect, element.getId())) {
-                        connectionList.add(new Pair<>(elementToConnect, element.getId()));
+                        connectionList.add(new Connection(elementToConnect, element.getId()));
                     }
                     elementToConnect = null;
                 }
             }
         }
+        controller.showConnectionList(selectedElement.getId(), getSelectedElementConnections());
     }
 
     private boolean connectionAlreadyExists(Integer id1, int id2) {
-        for (Pair<Integer, Integer> pair : connectionList) {
-            if ((id1.equals(pair.getKey()) && id2 == pair.getValue()) || (id1.equals(pair.getValue()) && id2 == pair.getKey())) {
+        for (Connection connection : connectionList) {
+            if ((id1.equals(connection.getFirstId()) && id2 == connection.getSecondId()) || (id1.equals(connection.getSecondId()) && id2 == connection.getFirstId())) {
                 return true;
             }
         }
         return false;
+    }
+
+    private List<Connection> getSelectedElementConnections() {
+        List<Connection> selectedElementConnections = new ArrayList<>();
+        for (Connection connection : connectionList) {
+            if (connection.getFirstId() == selectedElement.getId() || connection.getSecondId() == selectedElement.getId()) {
+                selectedElementConnections.add(connection);
+            }
+        }
+        return selectedElementConnections;
     }
 
     public static void stopEngine() {
@@ -177,10 +204,11 @@ public class Engine {
                     ctx.clearRect(0, 0, ctx.getCanvas().getWidth(), ctx.getCanvas().getHeight());
                     List<Element> reversedList = new ArrayList<>(elementList);
                     Collections.reverse(reversedList);
-                    for (Pair<Integer, Integer> pair : connectionList) {
-                        Element element1 = getElementById(pair.getKey());
-                        Element element2 = getElementById(pair.getValue());
+                    for (Connection connection : connectionList) {
+                        Element element1 = getElementById(connection.getFirstId());
+                        Element element2 = getElementById(connection.getSecondId());
                         if (element1 != null && element2 != null) {
+                            ctx.setStroke(connection.getColor());
                             ctx.strokeLine(
                                     element1.getX() + (Values.ELEMENT_SIZE / 2.0),
                                     element1.getY() + (Values.ELEMENT_SIZE / 2.0),
@@ -188,6 +216,7 @@ public class Engine {
                                     element2.getY() + (Values.ELEMENT_SIZE / 2.0));
                         }
                     }
+                    ctx.setStroke(Color.BLACK);
                     for (Element element : reversedList) {
                         if (element == selectedElement) {
                             ctx.strokeRect(
