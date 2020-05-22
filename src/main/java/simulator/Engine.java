@@ -42,7 +42,7 @@ public class Engine {
     }
 
     private void setCtxConfig() {
-        ctx.setStroke(Paint.valueOf("000000"));
+        ctx.setStroke(Color.BLACK);
         ctx.setLineWidth(2.0);
     }
 
@@ -201,39 +201,52 @@ public class Engine {
             protected Void call() throws Exception {
                 while (!closeTask) {
                     shouldUpdate = false;
-                    ctx.clearRect(0, 0, ctx.getCanvas().getWidth(), ctx.getCanvas().getHeight());
-                    List<Element> reversedList = new ArrayList<>(elementList);
-                    Collections.reverse(reversedList);
-                    for (Connection connection : connectionList) {
-                        Element element1 = getElementById(connection.getFirstId());
-                        Element element2 = getElementById(connection.getSecondId());
-                        if (element1 != null && element2 != null) {
-                            ctx.setStroke(connection.getColor());
-                            ctx.strokeLine(
-                                    element1.getX() + (Values.ELEMENT_SIZE / 2.0),
-                                    element1.getY() + (Values.ELEMENT_SIZE / 2.0),
-                                    element2.getX() + (Values.ELEMENT_SIZE / 2.0),
-                                    element2.getY() + (Values.ELEMENT_SIZE / 2.0));
-                        }
-                    }
-                    ctx.setStroke(Color.BLACK);
-                    for (Element element : reversedList) {
-                        if (element == selectedElement) {
-                            ctx.strokeRect(
-                                    element.getX() - Values.ELEMENT_STROKE,
-                                    element.getY() - Values.ELEMENT_STROKE,
-                                    Values.ELEMENT_SIZE + Values.ELEMENT_STROKE * 2,
-                                    Values.ELEMENT_SIZE + Values.ELEMENT_STROKE * 2
-                            );
-                        }
-                        ctx.drawImage(element.getImage(), element.getX(), element.getY(), Values.ELEMENT_SIZE, Values.ELEMENT_SIZE);
-                    }
-
+                    clearScreen();
+                    drawConnections();
+                    drawElements();
                     if (!shouldUpdate) {
                         Thread.sleep(Values.ENGINE_MILLISECONDS_PAUSE);
                     }
                 }
                 return null;
+            }
+
+            private void clearScreen() {
+                ctx.clearRect(0, 0, ctx.getCanvas().getWidth(), ctx.getCanvas().getHeight());
+            }
+
+            private void drawConnections() {
+                List<Element> reversedList = new ArrayList<>(elementList);
+                Collections.reverse(reversedList);
+                for (Connection connection : connectionList) {
+                    Element element1 = getElementById(connection.getFirstId());
+                    Element element2 = getElementById(connection.getSecondId());
+                    if (element1 != null && element2 != null) {
+                        ctx.setStroke(connection.getColor());
+                        ctx.strokeLine(
+                                element1.getX() + (Values.ELEMENT_SIZE / 2.0),
+                                element1.getY() + (Values.ELEMENT_SIZE / 2.0),
+                                element2.getX() + (Values.ELEMENT_SIZE / 2.0),
+                                element2.getY() + (Values.ELEMENT_SIZE / 2.0));
+                    }
+                }
+            }
+
+            private void drawElements() {
+                ctx.setStroke(Color.BLACK);
+                List<Element> reversedList = new ArrayList<>(elementList);
+                Collections.reverse(reversedList);
+                for (Element element : reversedList) {
+                    if (element == selectedElement) {
+                        ctx.strokeRect(
+                                element.getX() - Values.ELEMENT_STROKE,
+                                element.getY() - Values.ELEMENT_STROKE,
+                                Values.ELEMENT_SIZE + Values.ELEMENT_STROKE * 2,
+                                Values.ELEMENT_SIZE + Values.ELEMENT_STROKE * 2
+                        );
+                    }
+                    ctx.drawImage(element.getImage(), element.getX(), element.getY(), Values.ELEMENT_SIZE, Values.ELEMENT_SIZE);
+                }
             }
         };
         new Thread(task).start();

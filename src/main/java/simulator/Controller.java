@@ -136,6 +136,7 @@ public class Controller implements Initializable {
             connectionRowView.setOnDeleteClickListener(this::onDeleteConnection);
             connectionsInfo.getChildren().add(connectionRowView);
         }
+        connectionsInfo.setVisible(true);
     }
 
     public void hideConnectionList() {
