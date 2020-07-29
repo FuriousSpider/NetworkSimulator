@@ -2,12 +2,11 @@ package simulator.element.device;
 
 import simulator.element.Connection;
 import simulator.element.Message;
-import simulator.element.device.Element;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class Router extends Element {
+public class Router extends Device {
     public static String fileName = "/router.png";
     public static String deviceType = "Router";
 
@@ -16,7 +15,7 @@ public class Router extends Element {
     }
 
     @Override
-    public List<Message> handleMessage(Element source, List<Connection> connectionList) {
+    public List<Message> handleMessage(Message message, List<Connection> connectionList) {
         return new ArrayList<>();
     }
 }

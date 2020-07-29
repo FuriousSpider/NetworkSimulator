@@ -41,6 +41,14 @@ public class Connection {
         return portPair.getKey().equals(port) || portPair.getValue().equals(port);
     }
 
+    public Port getOtherPort(Port port) {
+        if (port.equals(portPair.getKey())) {
+            return portPair.getValue();
+        } else {
+            return portPair.getKey();
+        }
+    }
+
     public Port getOtherPort(List<Port> portList) {
         for (Port port : portList) {
             if (port.equals(portPair.getKey())) {

@@ -6,7 +6,7 @@ import simulator.element.Message;
 import java.util.ArrayList;
 import java.util.List;
 
-public class EndDevice extends Element {
+public class EndDevice extends Device {
     public static String fileName = "/endDevice.png";
     public static String deviceType = "End Device";
 
@@ -15,7 +15,7 @@ public class EndDevice extends Element {
     }
 
     @Override
-    public List<Message> handleMessage(Element source, List<Connection> connectionList) {
+    public List<Message> handleMessage(Message message, List<Connection> connectionList) {
         return new ArrayList<>();
     }
 }

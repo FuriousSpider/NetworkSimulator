@@ -20,7 +20,7 @@ public class ConnectionRowView extends HBox {
     public ConnectionRowView(Connection connection, Port port) {
         this.id = connection.getId();
         Engine engine = Engine.getInstance();
-        Label connectedWith = new Label(engine.getElementById(port.getId().getKey()).getDeviceType());
+        Label connectedWith = new Label(engine.getDeviceByPort(port).getDeviceType());
         Label colorLabel = new Label();
         Button deleteConnection = new Button("Remove");
 

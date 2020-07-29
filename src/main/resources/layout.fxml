@@ -21,18 +21,26 @@
         <VBox styleClass="rightLayout">
             <StackPane>
                 <GridPane fx:id="elementInfo">
-                    <Label text="Device info" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
-                    <Label text="Device type: " GridPane.columnIndex="0" GridPane.rowIndex="1"/>
-                    <Label fx:id="elementInfoDeviceType" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
-                    <Button onAction="#handleConnectElementsButtonClick" text="Connect" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
-                    <Button onAction="#handleRemoveElementButtonClick" text="Remove" GridPane.columnIndex="0" GridPane.rowIndex="3"/>
+                    <Label text="Device info" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                    <Label text="Device type: " GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                    <Label fx:id="elementInfoDeviceType" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+                    <Label text="MAC address: " GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+                    <Label fx:id="elementInfoMacAddress" GridPane.rowIndex="2" GridPane.columnIndex="1" onMouseClicked="#handleElementInfoMacAddressClick"/>
+                    <Button onAction="#handleConnectElementsButtonClick" text="Connect" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+                    <Button onAction="#handleRemoveElementButtonClick" text="Remove" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
                 </GridPane>
             </StackPane>
             <VBox fx:id="connectionsInfo"/>
-            <HBox fx:id="simulationViewGroup">
+            <VBox>
+                <GridPane>
+                    <Label text="Source MAC: " GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                    <TextField fx:id="simulationSourceMac" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+                    <Label text="Destination MAC: " GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                    <TextField fx:id="simulationDestinationMac" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+                </GridPane>
                 <Button text="Simulate" onAction="#handleStartSimulationButtonClick" />
                 <Button text="Stop simulation" onAction="#handleStopSimulationButtonClick" />
-            </HBox>
+            </VBox>
         </VBox>
     </right>
     <bottom>

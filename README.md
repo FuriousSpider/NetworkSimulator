@@ -2,8 +2,8 @@
 A simple application that presents how network devices work.
 
 Controls:  
-left mouse button - select or move an element  
+left mouse button - select or move an device  
 middle mouse button - move all elements  
-ESC - deselect element / quit connecting  
-DELETE - remove selected element  
+ESC - deselect device / quit connecting  
+DELETE - remove selected device  
 c - connect elements

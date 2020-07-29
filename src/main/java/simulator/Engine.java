@@ -2,11 +2,13 @@ package simulator;
 
 import javafx.concurrent.Task;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.ClipboardContent;
 import javafx.scene.paint.Color;
 import javafx.util.Pair;
 import simulator.element.Connection;
 import simulator.element.Port;
-import simulator.element.device.Element;
+import simulator.element.device.Device;
 import simulator.element.Message;
 import util.Values;
 
@@ -18,24 +20,24 @@ public class Engine {
     private static final Engine INSTANCE = new Engine();
     private Controller controller;
     private GraphicsContext ctx;
-    private final List<Element> elementList;
+    private final List<Device> deviceList;
     private final List<Connection> connectionList;
     private final List<Message> messageList;
     private Integer elementToConnect;
-    private Element presentlyClickedElement;
-    private Element selectedElement;
+    private Device presentlyClickedDevice;
+    private Device selectedDevice;
     private boolean shouldUpdate;
     private static boolean closeTask;
     private boolean runSimulation;
     private Pair<Integer, Integer> mousePosition;
 
     private Engine() {
-        this.elementList = new ArrayList<>();
+        this.deviceList = new ArrayList<>();
         this.connectionList = new ArrayList<>();
         this.messageList = new ArrayList<>();
         this.elementToConnect = null;
-        this.presentlyClickedElement = null;
-        this.selectedElement = null;
+        this.presentlyClickedDevice = null;
+        this.selectedDevice = null;
         this.shouldUpdate = false;
         closeTask = false;
         this.runSimulation = false;
@@ -62,31 +64,58 @@ public class Engine {
         ctx.setLineWidth(2.0);
     }
 
-    public Element getElementById(int id) {
-        for (Element element : elementList) {
-            if (element.getId() == id) {
-                return element;
+    public Device getDeviceById(int id) {
+        for (Device device : deviceList) {
+            if (device.getId() == id) {
+                return device;
             }
         }
         return null;
     }
 
-    public void addDevice(Element element) {
-        this.elementList.add(0, element);
+    public Device getDeviceByPort(Port port) {
+        for (Device device : deviceList) {
+            if (device.getPortList().contains(port)) {
+                return device;
+            }
+        }
+        return null;
+    }
+
+    public Device getDeviceByMac(String macAddress) {
+        for (Device device : deviceList) {
+            if (device.getMacAddress().equals(macAddress)) {
+                return device;
+            }
+        }
+        return null;
+    }
+
+    public Connection getConnectionByPort(Port port) {
+        for (Connection connection : connectionList) {
+            if (connection.containsPort(port)) {
+                return connection;
+            }
+        }
+        return null;
+    }
+
+    public void addDevice(Device device) {
+        this.deviceList.add(0, device);
         shouldUpdate = true;
     }
 
-    public void selectElement(int x, int y) {
+    public void selectDevice(int x, int y) {
         if (elementToConnect != null) {
             connectTo(x, y);
         } else {
-            for (Element element : elementList) {
-                if (x >= element.getX() && x <= element.getX() + Values.ELEMENT_SIZE && y >= element.getY() && y <= element.getY() + Values.ELEMENT_SIZE) {
-                    if (presentlyClickedElement != element) {
-                        presentlyClickedElement = element;
-                        selectedElement = presentlyClickedElement;
-                        controller.showElementInfo(selectedElement);
-                        controller.showConnectionList(selectedElement, getElementConnections(selectedElement));
+            for (Device device : deviceList) {
+                if (x >= device.getX() && x <= device.getX() + Values.DEVICE_SIZE && y >= device.getY() && y <= device.getY() + Values.DEVICE_SIZE) {
+                    if (presentlyClickedDevice != device) {
+                        presentlyClickedDevice = device;
+                        selectedDevice = presentlyClickedDevice;
+                        controller.showDeviceInfo(selectedDevice);
+                        controller.showConnectionList(selectedDevice, getDeviceConnections(selectedDevice));
                     }
                     break;
                 }
@@ -95,8 +124,8 @@ public class Engine {
         }
     }
 
-    public void deselectElement() {
-        presentlyClickedElement = null;
+    public void deselectDevice() {
+        presentlyClickedDevice = null;
         shouldUpdate = true;
     }
 
@@ -104,8 +133,8 @@ public class Engine {
         if (elementToConnect != null) {
             elementToConnect = null;
         } else {
-            presentlyClickedElement = null;
-            selectedElement = null;
+            presentlyClickedDevice = null;
+            selectedDevice = null;
             controller.hideElementInfo();
             controller.hideConnectionList();
         }
@@ -113,8 +142,8 @@ public class Engine {
 
     public void removeSelectedElement() {
         removeConnections();
-        elementList.remove(selectedElement);
-        selectedElement = null;
+        deviceList.remove(selectedDevice);
+        selectedDevice = null;
         controller.hideElementInfo();
         controller.hideConnectionList();
     }
@@ -127,13 +156,13 @@ public class Engine {
                 break;
             }
         }
-        controller.showConnectionList(selectedElement, getElementConnections(selectedElement));
+        controller.showConnectionList(selectedDevice, getDeviceConnections(selectedDevice));
     }
 
     private void removeConnections() {
-        if (selectedElement == null) return;
+        if (selectedDevice == null) return;
         List<Connection> connectionsToRemove = new ArrayList<>();
-        for (Port port : selectedElement.getPortList()) {
+        for (Port port : selectedDevice.getPortList()) {
             for (Connection connection : connectionList) {
                 if (connection.containsPort(port)) {
                     connectionsToRemove.add(connection);
@@ -149,14 +178,14 @@ public class Engine {
     }
 
     private void removeConnectionPorts(Connection connection) {
-        getElementById(connection.getFirstElementId()).removePort(connection.getPortPair().getKey());
-        getElementById(connection.getSecondElementId()).removePort(connection.getPortPair().getValue());
+        getDeviceById(connection.getFirstElementId()).removePort(connection.getPortPair().getKey());
+        getDeviceById(connection.getSecondElementId()).removePort(connection.getPortPair().getValue());
     }
 
     public void moveElement(int x, int y) {
-        if (presentlyClickedElement != null && mousePosition != null) {
-            presentlyClickedElement.setX(presentlyClickedElement.getX() + (x - mousePosition.getKey()));
-            presentlyClickedElement.setY(presentlyClickedElement.getY() + (y - mousePosition.getValue()));
+        if (presentlyClickedDevice != null && mousePosition != null) {
+            presentlyClickedDevice.setX(presentlyClickedDevice.getX() + (x - mousePosition.getKey()));
+            presentlyClickedDevice.setY(presentlyClickedDevice.getY() + (y - mousePosition.getValue()));
             mousePosition = new Pair<>(x, y);
         }
     }
@@ -171,32 +200,32 @@ public class Engine {
 
     public void moveAll(int x, int y) {
         if (mousePosition != null) {
-            for (Element element : elementList) {
-                element.setX(element.getX() + (x - mousePosition.getKey()));
-                element.setY(element.getY() + (y - mousePosition.getValue()));
+            for (Device device : deviceList) {
+                device.setX(device.getX() + (x - mousePosition.getKey()));
+                device.setY(device.getY() + (y - mousePosition.getValue()));
             }
             mousePosition = new Pair<>(x, y);
         }
     }
 
     public void onConnectClicked() {
-        if (selectedElement != null) {
-            elementToConnect = selectedElement.getId();
+        if (selectedDevice != null) {
+            elementToConnect = selectedDevice.getId();
         }
     }
 
     private void connectTo(int x, int y) {
-        for (Element element : elementList) {
-            if (x >= element.getX() && x <= element.getX() + Values.ELEMENT_SIZE && y >= element.getY() && y <= element.getY() + Values.ELEMENT_SIZE) {
-                if (!elementToConnect.equals(element.getId())) {
-                    if (!connectionAlreadyExists(elementToConnect, element.getId())) {
-                        connectionList.add(new Connection(getElementById(elementToConnect).getNewPort() , element.getNewPort()));
+        for (Device device : deviceList) {
+            if (x >= device.getX() && x <= device.getX() + Values.DEVICE_SIZE && y >= device.getY() && y <= device.getY() + Values.DEVICE_SIZE) {
+                if (!elementToConnect.equals(device.getId())) {
+                    if (!connectionAlreadyExists(elementToConnect, device.getId())) {
+                        connectionList.add(new Connection(getDeviceById(elementToConnect).getNewPort() , device.getNewPort()));
                     }
                     elementToConnect = null;
                 }
             }
         }
-        controller.showConnectionList(selectedElement, getElementConnections(selectedElement));
+        controller.showConnectionList(selectedDevice, getDeviceConnections(selectedDevice));
     }
 
     private boolean connectionAlreadyExists(Integer id1, int id2) {
@@ -209,9 +238,9 @@ public class Engine {
         return false;
     }
 
-    private List<Connection> getElementConnections(Element element) {
+    private List<Connection> getDeviceConnections(Device device) {
         List<Connection> selectedElementConnections = new ArrayList<>();
-        for (Port port : element.getPortList()) {
+        for (Port port : device.getPortList()) {
             for (Connection connection : connectionList) {
                 if (connection.containsPort(port)) {
                     selectedElementConnections.add(connection);
@@ -221,7 +250,13 @@ public class Engine {
         return selectedElementConnections;
     }
 
-        public static void stopEngine() {
+    public void copyToClipboard(String text) {
+        ClipboardContent clipboardContent = new ClipboardContent();
+        clipboardContent.putString(text);
+        Clipboard.getSystemClipboard().setContent(clipboardContent);
+    }
+
+    public static void stopEngine() {
         closeTask = true;
     }
 
@@ -247,36 +282,36 @@ public class Engine {
             }
 
             private void drawConnections() {
-                List<Element> reversedList = new ArrayList<>(elementList);
+                List<Device> reversedList = new ArrayList<>(deviceList);
                 Collections.reverse(reversedList);
                 for (Connection connection : connectionList) {
-                    Element element1 = getElementById(connection.getFirstElementId());
-                    Element element2 = getElementById(connection.getSecondElementId());
-                    if (element1 != null && element2 != null) {
+                    Device device1 = getDeviceById(connection.getFirstElementId());
+                    Device device2 = getDeviceById(connection.getSecondElementId());
+                    if (device1 != null && device2 != null) {
                         ctx.setStroke(connection.getColor());
                         ctx.strokeLine(
-                                element1.getX() + (Values.ELEMENT_SIZE / 2.0),
-                                element1.getY() + (Values.ELEMENT_SIZE / 2.0),
-                                element2.getX() + (Values.ELEMENT_SIZE / 2.0),
-                                element2.getY() + (Values.ELEMENT_SIZE / 2.0));
+                                device1.getX() + (Values.DEVICE_SIZE / 2.0),
+                                device1.getY() + (Values.DEVICE_SIZE / 2.0),
+                                device2.getX() + (Values.DEVICE_SIZE / 2.0),
+                                device2.getY() + (Values.DEVICE_SIZE / 2.0));
                     }
                 }
             }
 
             private void drawElements() {
                 ctx.setStroke(Color.BLACK);
-                List<Element> reversedList = new ArrayList<>(elementList);
+                List<Device> reversedList = new ArrayList<>(deviceList);
                 Collections.reverse(reversedList);
-                for (Element element : reversedList) {
-                    if (element == selectedElement) {
+                for (Device element : reversedList) {
+                    if (element == selectedDevice) {
                         ctx.strokeRect(
-                                element.getX() - Values.ELEMENT_STROKE,
-                                element.getY() - Values.ELEMENT_STROKE,
-                                Values.ELEMENT_SIZE + Values.ELEMENT_STROKE * 2,
-                                Values.ELEMENT_SIZE + Values.ELEMENT_STROKE * 2
+                                element.getX() - Values.DEVICE_STROKE,
+                                element.getY() - Values.DEVICE_STROKE,
+                                Values.DEVICE_SIZE + Values.DEVICE_STROKE * 2,
+                                Values.DEVICE_SIZE + Values.DEVICE_STROKE * 2
                         );
                     }
-                    ctx.drawImage(element.getImage(), element.getX(), element.getY(), Values.ELEMENT_SIZE, Values.ELEMENT_SIZE);
+                    ctx.drawImage(element.getImage(), element.getX(), element.getY(), Values.DEVICE_SIZE, Values.DEVICE_SIZE);
                 }
             }
 
@@ -289,12 +324,12 @@ public class Engine {
         new Thread(task).start();
     }
 
-    public void startSimulation() {
+    public void startSimulation(String sourceMac, String destinationMac) {
         if (runSimulation) return;
         Task<Void> task = new Task<>() {
             @Override
             protected Void call() throws Exception {
-                prepareSimulation();
+                prepareSimulation(sourceMac, destinationMac);
                 while(runSimulation) {
                     nextSimulationStep();
                     checkSimulationProgress();
@@ -303,20 +338,16 @@ public class Engine {
                 return null;
             }
 
-            private void prepareSimulation() {
+            private void prepareSimulation(String sourceMac, String destinationMac) {
                 runSimulation = true;
                 messageList.clear();
-                for (Connection connection : getElementConnections(selectedElement)) {
-                    int idFrom;
-                    int idTo;
-                    if (connection.getFirstElementId() == selectedElement.getId()) {
-                        idFrom = connection.getFirstElementId();
-                        idTo = connection.getSecondElementId();
-                    } else {
-                        idFrom = connection.getSecondElementId();
-                        idTo = connection.getFirstElementId();
+                Device sourceDevice = getDeviceByMac(sourceMac);
+                if (sourceDevice != null) {
+                    for (Port port : sourceDevice.getPortList()) {
+                        messageList.add(new Message(sourceMac, destinationMac, port, getConnectionByPort(port).getOtherPort(port)));
                     }
-                    messageList.add(new Message(getElementById(idFrom), getElementById(idTo)));
+                } else {
+                    runSimulation = false;
                 }
             }
 
@@ -325,13 +356,7 @@ public class Engine {
                 List<Message> messagesToAdd = new ArrayList<>();
                 for (Message message : messageList) {
                     if (message.getProgress() >= Values.MESSAGE_PROGRESS_MAX) {
-                        List<Connection> elementConnectionList = new ArrayList<>();
-                        for (Connection connection : connectionList) {
-                            if (connection.getFirstElementId() == message.getTo().getId() || connection.getSecondElementId() == message.getTo().getId()) {
-                                elementConnectionList.add(connection);
-                            }
-                        }
-                        messagesToAdd.addAll(message.getTo().handleMessage(message.getFrom(), elementConnectionList));
+                        messagesToAdd.addAll(getDeviceByPort(message.getCurrentDestinationPort()).handleMessage(message, getDeviceConnections(getDeviceByPort(message.getCurrentDestinationPort()))));
                         messagesToRemove.add(message);
                     } else {
                         message.nextStep();

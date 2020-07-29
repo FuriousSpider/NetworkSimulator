@@ -4,24 +4,27 @@ import javafx.scene.image.Image;
 import simulator.element.Connection;
 import simulator.element.Message;
 import simulator.element.Port;
+import util.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
 
-abstract public class Element {
+abstract public class Device {
     private final int id;
     private final Image image;
     private int x;
     private int y;
     private final String deviceType;
+    private final String macAddress;
     private final List<Port> portList;
     private static int idCounter = 0;
 
-    protected Element(String imagePath, int x, int y, String deviceType) {
+    protected Device(String imagePath, int x, int y, String deviceType) {
         this.image = new Image(imagePath);
         this.x = x;
         this.y = y;
         this.deviceType = deviceType;
+        this.macAddress = Utils.generateMacAddress();
         this.id = idCounter++;
         this.portList = new ArrayList<>();
     }
@@ -48,6 +51,10 @@ abstract public class Element {
         return port;
     }
 
+    public String getMacAddress() {
+        return macAddress;
+    }
+
     public String getDeviceType() {
         return deviceType;
     }
@@ -68,5 +75,5 @@ abstract public class Element {
         portList.remove(port);
     }
 
-    public abstract List<Message> handleMessage(Element source, List<Connection> connectionList);
+    public abstract List<Message> handleMessage(Message message, List<Connection> connectionList);
 }

@@ -3,6 +3,7 @@ package simulator;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
@@ -30,7 +31,11 @@ public class Controller implements Initializable {
     @FXML
     private Label elementInfoDeviceType;
     @FXML
-    private HBox simulationViewGroup;
+    private Label elementInfoMacAddress;
+    @FXML
+    private TextField simulationSourceMac;
+    @FXML
+    private TextField simulationDestinationMac;
     private Engine engine;
 
     @Override
@@ -51,27 +56,27 @@ public class Controller implements Initializable {
 
     @FXML
     private void handleEndDeviceButtonClick() {
-        engine.addDevice(new EndDevice(Values.ELEMENT_DEFAULT_POSITION, Values.ELEMENT_DEFAULT_POSITION));
+        engine.addDevice(new EndDevice(Values.DEVICE_DEFAULT_POSITION, Values.DEVICE_DEFAULT_POSITION));
     }
 
     @FXML
     private void handleHubButtonClick() {
-        engine.addDevice(new Hub(Values.ELEMENT_DEFAULT_POSITION, Values.ELEMENT_DEFAULT_POSITION));
+        engine.addDevice(new Hub(Values.DEVICE_DEFAULT_POSITION, Values.DEVICE_DEFAULT_POSITION));
     }
 
     @FXML
     private void handleSwitchButtonClick() {
-        engine.addDevice(new Switch(Values.ELEMENT_DEFAULT_POSITION, Values.ELEMENT_DEFAULT_POSITION));
+        engine.addDevice(new Switch(Values.DEVICE_DEFAULT_POSITION, Values.DEVICE_DEFAULT_POSITION));
     }
 
     @FXML
     private void handleRouterButtonClick() {
-        engine.addDevice(new Router(Values.ELEMENT_DEFAULT_POSITION, Values.ELEMENT_DEFAULT_POSITION));
+        engine.addDevice(new Router(Values.DEVICE_DEFAULT_POSITION, Values.DEVICE_DEFAULT_POSITION));
     }
 
     @FXML
     private void handleFirewallButtonClick() {
-        engine.addDevice(new Firewall(Values.ELEMENT_DEFAULT_POSITION, Values.ELEMENT_DEFAULT_POSITION));
+        engine.addDevice(new Firewall(Values.DEVICE_DEFAULT_POSITION, Values.DEVICE_DEFAULT_POSITION));
     }
 
     @FXML
@@ -85,8 +90,13 @@ public class Controller implements Initializable {
     }
 
     @FXML
+    private void handleElementInfoMacAddressClick() {
+        engine.copyToClipboard(elementInfoMacAddress.getText());
+    }
+
+    @FXML
     private void handleStartSimulationButtonClick() {
-        engine.startSimulation();
+        engine.startSimulation(simulationSourceMac.getText(), simulationDestinationMac.getText());
     }
 
     @FXML
@@ -97,7 +107,7 @@ public class Controller implements Initializable {
     private void canvasMousePressed(MouseEvent mouseEvent) {
         engine.onMousePressed((int) mouseEvent.getX(), (int) mouseEvent.getY());
         if (mouseEvent.getButton() == MouseButton.PRIMARY) {
-            engine.selectElement((int) mouseEvent.getX(), (int) mouseEvent.getY());
+            engine.selectDevice((int) mouseEvent.getX(), (int) mouseEvent.getY());
         }
     }
 
@@ -112,7 +122,7 @@ public class Controller implements Initializable {
     private void canvasMouseReleased(MouseEvent mouseEvent) {
         engine.onMouseReleased();
         if (mouseEvent.getButton() == MouseButton.PRIMARY) {
-            engine.deselectElement();
+            engine.deselectDevice();
         }
     }
 
@@ -126,19 +136,20 @@ public class Controller implements Initializable {
         }
     }
 
-    public void showElementInfo(Element selectedElement) {
+    public void showDeviceInfo(Device selectedDevice) {
         elementInfo.setVisible(true);
-        elementInfoDeviceType.setText(selectedElement.getDeviceType());
+        elementInfoDeviceType.setText(selectedDevice.getDeviceType());
+        elementInfoMacAddress.setText(selectedDevice.getMacAddress());
     }
 
     public void hideElementInfo() {
         elementInfo.setVisible(false);
     }
 
-    public void showConnectionList(Element selectedElement, List<Connection> connectionList) {
+    public void showConnectionList(Device selectedDevice, List<Connection> connectionList) {
         connectionsInfo.getChildren().clear();
         for (Connection connection : connectionList) {
-            Port other = connection.getOtherPort(selectedElement.getPortList());
+            Port other = connection.getOtherPort(selectedDevice.getPortList());
             ConnectionRowView connectionRowView = new ConnectionRowView(connection, other);
             connectionRowView.setOnDeleteClickListener(this::onDeleteConnection);
             connectionsInfo.getChildren().add(connectionRowView);
@@ -152,13 +163,5 @@ public class Controller implements Initializable {
 
     private void onDeleteConnection(int id) {
         engine.removeConnection(id);
-    }
-
-    public void showSimulationButton() {
-        simulationViewGroup.setVisible(true);
-    }
-
-    public void hideSimulationButton() {
-        simulationViewGroup.setVisible(false);
     }
 }

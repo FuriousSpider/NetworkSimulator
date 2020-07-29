@@ -1,13 +1,12 @@
 package simulator.element.device;
 
-import simulator.Engine;
 import simulator.element.Connection;
 import simulator.element.Message;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class Hub extends Element {
+public class Hub extends Device {
     public static String fileName = "/hub.png";
     public static String deviceType = "Hub";
 
@@ -16,17 +15,15 @@ public class Hub extends Element {
     }
 
     @Override
-    public List<Message> handleMessage(Element source, List<Connection> connectionList) {
+    public List<Message> handleMessage(Message message, List<Connection> connectionList) {
         List<Message> messageList = new ArrayList<>();
         for (Connection connection : connectionList) {
-            Element other;
-            if (Engine.getInstance().getElementById(connection.getFirstElementId()) == this) {
-                other = Engine.getInstance().getElementById(connection.getSecondElementId());
-            } else {
-                other = Engine.getInstance().getElementById(connection.getFirstElementId());
-            }
-            if (other != source) {
-                messageList.add(new Message(this, other));
+            if (!connection.containsPort(message.getCurrentDestinationPort())) {
+                if (connection.getFirstElementId() == this.getId()) {
+                    messageList.add(new Message(message, connection.getPortPair().getKey(), connection.getPortPair().getValue()));
+                } else {
+                    messageList.add(new Message(message, connection.getPortPair().getValue(), connection.getPortPair().getKey()));
+                }
             }
         }
         return messageList;
