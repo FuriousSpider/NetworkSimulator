@@ -7,11 +7,9 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import simulator.element.*;
+import simulator.element.device.*;
 import simulator.view.ConnectionRowView;
 import util.Values;
 import view.CanvasPane;
@@ -31,13 +29,17 @@ public class Controller implements Initializable {
     private VBox connectionsInfo;
     @FXML
     private Label elementInfoDeviceType;
+    @FXML
+    private HBox simulationViewGroup;
     private Engine engine;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         CanvasPane canvas = new CanvasPane(canvasPane.getWidth(), canvasPane.getHeight());
         canvasPane.getChildren().add(canvas);
-        engine = new Engine(this, canvas.getCanvas().getGraphicsContext2D());
+        engine = Engine.getInstance();
+        engine.setController(this);
+        engine.setGraphicsContext(canvas.getCanvas().getGraphicsContext2D());
 
         canvas.getCanvas().setOnMouseDragged(this::canvasMouseDragged);
         canvas.getCanvas().setOnMousePressed(this::canvasMousePressed);
@@ -82,6 +84,16 @@ public class Controller implements Initializable {
         engine.onConnectClicked();
     }
 
+    @FXML
+    private void handleStartSimulationButtonClick() {
+        engine.startSimulation();
+    }
+
+    @FXML
+    private void handleStopSimulationButtonClick() {
+        engine.stopSimulation();
+    }
+
     private void canvasMousePressed(MouseEvent mouseEvent) {
         engine.onMousePressed((int) mouseEvent.getX(), (int) mouseEvent.getY());
         if (mouseEvent.getButton() == MouseButton.PRIMARY) {
@@ -123,16 +135,11 @@ public class Controller implements Initializable {
         elementInfo.setVisible(false);
     }
 
-    public void showConnectionList(int selectedId, List<Connection> connectionList) {
+    public void showConnectionList(Element selectedElement, List<Connection> connectionList) {
         connectionsInfo.getChildren().clear();
         for (Connection connection : connectionList) {
-            int id;
-            if (selectedId != connection.getFirstId()) {
-                id = connection.getFirstId();
-            } else {
-                id = connection.getSecondId();
-            }
-            ConnectionRowView connectionRowView = new ConnectionRowView(id, engine.getElementById(id).getDeviceType(), connection.getColor());
+            Port other = connection.getOtherPort(selectedElement.getPortList());
+            ConnectionRowView connectionRowView = new ConnectionRowView(connection, other);
             connectionRowView.setOnDeleteClickListener(this::onDeleteConnection);
             connectionsInfo.getChildren().add(connectionRowView);
         }
@@ -145,5 +152,13 @@ public class Controller implements Initializable {
 
     private void onDeleteConnection(int id) {
         engine.removeConnection(id);
+    }
+
+    public void showSimulationButton() {
+        simulationViewGroup.setVisible(true);
+    }
+
+    public void hideSimulationButton() {
+        simulationViewGroup.setVisible(false);
     }
 }

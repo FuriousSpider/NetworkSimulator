@@ -8,20 +8,23 @@ import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.HBox;
-import javafx.scene.paint.Color;
+import simulator.Engine;
+import simulator.element.Connection;
+import simulator.element.Port;
 import util.Values;
 
 public class ConnectionRowView extends HBox {
     private final int id;
     private OnDeleteClickListener onDeleteClickListener;
 
-    public ConnectionRowView(int id, String connectedWithName, Color color) {
-        this.id = id;
-        Label connectedWith = new Label(connectedWithName);
+    public ConnectionRowView(Connection connection, Port port) {
+        this.id = connection.getId();
+        Engine engine = Engine.getInstance();
+        Label connectedWith = new Label(engine.getElementById(port.getId().getKey()).getDeviceType());
         Label colorLabel = new Label();
         Button deleteConnection = new Button("Remove");
 
-        colorLabel.setBackground(new Background(new BackgroundFill(color, CornerRadii.EMPTY, Insets.EMPTY)));
+        colorLabel.setBackground(new Background(new BackgroundFill(connection.getColor(), CornerRadii.EMPTY, Insets.EMPTY)));
         colorLabel.setMinHeight(Values.LABEL_COLOR_MIN_HEIGHT);
         colorLabel.setMinWidth(Values.LABEL_COLOR_MIN_WIDHT);
         deleteConnection.setOnMouseClicked(this::onMouseClicked);

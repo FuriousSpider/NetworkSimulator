@@ -12,4 +12,8 @@ public class Values {
 
     public static double LABEL_COLOR_MIN_HEIGHT = 20.0;
     public static double LABEL_COLOR_MIN_WIDHT = 50.0;
+
+    public static int MESSAGE_SIZE = 50;
+    public static int MESSAGE_PROGRESS_MAX = 100;
+    public static int MESSAGE_PROGRESS_STEP = 3;
 }

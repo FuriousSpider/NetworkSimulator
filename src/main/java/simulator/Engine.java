@@ -3,10 +3,11 @@ package simulator;
 import javafx.concurrent.Task;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
 import javafx.util.Pair;
 import simulator.element.Connection;
-import simulator.element.Element;
+import simulator.element.Port;
+import simulator.element.device.Element;
+import simulator.element.Message;
 import util.Values;
 
 import java.util.ArrayList;
@@ -14,28 +15,43 @@ import java.util.Collections;
 import java.util.List;
 
 public class Engine {
-    private final Controller controller;
-    private final GraphicsContext ctx;
+    private static final Engine INSTANCE = new Engine();
+    private Controller controller;
+    private GraphicsContext ctx;
     private final List<Element> elementList;
     private final List<Connection> connectionList;
+    private final List<Message> messageList;
     private Integer elementToConnect;
     private Element presentlyClickedElement;
     private Element selectedElement;
     private boolean shouldUpdate;
     private static boolean closeTask;
+    private boolean runSimulation;
     private Pair<Integer, Integer> mousePosition;
 
-    public Engine(Controller controller, GraphicsContext context) {
-        this.controller = controller;
-        this.ctx = context;
+    private Engine() {
         this.elementList = new ArrayList<>();
         this.connectionList = new ArrayList<>();
+        this.messageList = new ArrayList<>();
         this.elementToConnect = null;
         this.presentlyClickedElement = null;
         this.selectedElement = null;
         this.shouldUpdate = false;
         closeTask = false;
+        this.runSimulation = false;
         this.mousePosition = null;
+    }
+
+    public static Engine getInstance() {
+        return INSTANCE;
+    }
+
+    public void setController(Controller controller) {
+        this.controller = controller;
+    }
+
+    public void setGraphicsContext(GraphicsContext context) {
+        this.ctx = context;
 
         setCtxConfig();
         startEngine();
@@ -70,7 +86,7 @@ public class Engine {
                         presentlyClickedElement = element;
                         selectedElement = presentlyClickedElement;
                         controller.showElementInfo(selectedElement);
-                        controller.showConnectionList(selectedElement.getId(), getSelectedElementConnections());
+                        controller.showConnectionList(selectedElement, getElementConnections(selectedElement));
                     }
                     break;
                 }
@@ -105,25 +121,36 @@ public class Engine {
 
     public void removeConnection(int id) {
         for (Connection connection : connectionList) {
-            if ((connection.getFirstId() == id && connection.getSecondId() == selectedElement.getId()) || (connection.getSecondId() == id && connection.getFirstId() == selectedElement.getId())) {
+            if (connection.getId() == id) {
                 connectionList.remove(connection);
+                removeConnectionPorts(connection);
                 break;
             }
         }
-        controller.showConnectionList(selectedElement.getId(), getSelectedElementConnections());
+        controller.showConnectionList(selectedElement, getElementConnections(selectedElement));
     }
 
     private void removeConnections() {
         if (selectedElement == null) return;
         List<Connection> connectionsToRemove = new ArrayList<>();
-        for (Connection connection : connectionList) {
-            if (selectedElement.getId() == connection.getFirstId() || selectedElement.getId() == connection.getSecondId()) {
-                connectionsToRemove.add(connection);
+        for (Port port : selectedElement.getPortList()) {
+            for (Connection connection : connectionList) {
+                if (connection.containsPort(port)) {
+                    connectionsToRemove.add(connection);
+                }
             }
         }
         if (!connectionsToRemove.isEmpty()) {
+            for (Connection connection : connectionsToRemove) {
+                removeConnectionPorts(connection);
+            }
             connectionList.removeAll(connectionsToRemove);
         }
+    }
+
+    private void removeConnectionPorts(Connection connection) {
+        getElementById(connection.getFirstElementId()).removePort(connection.getPortPair().getKey());
+        getElementById(connection.getSecondElementId()).removePort(connection.getPortPair().getValue());
     }
 
     public void moveElement(int x, int y) {
@@ -163,35 +190,38 @@ public class Engine {
             if (x >= element.getX() && x <= element.getX() + Values.ELEMENT_SIZE && y >= element.getY() && y <= element.getY() + Values.ELEMENT_SIZE) {
                 if (!elementToConnect.equals(element.getId())) {
                     if (!connectionAlreadyExists(elementToConnect, element.getId())) {
-                        connectionList.add(new Connection(elementToConnect, element.getId()));
+                        connectionList.add(new Connection(getElementById(elementToConnect).getNewPort() , element.getNewPort()));
                     }
                     elementToConnect = null;
                 }
             }
         }
-        controller.showConnectionList(selectedElement.getId(), getSelectedElementConnections());
+        controller.showConnectionList(selectedElement, getElementConnections(selectedElement));
     }
 
     private boolean connectionAlreadyExists(Integer id1, int id2) {
         for (Connection connection : connectionList) {
-            if ((id1.equals(connection.getFirstId()) && id2 == connection.getSecondId()) || (id1.equals(connection.getSecondId()) && id2 == connection.getFirstId())) {
+            if (id1.equals(connection.getFirstElementId()) && id2 == connection.getSecondElementId()
+            || id2 == connection.getFirstElementId() && id1.equals(connection.getSecondElementId())) {
                 return true;
             }
         }
         return false;
     }
 
-    private List<Connection> getSelectedElementConnections() {
+    private List<Connection> getElementConnections(Element element) {
         List<Connection> selectedElementConnections = new ArrayList<>();
-        for (Connection connection : connectionList) {
-            if (connection.getFirstId() == selectedElement.getId() || connection.getSecondId() == selectedElement.getId()) {
-                selectedElementConnections.add(connection);
+        for (Port port : element.getPortList()) {
+            for (Connection connection : connectionList) {
+                if (connection.containsPort(port)) {
+                    selectedElementConnections.add(connection);
+                }
             }
         }
         return selectedElementConnections;
     }
 
-    public static void stopEngine() {
+        public static void stopEngine() {
         closeTask = true;
     }
 
@@ -204,6 +234,7 @@ public class Engine {
                     clearScreen();
                     drawConnections();
                     drawElements();
+                    drawMessages();
                     if (!shouldUpdate) {
                         Thread.sleep(Values.ENGINE_MILLISECONDS_PAUSE);
                     }
@@ -219,8 +250,8 @@ public class Engine {
                 List<Element> reversedList = new ArrayList<>(elementList);
                 Collections.reverse(reversedList);
                 for (Connection connection : connectionList) {
-                    Element element1 = getElementById(connection.getFirstId());
-                    Element element2 = getElementById(connection.getSecondId());
+                    Element element1 = getElementById(connection.getFirstElementId());
+                    Element element2 = getElementById(connection.getSecondElementId());
                     if (element1 != null && element2 != null) {
                         ctx.setStroke(connection.getColor());
                         ctx.strokeLine(
@@ -248,7 +279,83 @@ public class Engine {
                     ctx.drawImage(element.getImage(), element.getX(), element.getY(), Values.ELEMENT_SIZE, Values.ELEMENT_SIZE);
                 }
             }
+
+            private void drawMessages() {
+                for (Message message : messageList) {
+                    ctx.drawImage(message.getImage(), message.getX(), message.getY(), Values.MESSAGE_SIZE, Values.MESSAGE_SIZE);
+                }
+            }
         };
         new Thread(task).start();
+    }
+
+    public void startSimulation() {
+        if (runSimulation) return;
+        Task<Void> task = new Task<>() {
+            @Override
+            protected Void call() throws Exception {
+                prepareSimulation();
+                while(runSimulation) {
+                    nextSimulationStep();
+                    checkSimulationProgress();
+                    Thread.sleep(Values.ENGINE_MILLISECONDS_PAUSE);
+                }
+                return null;
+            }
+
+            private void prepareSimulation() {
+                runSimulation = true;
+                messageList.clear();
+                for (Connection connection : getElementConnections(selectedElement)) {
+                    int idFrom;
+                    int idTo;
+                    if (connection.getFirstElementId() == selectedElement.getId()) {
+                        idFrom = connection.getFirstElementId();
+                        idTo = connection.getSecondElementId();
+                    } else {
+                        idFrom = connection.getSecondElementId();
+                        idTo = connection.getFirstElementId();
+                    }
+                    messageList.add(new Message(getElementById(idFrom), getElementById(idTo)));
+                }
+            }
+
+            private void nextSimulationStep() {
+                List<Message> messagesToRemove = new ArrayList<>();
+                List<Message> messagesToAdd = new ArrayList<>();
+                for (Message message : messageList) {
+                    if (message.getProgress() >= Values.MESSAGE_PROGRESS_MAX) {
+                        List<Connection> elementConnectionList = new ArrayList<>();
+                        for (Connection connection : connectionList) {
+                            if (connection.getFirstElementId() == message.getTo().getId() || connection.getSecondElementId() == message.getTo().getId()) {
+                                elementConnectionList.add(connection);
+                            }
+                        }
+                        messagesToAdd.addAll(message.getTo().handleMessage(message.getFrom(), elementConnectionList));
+                        messagesToRemove.add(message);
+                    } else {
+                        message.nextStep();
+                    }
+                }
+
+                if (!messagesToAdd.isEmpty()) {
+                    messageList.addAll(messagesToAdd);
+                }
+                if (!messagesToRemove.isEmpty()) {
+                    messageList.removeAll(messagesToRemove);
+                }
+            }
+
+            private void checkSimulationProgress() {
+                if (messageList.isEmpty()) {
+                    runSimulation = false;
+                }
+            }
+        };
+        new Thread(task).start();
+    }
+
+    public void stopSimulation() {
+        this.runSimulation = false;
     }
 }

@@ -29,6 +29,10 @@
                 </GridPane>
             </StackPane>
             <VBox fx:id="connectionsInfo"/>
+            <HBox fx:id="simulationViewGroup">
+                <Button text="Simulate" onAction="#handleStartSimulationButtonClick" />
+                <Button text="Stop simulation" onAction="#handleStopSimulationButtonClick" />
+            </HBox>
         </VBox>
     </right>
     <bottom>
