@@ -5,6 +5,9 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Text?>
 <?import java.net.URL?>
+<?import simulator.view.EditableLabel?>
+<?import simulator.view.LogPanel?>
+<?import simulator.view.TitleLabel?>
 <BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="simulator.Controller" styleClass="layout" fx:id="root">
     <stylesheets>
         <URL value="@Styles.css"/>
@@ -20,15 +23,15 @@
     <right>
         <VBox styleClass="rightLayout">
             <StackPane>
-                <GridPane fx:id="elementInfo">
-                    <Label text="Device info" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
-                    <Label text="Device type: " GridPane.rowIndex="1" GridPane.columnIndex="0"/>
-                    <Label fx:id="elementInfoDeviceType" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
-                    <Label text="MAC address: " GridPane.rowIndex="2" GridPane.columnIndex="0"/>
-                    <Label fx:id="elementInfoMacAddress" GridPane.rowIndex="2" GridPane.columnIndex="1" onMouseClicked="#handleElementInfoMacAddressClick"/>
-                    <Button onAction="#handleConnectElementsButtonClick" text="Connect" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
-                    <Button onAction="#handleRemoveElementButtonClick" text="Remove" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
-                </GridPane>
+                <VBox fx:id="elementInfo">
+                    <Label text="Device info"/>
+                    <TitleLabel fx:id="elementInfoDeviceType" title="Device type: "/>
+                    <EditableLabel fx:id="elementInfoDeviceName" title="Device name: " defaultValue="Why are you running?"/>
+                    <Label text="MAC address: "/>
+                    <Label fx:id="elementInfoMacAddress" onMouseClicked="#handleElementInfoMacAddressClick"/>
+                    <Button onAction="#handleConnectElementsButtonClick" text="Connect"/>
+                    <Button onAction="#handleRemoveElementButtonClick" text="Remove"/>
+                </VBox>
             </StackPane>
             <VBox fx:id="connectionsInfo"/>
             <VBox>
@@ -38,9 +41,11 @@
                     <Label text="Destination MAC: " GridPane.rowIndex="1" GridPane.columnIndex="0"/>
                     <TextField fx:id="simulationDestinationMac" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
                 </GridPane>
-                <Button text="Simulate" onAction="#handleStartSimulationButtonClick" />
-                <Button text="Stop simulation" onAction="#handleStopSimulationButtonClick" />
+                <Button text="Simulate" onAction="#handleStartSimulationButtonClick"/>
+                <Button text="Stop simulation" onAction="#handleStopSimulationButtonClick"/>
             </VBox>
+            <Region VBox.vgrow="ALWAYS"/>
+            <LogPanel fx:id="logPanel" prefHeight="150"/>
         </VBox>
     </right>
     <bottom>

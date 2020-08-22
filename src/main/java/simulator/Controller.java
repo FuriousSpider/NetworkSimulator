@@ -12,6 +12,9 @@ import javafx.scene.layout.*;
 import simulator.element.*;
 import simulator.element.device.*;
 import simulator.view.ConnectionRowView;
+import simulator.view.EditableLabel;
+import simulator.view.LogPanel;
+import simulator.view.TitleLabel;
 import util.Values;
 import view.CanvasPane;
 
@@ -25,17 +28,21 @@ public class Controller implements Initializable {
     @FXML
     private Pane canvasPane;
     @FXML
-    private GridPane elementInfo;
+    private VBox elementInfo;
+    @FXML
+    private EditableLabel elementInfoDeviceName;
     @FXML
     private VBox connectionsInfo;
     @FXML
-    private Label elementInfoDeviceType;
+    private TitleLabel elementInfoDeviceType;
     @FXML
     private Label elementInfoMacAddress;
     @FXML
     private TextField simulationSourceMac;
     @FXML
     private TextField simulationDestinationMac;
+    @FXML
+    private LogPanel logPanel;
     private Engine engine;
 
     @Override
@@ -49,6 +56,7 @@ public class Controller implements Initializable {
         canvas.getCanvas().setOnMouseDragged(this::canvasMouseDragged);
         canvas.getCanvas().setOnMousePressed(this::canvasMousePressed);
         canvas.getCanvas().setOnMouseReleased(this::canvasMouseReleased);
+        canvas.getCanvas().setOnMouseMoved(this::canvasMouseMoved);
         root.setOnKeyPressed(this::keyPressed);
 
         hideElementInfo();
@@ -96,6 +104,7 @@ public class Controller implements Initializable {
 
     @FXML
     private void handleStartSimulationButtonClick() {
+        //TODO: when sourceMac TextField focused you cannot use key shorcuts on canvas
         engine.startSimulation(simulationSourceMac.getText(), simulationDestinationMac.getText());
     }
 
@@ -126,6 +135,12 @@ public class Controller implements Initializable {
         }
     }
 
+    private void canvasMouseMoved(MouseEvent mouseEvent) {
+        if (engine.isInConnectionMode()) {
+            engine.changeConnectMousePosition((int) mouseEvent.getX(), (int) mouseEvent.getY());
+        }
+    }
+
     private void keyPressed(KeyEvent keyEvent) {
         if (keyEvent.getCode() == KeyCode.DELETE) {
             engine.removeSelectedElement();
@@ -138,7 +153,7 @@ public class Controller implements Initializable {
 
     public void showDeviceInfo(Device selectedDevice) {
         elementInfo.setVisible(true);
-        elementInfoDeviceType.setText(selectedDevice.getDeviceType());
+        elementInfoDeviceType.setValue(selectedDevice.getDeviceType());
         elementInfoMacAddress.setText(selectedDevice.getMacAddress());
     }
 
@@ -163,5 +178,9 @@ public class Controller implements Initializable {
 
     private void onDeleteConnection(int id) {
         engine.removeConnection(id);
+    }
+
+    public void log(String text) {
+        logPanel.log(text);
     }
 }

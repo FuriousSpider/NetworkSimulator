@@ -14,6 +14,7 @@ abstract public class Device {
     private final Image image;
     private int x;
     private int y;
+    private String name;
     private final String deviceType;
     private final String macAddress;
     private final List<Port> portList;
@@ -26,6 +27,7 @@ abstract public class Device {
         this.deviceType = deviceType;
         this.macAddress = Utils.generateMacAddress();
         this.id = idCounter++;
+        this.name = String.valueOf(this.id);
         this.portList = new ArrayList<>();
     }
 

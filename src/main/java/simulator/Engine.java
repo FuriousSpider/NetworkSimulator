@@ -1,10 +1,14 @@
 package simulator;
 
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
+import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.paint.Color;
+import javafx.util.Duration;
 import javafx.util.Pair;
 import simulator.element.Connection;
 import simulator.element.Port;
@@ -26,10 +30,10 @@ public class Engine {
     private Integer elementToConnect;
     private Device presentlyClickedDevice;
     private Device selectedDevice;
-    private boolean shouldUpdate;
-    private static boolean closeTask;
     private boolean runSimulation;
     private Pair<Integer, Integer> mousePosition;
+    private Pair<Integer, Integer> connectMousePosition;
+    private static Timeline timeline;
 
     private Engine() {
         this.deviceList = new ArrayList<>();
@@ -38,8 +42,6 @@ public class Engine {
         this.elementToConnect = null;
         this.presentlyClickedDevice = null;
         this.selectedDevice = null;
-        this.shouldUpdate = false;
-        closeTask = false;
         this.runSimulation = false;
         this.mousePosition = null;
     }
@@ -102,7 +104,7 @@ public class Engine {
 
     public void addDevice(Device device) {
         this.deviceList.add(0, device);
-        shouldUpdate = true;
+        controller.log(device.getDeviceType() + " added");
     }
 
     public void selectDevice(int x, int y) {
@@ -120,13 +122,11 @@ public class Engine {
                     break;
                 }
             }
-            shouldUpdate = true;
         }
     }
 
     public void deselectDevice() {
         presentlyClickedDevice = null;
-        shouldUpdate = true;
     }
 
     public void dropSelection() {
@@ -146,6 +146,9 @@ public class Engine {
         selectedDevice = null;
         controller.hideElementInfo();
         controller.hideConnectionList();
+        if (elementToConnect != null) {
+            elementToConnect = null;
+        }
     }
 
     public void removeConnection(int id) {
@@ -208,6 +211,10 @@ public class Engine {
         }
     }
 
+    public void changeConnectMousePosition(int x, int y) {
+        this.connectMousePosition = new Pair<>(x, y);
+    }
+
     public void onConnectClicked() {
         if (selectedDevice != null) {
             elementToConnect = selectedDevice.getId();
@@ -219,7 +226,7 @@ public class Engine {
             if (x >= device.getX() && x <= device.getX() + Values.DEVICE_SIZE && y >= device.getY() && y <= device.getY() + Values.DEVICE_SIZE) {
                 if (!elementToConnect.equals(device.getId())) {
                     if (!connectionAlreadyExists(elementToConnect, device.getId())) {
-                        connectionList.add(new Connection(getDeviceById(elementToConnect).getNewPort() , device.getNewPort()));
+                        connectionList.add(new Connection(getDeviceById(elementToConnect).getNewPort(), device.getNewPort()));
                     }
                     elementToConnect = null;
                 }
@@ -231,7 +238,7 @@ public class Engine {
     private boolean connectionAlreadyExists(Integer id1, int id2) {
         for (Connection connection : connectionList) {
             if (id1.equals(connection.getFirstElementId()) && id2 == connection.getSecondElementId()
-            || id2 == connection.getFirstElementId() && id1.equals(connection.getSecondElementId())) {
+                    || id2 == connection.getFirstElementId() && id1.equals(connection.getSecondElementId())) {
                 return true;
             }
         }
@@ -254,88 +261,100 @@ public class Engine {
         ClipboardContent clipboardContent = new ClipboardContent();
         clipboardContent.putString(text);
         Clipboard.getSystemClipboard().setContent(clipboardContent);
+        controller.log("Value: \"" + text + "\" has been copied to the clipboard");
+    }
+
+    public boolean isInConnectionMode() {
+        return elementToConnect != null;
     }
 
     public static void stopEngine() {
-        closeTask = true;
+        timeline.stop();
     }
 
     private void startEngine() {
-        Task<Void> task = new Task<>() {
-            @Override
-            protected Void call() throws Exception {
-                while (!closeTask) {
-                    shouldUpdate = false;
+        timeline = new Timeline(
+                new KeyFrame(Duration.seconds(0), actionEvent -> {
                     clearScreen();
                     drawConnections();
                     drawElements();
                     drawMessages();
-                    if (!shouldUpdate) {
-                        Thread.sleep(Values.ENGINE_MILLISECONDS_PAUSE);
-                    }
-                }
-                return null;
-            }
+                }),
+                new KeyFrame(Duration.millis(Values.ENGINE_MILLISECONDS_PAUSE))
+        );
+        timeline.setCycleCount(Timeline.INDEFINITE);
+        timeline.play();
+    }
 
-            private void clearScreen() {
-                ctx.clearRect(0, 0, ctx.getCanvas().getWidth(), ctx.getCanvas().getHeight());
-            }
+    private void clearScreen() {
+        ctx.clearRect(0, 0, ctx.getCanvas().getWidth(), ctx.getCanvas().getHeight());
+    }
 
-            private void drawConnections() {
-                List<Device> reversedList = new ArrayList<>(deviceList);
-                Collections.reverse(reversedList);
-                for (Connection connection : connectionList) {
-                    Device device1 = getDeviceById(connection.getFirstElementId());
-                    Device device2 = getDeviceById(connection.getSecondElementId());
-                    if (device1 != null && device2 != null) {
-                        ctx.setStroke(connection.getColor());
-                        ctx.strokeLine(
-                                device1.getX() + (Values.DEVICE_SIZE / 2.0),
-                                device1.getY() + (Values.DEVICE_SIZE / 2.0),
-                                device2.getX() + (Values.DEVICE_SIZE / 2.0),
-                                device2.getY() + (Values.DEVICE_SIZE / 2.0));
-                    }
-                }
+    private void drawConnections() {
+        List<Device> reversedList = new ArrayList<>(deviceList);
+        Collections.reverse(reversedList);
+        for (Connection connection : connectionList) {
+            Device device1 = getDeviceById(connection.getFirstElementId());
+            Device device2 = getDeviceById(connection.getSecondElementId());
+            if (device1 != null && device2 != null) {
+                ctx.setStroke(connection.getColor());
+                ctx.strokeLine(
+                        device1.getX() + (Values.DEVICE_SIZE / 2.0),
+                        device1.getY() + (Values.DEVICE_SIZE / 2.0),
+                        device2.getX() + (Values.DEVICE_SIZE / 2.0),
+                        device2.getY() + (Values.DEVICE_SIZE / 2.0));
             }
+        }
+        if (isInConnectionMode() && connectMousePosition != null) {
+            ctx.setStroke(Color.BLACK);
+            ctx.strokeLine(
+                    getDeviceById(elementToConnect).getX() + (Values.DEVICE_SIZE / 2.0),
+                    getDeviceById(elementToConnect).getY() + (Values.DEVICE_SIZE / 2.0),
+                    connectMousePosition.getKey(),
+                    connectMousePosition.getValue());
+        }
+    }
 
-            private void drawElements() {
-                ctx.setStroke(Color.BLACK);
-                List<Device> reversedList = new ArrayList<>(deviceList);
-                Collections.reverse(reversedList);
-                for (Device element : reversedList) {
-                    if (element == selectedDevice) {
-                        ctx.strokeRect(
-                                element.getX() - Values.DEVICE_STROKE,
-                                element.getY() - Values.DEVICE_STROKE,
-                                Values.DEVICE_SIZE + Values.DEVICE_STROKE * 2,
-                                Values.DEVICE_SIZE + Values.DEVICE_STROKE * 2
-                        );
-                    }
-                    ctx.drawImage(element.getImage(), element.getX(), element.getY(), Values.DEVICE_SIZE, Values.DEVICE_SIZE);
-                }
+    private void drawElements() {
+        ctx.setStroke(Color.BLACK);
+        List<Device> reversedList = new ArrayList<>(deviceList);
+        Collections.reverse(reversedList);
+        for (Device element : reversedList) {
+            if (element == selectedDevice) {
+                ctx.strokeRect(
+                        element.getX() - Values.DEVICE_STROKE,
+                        element.getY() - Values.DEVICE_STROKE,
+                        Values.DEVICE_SIZE + Values.DEVICE_STROKE * 2,
+                        Values.DEVICE_SIZE + Values.DEVICE_STROKE * 2
+                );
             }
+            ctx.drawImage(element.getImage(), element.getX(), element.getY(), Values.DEVICE_SIZE, Values.DEVICE_SIZE);
+        }
+    }
 
-            private void drawMessages() {
-                for (Message message : messageList) {
-                    ctx.drawImage(message.getImage(), message.getX(), message.getY(), Values.MESSAGE_SIZE, Values.MESSAGE_SIZE);
-                }
-            }
-        };
-        new Thread(task).start();
+    private void drawMessages() {
+        for (Message message : messageList) {
+            ctx.drawImage(message.getImage(), message.getX(), message.getY(), Values.MESSAGE_SIZE, Values.MESSAGE_SIZE);
+        }
     }
 
     public void startSimulation(String sourceMac, String destinationMac) {
         if (runSimulation) return;
-        Task<Void> task = new Task<>() {
+        Service<Void> service = new Service<>() {
             @Override
-            protected Void call() throws Exception {
-                prepareSimulation(sourceMac, destinationMac);
-                while(runSimulation) {
-                    nextSimulationStep();
-                    checkSimulationProgress();
-                    Thread.sleep(Values.ENGINE_MILLISECONDS_PAUSE);
-                }
-                return null;
+            protected Task<Void> createTask() {
+                return new Task<>() {
+                    @Override
+                    protected Void call() throws Exception {
+                        prepareSimulation(sourceMac, destinationMac);
+                        while (runSimulation) {
+                            nextSimulationStep();
+                            checkSimulationProgress();
+                            Thread.sleep(Values.ENGINE_MILLISECONDS_PAUSE);
+                        }
+                        return null;
+                    }
+                };
             }
 
             private void prepareSimulation(String sourceMac, String destinationMac) {
@@ -377,7 +396,7 @@ public class Engine {
                 }
             }
         };
-        new Thread(task).start();
+        service.start();
     }
 
     public void stopSimulation() {
