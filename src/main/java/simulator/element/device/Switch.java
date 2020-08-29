@@ -13,7 +13,7 @@ public class Switch extends Device {
     public static String fileName = "/switch.png";
     public static String deviceType = "Switch";
 
-    private Map<String, Port> associationTable;
+    private final Map<String, Port> associationTable;
 
     public Switch(int x, int y) {
         super(fileName, x, y, deviceType);
@@ -33,9 +33,13 @@ public class Switch extends Device {
                 }
             }
 
-            List<Message> messageList = new ArrayList<>();
-            messageList.add(new Message(message, sourcePort, destinationPort));
-            return messageList;
+            if (message.getCurrentDestinationPort() != destinationPort) {
+                List<Message> messageList = new ArrayList<>();
+                messageList.add(new Message(message, sourcePort, destinationPort));
+                return messageList;
+            } else {
+                return new ArrayList<>();
+            }
         } else {
             List<Message> messageList = new ArrayList<>();
             for (Connection connection : connectionList) {

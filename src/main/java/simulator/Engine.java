@@ -11,9 +11,10 @@ import javafx.scene.paint.Color;
 import javafx.util.Duration;
 import javafx.util.Pair;
 import simulator.element.Connection;
+import simulator.element.Message;
 import simulator.element.Port;
 import simulator.element.device.Device;
-import simulator.element.Message;
+import simulator.element.device.EndDevice;
 import util.Values;
 
 import java.util.ArrayList;
@@ -84,10 +85,10 @@ public class Engine {
         return null;
     }
 
-    public Device getDeviceByMac(String macAddress) {
+    public EndDevice getDeviceByIPAddress(String ipAddress) {
         for (Device device : deviceList) {
-            if (device.getMacAddress().equals(macAddress)) {
-                return device;
+            if (device instanceof EndDevice && ((EndDevice) device).getIpAddress().split("/")[0].equals(ipAddress)) {
+                return (EndDevice) device;
             }
         }
         return null;
@@ -338,7 +339,7 @@ public class Engine {
         }
     }
 
-    public void startSimulation(String sourceMac, String destinationMac) {
+    public void startSimulation(String sourceIPAddress, String destinationIPAddress) {
         if (runSimulation) return;
         Service<Void> service = new Service<>() {
             @Override
@@ -346,7 +347,7 @@ public class Engine {
                 return new Task<>() {
                     @Override
                     protected Void call() throws Exception {
-                        prepareSimulation(sourceMac, destinationMac);
+                        prepareSimulation(sourceIPAddress, destinationIPAddress);
                         while (runSimulation) {
                             nextSimulationStep();
                             checkSimulationProgress();
@@ -357,13 +358,35 @@ public class Engine {
                 };
             }
 
-            private void prepareSimulation(String sourceMac, String destinationMac) {
+            private void prepareSimulation(String sourceIPAddress, String destinationIPAddress) {
                 runSimulation = true;
                 messageList.clear();
-                Device sourceDevice = getDeviceByMac(sourceMac);
+                EndDevice sourceDevice = getDeviceByIPAddress(sourceIPAddress);
+                EndDevice destinationDevice = getDeviceByIPAddress(destinationIPAddress);
                 if (sourceDevice != null) {
                     for (Port port : sourceDevice.getPortList()) {
-                        messageList.add(new Message(sourceMac, destinationMac, port, getConnectionByPort(port).getOtherPort(port)));
+                        String sourceIPAddressWithMask = null;
+                        String destinationIPAddressWithMask = null;
+
+                        for (Device device : deviceList) {
+                            if (device instanceof EndDevice) {
+                                if (((EndDevice) device).getIpAddress().contains(sourceIPAddress)) {
+                                    sourceIPAddressWithMask = ((EndDevice) device).getIpAddress();
+                                }
+                                if (((EndDevice) device).getIpAddress().contains(destinationIPAddress)) {
+                                    destinationIPAddressWithMask = ((EndDevice) device).getIpAddress();
+                                }
+                            }
+                        }
+
+                        messageList.add(new Message(
+                                sourceIPAddressWithMask,
+                                destinationIPAddressWithMask,
+                                sourceDevice.getMacAddress(),
+                                destinationDevice.getMacAddress(),
+                                port,
+                                getConnectionByPort(port).getOtherPort(port)
+                        ));
                     }
                 } else {
                     runSimulation = false;
@@ -375,6 +398,7 @@ public class Engine {
                 List<Message> messagesToAdd = new ArrayList<>();
                 for (Message message : messageList) {
                     if (message.getProgress() >= Values.MESSAGE_PROGRESS_MAX) {
+                        //TODO: throws a lot of errors after simulation complete
                         messagesToAdd.addAll(getDeviceByPort(message.getCurrentDestinationPort()).handleMessage(message, getDeviceConnections(getDeviceByPort(message.getCurrentDestinationPort()))));
                         messagesToRemove.add(message);
                     } else {

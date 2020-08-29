@@ -8,17 +8,18 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.*;
-import simulator.element.*;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
+import simulator.element.Connection;
+import simulator.element.Port;
 import simulator.element.device.*;
-import simulator.view.ConnectionRowView;
-import simulator.view.EditableLabel;
-import simulator.view.LogPanel;
-import simulator.view.TitleLabel;
+import simulator.view.*;
 import util.Values;
 import view.CanvasPane;
 
 import java.net.URL;
+import java.util.HashMap;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -38,9 +39,13 @@ public class Controller implements Initializable {
     @FXML
     private Label elementInfoMacAddress;
     @FXML
-    private TextField simulationSourceMac;
+    private IPTextField elementInfoIpAddress;
     @FXML
-    private TextField simulationDestinationMac;
+    private RoutingTable routingTableView;
+    @FXML
+    private TextField simulationSourceIPAddress;
+    @FXML
+    private TextField simulationDestinationIPAddress;
     @FXML
     private LogPanel logPanel;
     private Engine engine;
@@ -105,7 +110,7 @@ public class Controller implements Initializable {
     @FXML
     private void handleStartSimulationButtonClick() {
         //TODO: when sourceMac TextField focused you cannot use key shorcuts on canvas
-        engine.startSimulation(simulationSourceMac.getText(), simulationDestinationMac.getText());
+        engine.startSimulation(simulationSourceIPAddress.getText(), simulationDestinationIPAddress.getText());
     }
 
     @FXML
@@ -155,6 +160,21 @@ public class Controller implements Initializable {
         elementInfo.setVisible(true);
         elementInfoDeviceType.setValue(selectedDevice.getDeviceType());
         elementInfoMacAddress.setText(selectedDevice.getMacAddress());
+        if (selectedDevice instanceof EndDevice) {
+            elementInfoIpAddress.show();
+            elementInfoIpAddress.setIpAddress(((EndDevice) selectedDevice).getIpAddress());
+            elementInfoIpAddress.setOnSaveClickedListener(((EndDevice) selectedDevice));
+        } else {
+            elementInfoIpAddress.hide();
+        }
+        if (selectedDevice instanceof Router) {
+            Router router = (Router) selectedDevice;
+            routingTableView.show();
+            routingTableView.setEntryList(new HashMap<>(router.getRoutingTable()));
+            routingTableView.setOnRoutingTableChangeListener(router);
+        } else {
+            routingTableView.hide();
+        }
     }
 
     public void hideElementInfo() {

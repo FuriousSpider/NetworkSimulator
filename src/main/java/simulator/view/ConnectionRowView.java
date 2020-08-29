@@ -17,16 +17,25 @@ public class ConnectionRowView extends HBox {
     private final int id;
     private OnDeleteClickListener onDeleteClickListener;
 
-    public ConnectionRowView(Connection connection, Port port) {
+    public ConnectionRowView(Connection connection, Port otherPort) {
         this.id = connection.getId();
+        Port thisPort = connection.getOtherPort(otherPort);
         Engine engine = Engine.getInstance();
-        Label connectedWith = new Label(engine.getDeviceByPort(port).getDeviceType());
+        Label connectedWith = new Label(engine.getDeviceByPort(otherPort).getDeviceType());
         Label colorLabel = new Label();
         Button deleteConnection = new Button("Remove");
 
+        if (thisPort.hasInterface()) {
+            IPTextField ipTextField = new IPTextField();
+            ipTextField.setIpAddress(thisPort.getIpAddress());
+            ipTextField.setOnSaveClickedListener(thisPort);
+            ipTextField.show();
+            this.getChildren().add(ipTextField);
+        }
+
         colorLabel.setBackground(new Background(new BackgroundFill(connection.getColor(), CornerRadii.EMPTY, Insets.EMPTY)));
         colorLabel.setMinHeight(Values.LABEL_COLOR_MIN_HEIGHT);
-        colorLabel.setMinWidth(Values.LABEL_COLOR_MIN_WIDHT);
+        colorLabel.setMinWidth(Values.LABEL_COLOR_MIN_WIDTH);
         deleteConnection.setOnMouseClicked(this::onMouseClicked);
 
         this.getChildren().add(connectedWith);
