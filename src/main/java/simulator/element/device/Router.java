@@ -1,5 +1,6 @@
 package simulator.element.device;
 
+import simulator.Engine;
 import simulator.element.Connection;
 import simulator.element.Message;
 import simulator.element.Port;
@@ -33,27 +34,26 @@ public class Router extends Device implements RoutingTable.OnRoutingTableChangeL
         for (Port port : getPortList()) {
             if (Utils.belongToTheSameNetwork(message.getDestinationIpAddress(), port.getIpAddress())) {
                 List<Message> messageList = new ArrayList<>();
-                Port destinationPort = null;
+                Port destinationPort;
                 for (Connection connection : connectionList) {
-                    if (connection.containsPort(port)) {
+                    if (connection.containsPort(port) && port != message.getCurrentDestinationPort()) {
                         destinationPort = connection.getOtherPort(port);
+                        messageList.add(new Message(message, port, destinationPort));
+                        return messageList;
                     }
                 }
-                messageList.add(new Message(message, port, destinationPort));
-                return messageList;
+
             }
         }
-        //TODO: change to checking by network address rather than by specific ip address because it's not working when hub/switch between routers
         for (String key : routingTable.keySet()) {
-            if (Utils.getNetworkAddressFromIp(message.getDestinationIpAddress()).equals(key)) {
+            if (key.contains(Utils.getNetworkAddressFromIp(message.getDestinationIpAddress()))) {
                 String nextHop = routingTable.get(key);
                 for (Port port : getPortList()) {
-                    for (Connection connection : connectionList) {
-                        if (connection.containsPort(port) && connection.getOtherPort(port).getIpAddress() != null) {
-                            Port otherPort = connection.getOtherPort(port);
-                            if (otherPort.getIpAddress().split("/")[0].equals(nextHop)) {
+                    if (Utils.belongToTheSameNetwork(port.getIpAddress(), Engine.getInstance().getIpWithMaskByIp(nextHop))) {
+                        for (Connection connection : connectionList) {
+                            if (connection.containsPort(port) && port != message.getCurrentDestinationPort()) {
                                 List<Message> messageList = new ArrayList<>();
-                                messageList.add(new Message(message, port, otherPort));
+                                messageList.add(new Message(message, port, connection.getOtherPort(port)));
                                 return messageList;
                             }
                         }
@@ -64,12 +64,20 @@ public class Router extends Device implements RoutingTable.OnRoutingTableChangeL
         return new ArrayList<>();
     }
 
-    public Map<String, String> getRoutingTable() {
-        return routingTable;
+    public Map<String, String> getRoutingTableCopy() {
+        Map<String, String> map = new HashMap<>();
+        for (String key : routingTable.keySet()) {
+            map.put(key, routingTable.get(key));
+        }
+        return map;
     }
+
 
     @Override
     public void onRoutingTableChange(Map<String, String> routingTable) {
-        this.routingTable = routingTable;
+        this.routingTable.clear();
+        for (String key : routingTable.keySet()) {
+            this.routingTable.put(key, routingTable.get(key));
+        }
     }
 }

@@ -1,23 +1,34 @@
 package simulator.view;
 
+import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.text.Text;
+import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 
 import java.util.Date;
 
 public class LogPanel extends ScrollPane {
 
-    private final Text textField;
+    private final VBox logField;
 
     public LogPanel() {
-        this.textField = new Text("Log pannel:\n");
-        textField.wrappingWidthProperty().bind(this.widthProperty());
-        this.setContent(textField);
+        logField = new VBox();
+//        logField.setPrefWidth(this.getWidth());
+        this.setContent(logField);
+        logField.getChildren().add(new Label("Log pannel:"));
     }
 
     public void log(String text) {
         String time = (new Date()).toString().split(" ")[3];
-        this.textField.setText(textField.getText() + "\n" + time + ": " + text);
+        logField.getChildren().add(new Label(time + ": " + text));
+        this.setVvalue(1.0);
+    }
+
+    public void logError(String errorMessage) {
+        String time = (new Date()).toString().split(" ")[3];
+        Label label = new Label(time + ": " + errorMessage);
+        label.setTextFill(Color.RED);
+        logField.getChildren().add(label);
         this.setVvalue(1.0);
     }
 }

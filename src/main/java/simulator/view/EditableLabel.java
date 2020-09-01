@@ -59,7 +59,6 @@ public class EditableLabel extends VBox {
     }
 
     private void onEditButtonClicked(MouseEvent mouseEvent) {
-        //TODO: when label is not empty it takes additional space
         if (label.isVisible()) {
             textField.setText(value);
             textField.setVisible(true);

@@ -3,6 +3,7 @@ package util;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.regex.Pattern;
 
 public class Utils {
     private final static List<String> macAddressList = new ArrayList<>();
@@ -65,5 +66,23 @@ public class Utils {
 
     public static boolean belongToTheSameNetwork(String ipAddress1, String ipAddress2) {
         return getNetworkAddressFromIp(ipAddress1).equals(getNetworkAddressFromIp(ipAddress2));
+    }
+
+    public static boolean isNetworkAddress(String ipAddress) {
+        Pattern pattern = Pattern.compile(Values.REGEX_IP_ADDRESS_WITH_MASK);
+        if (pattern.matcher(ipAddress).matches()) {
+            return ipAddress.contains(getNetworkAddressFromIp(ipAddress));
+        } else {
+            return false;
+        }
+    }
+
+    public static boolean isHostAddress(String ipAddress) {
+        Pattern pattern = Pattern.compile(Values.REGEX_IP_ADDRESS_WITH_MASK);
+        if (pattern.matcher(ipAddress).matches()) {
+            return !ipAddress.contains(getNetworkAddressFromIp(ipAddress));
+        } else {
+            return false;
+        }
     }
 }

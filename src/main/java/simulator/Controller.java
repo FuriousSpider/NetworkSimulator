@@ -170,7 +170,7 @@ public class Controller implements Initializable {
         if (selectedDevice instanceof Router) {
             Router router = (Router) selectedDevice;
             routingTableView.show();
-            routingTableView.setEntryList(new HashMap<>(router.getRoutingTable()));
+            routingTableView.setEntryList(router.getRoutingTableCopy());
             routingTableView.setOnRoutingTableChangeListener(router);
         } else {
             routingTableView.hide();
@@ -202,5 +202,9 @@ public class Controller implements Initializable {
 
     public void log(String text) {
         logPanel.log(text);
+    }
+
+    public void logError(String errorMessage) {
+        logPanel.logError(errorMessage);
     }
 }

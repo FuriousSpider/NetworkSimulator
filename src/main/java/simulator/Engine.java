@@ -15,6 +15,7 @@ import simulator.element.Message;
 import simulator.element.Port;
 import simulator.element.device.Device;
 import simulator.element.device.EndDevice;
+import simulator.element.device.Router;
 import util.Values;
 
 import java.util.ArrayList;
@@ -263,6 +264,30 @@ public class Engine {
         clipboardContent.putString(text);
         Clipboard.getSystemClipboard().setContent(clipboardContent);
         controller.log("Value: \"" + text + "\" has been copied to the clipboard");
+    }
+
+    public String getIpWithMaskByIp(String address) {
+        for (Device device : deviceList) {
+            if (device instanceof EndDevice && ((EndDevice) device).getIpAddress().contains(address)) {
+                return ((EndDevice) device).getIpAddress();
+            } else if (device instanceof Router) {
+                Router router = (Router) device;
+                for (Port port : router.getPortList()) {
+                    if (port.hasInterface() && port.getIpAddress().contains(address)) {
+                        return port.getIpAddress();
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    public void log(String message) {
+        controller.log(message);
+    }
+
+    public void logError(String errorMessage) {
+        controller.logError(errorMessage);
     }
 
     public boolean isInConnectionMode() {

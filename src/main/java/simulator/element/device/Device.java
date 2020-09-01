@@ -47,6 +47,7 @@ abstract public class Device {
         return y;
     }
 
+    //TODO: limit port number -> create them at the beginning and give them something like "state"
     public Port getNewPort() {
         Port port = new Port(id);
         portList.add(port);

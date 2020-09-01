@@ -6,9 +6,13 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import simulator.Engine;
+import util.Utils;
+import util.Values;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 public class RoutingTable extends VBox {
 
@@ -47,13 +51,33 @@ public class RoutingTable extends VBox {
     }
 
     private void onAddButtonClicked(MouseEvent mouseEvent) {
-        //TODO: check if entries are correct: network and nextHop
-        this.routingTable.put(newEntryNetworkTextField.getText(), newEntryNextHopTextField.getText());
-        this.listener.onRoutingTableChange(new HashMap<>(routingTable));
-        setEntryList(routingTable);
+        Pattern ipv4Pattern = Pattern.compile(Values.REGEX_IP_ADDRESS_WITH_MASK);
+        boolean areEntriesValid = true;
+        if (!ipv4Pattern.matcher(newEntryNetworkTextField.getText()).matches()) {
+            areEntriesValid = false;
+            Engine.getInstance().logError(Values.ERROR_INVALID_NETWORK_IP_ADDRESS);
+        } else if (!Utils.isNetworkAddress(newEntryNetworkTextField.getText())) {
+            areEntriesValid = false;
+            Engine.getInstance().logError(Values.ERROR_ADDRESS_IS_NOT_A_NETWORK_ADDRESS);
+        }
+        if (!ipv4Pattern.matcher(newEntryNextHopTextField.getText()).matches()) {
+            areEntriesValid = false;
+            Engine.getInstance().logError(Values.ERROR_INVALID_IP_ADDRESS);
+        } else if (Utils.isNetworkAddress(newEntryNextHopTextField.getText())) {
+            areEntriesValid = false;
+            Engine.getInstance().logError(Values.ERROR_ADDRESS_IS_NOT_A_HOST_ADDRESS);
+        }
+
+        if (areEntriesValid) {
+            this.routingTable.put(newEntryNetworkTextField.getText(), newEntryNextHopTextField.getText());
+            this.listener.onRoutingTableChange(routingTable);
+            setEntryList(routingTable);
+            Engine.getInstance().log(Values.MESSAGE_RECORD_ADDED);
+        }
     }
 
     public void setEntryList(Map<String, String> routingTable) {
+        this.routingTable = routingTable;
         this.entryList.getChildren().clear();
         for (String key : routingTable.keySet()) {
             HBox line = new HBox();
@@ -83,7 +107,7 @@ public class RoutingTable extends VBox {
 
     private void onRemoveEntryClicked(MouseEvent mouseEvent) {
         routingTable.remove(((Button) mouseEvent.getSource()).getId());
-        listener.onRoutingTableChange(new HashMap<>(routingTable));
+        listener.onRoutingTableChange(routingTable);
         setEntryList(routingTable);
     }
 

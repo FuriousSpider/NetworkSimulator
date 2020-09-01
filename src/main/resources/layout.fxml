@@ -23,35 +23,37 @@
         </HBox>
     </top>
     <right>
-        <VBox styleClass="rightLayout">
-            <StackPane>
-                <VBox fx:id="elementInfo">
-                    <Label text="Device info"/>
-                    <TitleLabel fx:id="elementInfoDeviceType" title="Device type: "/>
-                    <EditableLabel fx:id="elementInfoDeviceName" title="Device name: " defaultValue="Why are you running?"/>
-                    <Label text="MAC address: "/>
-                    <Label fx:id="elementInfoMacAddress" onMouseClicked="#handleElementInfoMacAddressClick"/>
-                    <IPTextField fx:id="elementInfoIpAddress"/>
-                    <Button onAction="#handleConnectElementsButtonClick" text="Connect"/>
-                    <Button onAction="#handleRemoveElementButtonClick" text="Remove"/>
+        <ScrollPane fitToHeight="true" hbarPolicy="NEVER">
+            <VBox styleClass="rightLayout">
+                <StackPane>
+                    <VBox fx:id="elementInfo">
+                        <Label text="Device info"/>
+                        <TitleLabel fx:id="elementInfoDeviceType" title="Device type: "/>
+                        <EditableLabel fx:id="elementInfoDeviceName" title="Device name: " defaultValue="Why are you running?"/>
+                        <Label text="MAC address: "/>
+                        <Label fx:id="elementInfoMacAddress" onMouseClicked="#handleElementInfoMacAddressClick"/>
+                        <IPTextField fx:id="elementInfoIpAddress"/>
+                        <Button onAction="#handleConnectElementsButtonClick" text="Connect"/>
+                        <Button onAction="#handleRemoveElementButtonClick" text="Remove"/>
+                    </VBox>
+                </StackPane>
+                <VBox fx:id="connectionsInfo"/>
+                <RoutingTable fx:id="routingTableView" visible="false"/>
+                <Region VBox.vgrow="ALWAYS"/>
+                <VBox>
+                    <GridPane>
+                        <Label text="Simulation" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                        <Label text="Source IP Address: " GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                        <TextField fx:id="simulationSourceIPAddress" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+                        <Label text="Destination IP Address: " GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+                        <TextField fx:id="simulationDestinationIPAddress" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+                    </GridPane>
+                    <Button text="Simulate" onAction="#handleStartSimulationButtonClick"/>
+                    <Button text="Stop simulation" onAction="#handleStopSimulationButtonClick"/>
                 </VBox>
-            </StackPane>
-            <VBox fx:id="connectionsInfo"/>
-            <VBox>
-                <GridPane>
-                    <Label text="Simulation" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
-                    <Label text="Source IP Address: " GridPane.rowIndex="1" GridPane.columnIndex="0"/>
-                    <TextField fx:id="simulationSourceIPAddress" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
-                    <Label text="Destination IP Address: " GridPane.rowIndex="2" GridPane.columnIndex="0"/>
-                    <TextField fx:id="simulationDestinationIPAddress" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
-                </GridPane>
-                <Button text="Simulate" onAction="#handleStartSimulationButtonClick"/>
-                <Button text="Stop simulation" onAction="#handleStopSimulationButtonClick"/>
+                <LogPanel fx:id="logPanel" prefHeight="150" minHeight="150"/>
             </VBox>
-            <RoutingTable fx:id="routingTableView"/>
-            <Region VBox.vgrow="ALWAYS"/>
-            <LogPanel fx:id="logPanel" prefHeight="150"/>
-        </VBox>
+        </ScrollPane>
     </right>
     <bottom>
         <HBox styleClass="bottomLayout">

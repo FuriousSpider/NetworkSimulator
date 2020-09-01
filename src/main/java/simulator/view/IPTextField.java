@@ -6,14 +6,15 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import simulator.Engine;
+import util.Utils;
+import util.Values;
 
 public class IPTextField extends VBox {
     private final HBox firstLine;
     private final HBox secondLine;
-    private final HBox thirdLine;
     private final TextField ipAddressTextField;
     private final Label ipAddressLabel;
-    private final Label errorLabel;
     private final Button editButton;
     private final Button cancelButton;
 
@@ -25,25 +26,19 @@ public class IPTextField extends VBox {
     public IPTextField() {
         this.firstLine = new HBox();
         this.secondLine = new HBox();
-        this.thirdLine = new HBox();
         this.ipAddressTextField = new TextField();
         this.ipAddressLabel = new Label();
-        //TODO: handle error message
-        this.errorLabel = new Label("IP address doesn't match the pattern: xxx.xxx.xxx.xxx/xx");
         this.editButton = new Button("Edit");
         this.cancelButton = new Button("Cancel");
 
         this.getChildren().add(firstLine);
         this.getChildren().add(secondLine);
-        this.getChildren().add(thirdLine);
 
         this.firstLine.getChildren().add(ipAddressTextField);
         this.firstLine.getChildren().add(ipAddressLabel);
 
-        this.secondLine.getChildren().add(errorLabel);
-
-        this.thirdLine.getChildren().add(editButton);
-        this.thirdLine.getChildren().add(cancelButton);
+        this.secondLine.getChildren().add(editButton);
+        this.secondLine.getChildren().add(cancelButton);
 
         editButton.setOnMouseClicked(this::onEditButtonClicked);
         cancelButton.setOnMouseClicked(this::onCancelButtonClicked);
@@ -88,7 +83,10 @@ public class IPTextField extends VBox {
 
     private void onEditButtonClicked(MouseEvent mouseEvent) {
         if (isInEditMode) {
-            //TODO: validate if ipAddress is correct
+            if (!Utils.isHostAddress(ipAddressTextField.getText())) {
+                Engine.getInstance().logError(Values.ERROR_INVALID_IP_ADDRESS);
+                return;
+            }
             ipAddressValue = ipAddressTextField.getText();
             if (listener != null) {
                 listener.onSaveClicked(ipAddressValue);
