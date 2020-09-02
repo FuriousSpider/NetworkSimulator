@@ -1,6 +1,7 @@
 package simulator.element.device;
 
 import javafx.util.Pair;
+import simulator.Engine;
 import simulator.element.Connection;
 import simulator.element.Message;
 import simulator.element.Port;
@@ -13,12 +14,19 @@ public class Switch extends Device {
     public static String fileName = "/switch.png";
     public static String deviceType = "Switch";
 
-    private final List<Pair<String, Port>> associationTable;
+    private final List<Pair<String, Integer>> associationTable;
 
     public Switch(int x, int y) {
         super(fileName, x, y, deviceType);
 
         this.associationTable = new ArrayList<>();
+    }
+
+    @Override
+    void initPorts() {
+        for (int i = 0; i < Values.DEVICE_SWITCH_NUMBER_OF_PORTS; i++) {
+            getPortList().add(new Port());
+        }
     }
 
     @Override
@@ -45,9 +53,21 @@ public class Switch extends Device {
             for (Connection connection : connectionList) {
                 if (!connection.containsPort(message.getCurrentDestinationPort())) {
                     if (connection.getFirstElementId() == this.getId()) {
-                        messageList.add(new Message(message, connection.getPortPair().getKey(), connection.getPortPair().getValue()));
+                        messageList.add(
+                                new Message(
+                                        message,
+                                        Engine.getInstance().getPortById(connection.getPortPair().getKey()),
+                                        Engine.getInstance().getPortById(connection.getPortPair().getValue())
+                                )
+                        );
                     } else {
-                        messageList.add(new Message(message, connection.getPortPair().getValue(), connection.getPortPair().getKey()));
+                        messageList.add(
+                                new Message(
+                                        message,
+                                        Engine.getInstance().getPortById(connection.getPortPair().getValue()),
+                                        Engine.getInstance().getPortById(connection.getPortPair().getKey())
+                                )
+                        );
                     }
                 }
             }
@@ -55,17 +75,26 @@ public class Switch extends Device {
         }
     }
 
+    public List<Pair<String, Integer>> getAssociationTable() {
+        return getAssociationTable();
+    }
+
     private void addNewRecord(String macAddress, Port port) {
         if (!associationTableContainsKey(macAddress)) {
-            associationTable.add(new Pair<>(macAddress, port));
+            associationTable.add(new Pair<>(macAddress, port.getId()));
             if (associationTable.size() > Values.DEVICE_SWITCH_ASSOCIATION_TABLE_SIZE_LIMIT) {
                 associationTable.remove(0);
             }
         }
     }
 
+    public void setAssociationTable(List<Pair<String, Integer>> associationTable) {
+        this.associationTable.clear();
+        this.associationTable.addAll(associationTable);
+    }
+
     private boolean associationTableContainsKey(String key) {
-        for (Pair<String, Port> pair : associationTable) {
+        for (Pair<String, Integer> pair : associationTable) {
             if (pair.getKey().equals(key)) {
                 return true;
             }
@@ -74,9 +103,9 @@ public class Switch extends Device {
     }
 
     private Port getAssociationTablePort(String key) {
-        for (Pair<String, Port> pair : associationTable) {
+        for (Pair<String, Integer> pair : associationTable) {
             if (pair.getKey().equals(key)) {
-                return pair.getValue();
+                return Engine.getInstance().getPortById(pair.getValue());
             }
         }
         return null;

@@ -10,6 +10,11 @@ public class Values {
 
     public static int DEVICE_SWITCH_ASSOCIATION_TABLE_SIZE_LIMIT = 1000;
 
+    public static int DEVICE_FIREWALL_NUMBER_OF_PORTS = 2;
+    public static int DEVICE_HUB_NUMBER_OF_PORTS = 8;
+    public static int DEVICE_ROUTER_NUMBER_OF_PORTS = 8;
+    public static int DEVICE_SWITCH_NUMBER_OF_PORTS = 8;
+
     public static int ENGINE_MILLISECONDS_PAUSE = 33;
 
     public static double LABEL_COLOR_MIN_HEIGHT = 20.0;
@@ -19,6 +24,12 @@ public class Values {
     public static int MESSAGE_PROGRESS_MAX = 100;
     public static int MESSAGE_PROGRESS_STEP = 3;
 
+    public static String DIALOG_NEW_TITLE = "Start new project";
+    public static String DIALOG_NEW_CONTENT = "Do you want to create a new project?\nAll unsaved data will be lost.";
+
+    public static String DIALOG_OPEN_TITLE = "Open project";
+    public static String DIALOG_OPEN_CONTENT = "Do you want to open a project?\nAll unsaved data will be lost.";
+
     public static String REGEX_IP_ADDRESS_WITH_MASK = "^([01]?\\d\\d?|2[0-4]\\d|25[0-5])(?:\\.[01]?\\d\\d?|\\.2[0-4]\\d|\\.25[0-5]){3}(?:/[0-2]\\d|/3[0-2])?$";
 
     public static String MESSAGE_RECORD_ADDED = "Record has been added";
@@ -27,4 +38,6 @@ public class Values {
     public static String ERROR_INVALID_IP_ADDRESS = "Provided ip address is incorrect";
     public static String ERROR_ADDRESS_IS_NOT_A_NETWORK_ADDRESS = "Provided address is not a network address";
     public static String ERROR_ADDRESS_IS_NOT_A_HOST_ADDRESS = "Provided address is not a host address";
+    public static String ERROR_NO_FREE_PORT_AVAILABLE = " has no free port available";
+    public static String ERROR_OPEN_FILE_ERROR = "There was an error while opening a file";
 }

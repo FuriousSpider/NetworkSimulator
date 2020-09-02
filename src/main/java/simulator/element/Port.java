@@ -1,19 +1,24 @@
 package simulator.element;
 
-import javafx.util.Pair;
 import simulator.view.IPTextField;
 
 public class Port implements IPTextField.OnSaveClickedListener {
-    private final Pair<Integer, Integer> id;
-    private static int portIdCounter;
+    private int id;
     private Interface anInterface;
+    private boolean isPortTaken;
 
-    public Port(int deviceId) {
-        this.id = new Pair<>(deviceId, portIdCounter++);
+    private static int idCounter;
+
+    public Port() {
+        this.id = idCounter++;
     }
 
-    public Pair<Integer, Integer> getId() {
+    public int getId() {
         return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public void setNewInterface() {
@@ -24,12 +29,38 @@ public class Port implements IPTextField.OnSaveClickedListener {
         return anInterface != null;
     }
 
+    public boolean isPortTaken() {
+        return isPortTaken;
+    }
+
+    public void reservePort() {
+        this.isPortTaken = true;
+    }
+
+    public void releasePort() {
+        this.isPortTaken = false;
+    }
+
     public String getIpAddress() {
         if (hasInterface()) {
             return anInterface.getAddress();
         } else {
             return null;
         }
+    }
+
+    public void setIpAddress(String ipAddress) {
+        if (hasInterface()) {
+            anInterface.setAddress(ipAddress);
+        }
+    }
+
+    public static int getIdCounter() {
+        return idCounter;
+    }
+
+    public static void setIdCounter(int counter) {
+        idCounter = counter;
     }
 
     @Override

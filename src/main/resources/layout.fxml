@@ -3,7 +3,6 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.scene.text.Text?>
 <?import java.net.URL?>
 <?import simulator.view.EditableLabel?>
 <?import simulator.view.LogPanel?>
@@ -18,9 +17,16 @@
         <StackPane fx:id="canvasPane" styleClass="centerLayout"/>
     </center>
     <top>
-        <HBox styleClass="topLayout">
-            <Text text="Hello"/>
-        </HBox>
+        <MenuBar>
+            <Menu text="File">
+                <MenuItem text="New" onAction="#handleMenuNewClick"/>
+                <MenuItem text="Open" onAction="#handleMenuOpenClick"/>
+                <MenuItem text="Save" onAction="#handleMenuSaveClick"/>
+                <MenuItem text="Save As" onAction="#handleMenuSaveAsClick"/>
+                <SeparatorMenuItem/>
+                <MenuItem text="Exit" onAction="#handleMenuExitClick"/>
+            </Menu>
+        </MenuBar>
     </top>
     <right>
         <ScrollPane fitToHeight="true" hbarPolicy="NEVER">

@@ -3,6 +3,7 @@ package simulator.element.device;
 import simulator.element.Connection;
 import simulator.element.Interface;
 import simulator.element.Message;
+import simulator.element.Port;
 import simulator.view.IPTextField;
 
 import java.util.ArrayList;
@@ -19,12 +20,21 @@ public class EndDevice extends Device implements IPTextField.OnSaveClickedListen
     }
 
     @Override
+    void initPorts() {
+        getPortList().add(new Port());
+    }
+
+    @Override
     public List<Message> handleMessage(Message message, List<Connection> connectionList) {
         return new ArrayList<>();
     }
 
     public String getIpAddress() {
         return anInterface.getAddress();
+    }
+
+    public void setIpAddress(String ipAddress) {
+        anInterface.setAddress(ipAddress);
     }
 
     @Override

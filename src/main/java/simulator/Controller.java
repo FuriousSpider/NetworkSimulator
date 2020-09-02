@@ -1,7 +1,10 @@
 package simulator;
 
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
@@ -19,7 +22,6 @@ import util.Values;
 import view.CanvasPane;
 
 import java.net.URL;
-import java.util.HashMap;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -116,6 +118,48 @@ public class Controller implements Initializable {
     @FXML
     private void handleStopSimulationButtonClick() {
         engine.stopSimulation();
+    }
+
+    @FXML
+    private void handleMenuNewClick() {
+        YesCancelDialog dialog = new YesCancelDialog(Alert.AlertType.CONFIRMATION);
+        dialog.setTitle(Values.DIALOG_NEW_TITLE);
+        dialog.setContentText(Values.DIALOG_NEW_CONTENT);
+        dialog.showAndWait().ifPresent(type -> {
+            if (type.getText().equals(ButtonType.YES.getText())) {
+                engine.startNewProject();
+            }
+        });
+        logPanel.clear();
+    }
+
+    @FXML
+    private void handleMenuOpenClick() {
+        YesCancelDialog dialog = new YesCancelDialog(Alert.AlertType.CONFIRMATION);
+        dialog.setTitle(Values.DIALOG_OPEN_TITLE);
+        dialog.setContentText(Values.DIALOG_OPEN_CONTENT);
+        dialog.showAndWait().ifPresent(type -> {
+            if (type.getText().equals(ButtonType.YES.getText())) {
+                DataManager.open();
+            }
+        });
+        logPanel.clear();
+    }
+
+    @FXML
+    private void handleMenuSaveClick() {
+        engine.saveData();
+    }
+
+    @FXML
+    private void handleMenuSaveAsClick() {
+
+    }
+
+    @FXML
+    private void handleMenuExitClick() {
+        Engine.stopEngine();
+        Platform.exit();
     }
 
     private void canvasMousePressed(MouseEvent mouseEvent) {

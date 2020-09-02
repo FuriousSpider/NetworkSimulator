@@ -6,6 +6,7 @@ import simulator.element.Message;
 import simulator.element.Port;
 import simulator.view.RoutingTable;
 import util.Utils;
+import util.Values;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,7 +16,7 @@ import java.util.Map;
 public class Router extends Device implements RoutingTable.OnRoutingTableChangeListener {
     public static String fileName = "/router.png";
     public static String deviceType = "Router";
-    public Map<String, String> routingTable;
+    private final Map<String, String> routingTable;
 
     public Router(int x, int y) {
         super(fileName, x, y, deviceType);
@@ -23,10 +24,12 @@ public class Router extends Device implements RoutingTable.OnRoutingTableChangeL
     }
 
     @Override
-    public Port getNewPort() {
-        Port port = super.getNewPort();
-        port.setNewInterface();
-        return port;
+    void initPorts() {
+        for (int i = 0; i < Values.DEVICE_ROUTER_NUMBER_OF_PORTS; i++) {
+            Port port = new Port();
+            port.setNewInterface();
+            getPortList().add(port);
+        }
     }
 
     @Override
@@ -70,6 +73,11 @@ public class Router extends Device implements RoutingTable.OnRoutingTableChangeL
             map.put(key, routingTable.get(key));
         }
         return map;
+    }
+
+    public void setRoutingTable(Map<String, String> routingTable) {
+        this.routingTable.clear();
+        this.routingTable.putAll(routingTable);
     }
 
 

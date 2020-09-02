@@ -13,7 +13,6 @@ public class LogPanel extends ScrollPane {
 
     public LogPanel() {
         logField = new VBox();
-//        logField.setPrefWidth(this.getWidth());
         this.setContent(logField);
         logField.getChildren().add(new Label("Log pannel:"));
     }
@@ -30,5 +29,9 @@ public class LogPanel extends ScrollPane {
         label.setTextFill(Color.RED);
         logField.getChildren().add(label);
         this.setVvalue(1.0);
+    }
+
+    public void clear() {
+        logField.getChildren().clear();
     }
 }

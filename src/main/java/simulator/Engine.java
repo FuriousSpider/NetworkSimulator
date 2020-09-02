@@ -68,6 +68,33 @@ public class Engine {
         ctx.setLineWidth(2.0);
     }
 
+    public void startNewProject() {
+        stopSimulation();
+        connectMousePosition = null;
+        mousePosition = null;
+        selectedDevice = null;
+        presentlyClickedDevice = null;
+        elementToConnect = null;
+        messageList.clear();
+        connectionList.clear();
+        deviceList.clear();
+        controller.hideElementInfo();
+        controller.hideConnectionList();
+    }
+
+    public void loadData(DataManager.Data data) {
+        startNewProject();
+        deviceList.addAll(data.getDeviceArrayList());
+        connectionList.addAll(data.getConnectionArrayList());
+    }
+
+    public void saveData() {
+        DataManager.Data data = new DataManager.Data();
+        data.setDeviceArrayList(new ArrayList<>(deviceList));
+        data.setConnectionArrayList(new ArrayList<>(connectionList));
+        DataManager.save(data);
+    }
+
     public Device getDeviceById(int id) {
         for (Device device : deviceList) {
             if (device.getId() == id) {
@@ -86,10 +113,32 @@ public class Engine {
         return null;
     }
 
+    public Device getDeviceByPortId(int id) {
+        for (Device device : deviceList) {
+            for (Port port : device.getPortList()) {
+                if (port.getId() == id) {
+                    return device;
+                }
+            }
+        }
+        return null;
+    }
+
     public EndDevice getDeviceByIPAddress(String ipAddress) {
         for (Device device : deviceList) {
             if (device instanceof EndDevice && ((EndDevice) device).getIpAddress().split("/")[0].equals(ipAddress)) {
                 return (EndDevice) device;
+            }
+        }
+        return null;
+    }
+
+    public Port getPortById(int id) {
+        for (Device device : deviceList) {
+            for (Port port : device.getPortList()) {
+                if (port.getId() == id) {
+                    return port;
+                }
             }
         }
         return null;
@@ -106,7 +155,7 @@ public class Engine {
 
     public void addDevice(Device device) {
         this.deviceList.add(0, device);
-        controller.log(device.getDeviceType() + " added");
+        selectDevice(device.getX(), device.getY());
     }
 
     public void selectDevice(int x, int y) {
@@ -183,8 +232,9 @@ public class Engine {
     }
 
     private void removeConnectionPorts(Connection connection) {
-        getDeviceById(connection.getFirstElementId()).removePort(connection.getPortPair().getKey());
-        getDeviceById(connection.getSecondElementId()).removePort(connection.getPortPair().getValue());
+        Pair<Integer, Integer> pair = connection.getPortPair();
+        getPortById(pair.getKey()).releasePort();
+        getPortById(pair.getValue()).releasePort();
     }
 
     public void moveElement(int x, int y) {
@@ -228,7 +278,20 @@ public class Engine {
             if (x >= device.getX() && x <= device.getX() + Values.DEVICE_SIZE && y >= device.getY() && y <= device.getY() + Values.DEVICE_SIZE) {
                 if (!elementToConnect.equals(device.getId())) {
                     if (!connectionAlreadyExists(elementToConnect, device.getId())) {
-                        connectionList.add(new Connection(getDeviceById(elementToConnect).getNewPort(), device.getNewPort()));
+                        Port first = getDeviceById(elementToConnect).getEmptyPort();
+                        Port second = device.getEmptyPort();
+                        if (first != null && second != null) {
+                            connectionList.add(new Connection(first.getId(), second.getId()));
+                        } else {
+                            //TODO: change device type to device name
+                            if (first == null) {
+                                Device dev = getDeviceById(elementToConnect);
+                                controller.logError(dev.getDeviceType() + Values.ERROR_NO_FREE_PORT_AVAILABLE);
+                            }
+                            if (second == null) {
+                                controller.logError(device.getDeviceType() + Values.ERROR_NO_FREE_PORT_AVAILABLE);
+                            }
+                        }
                     }
                     elementToConnect = null;
                 }

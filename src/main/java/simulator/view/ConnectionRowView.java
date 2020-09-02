@@ -25,7 +25,7 @@ public class ConnectionRowView extends HBox {
         Label colorLabel = new Label();
         Button deleteConnection = new Button("Remove");
 
-        if (thisPort.hasInterface()) {
+        if (thisPort.hasInterface() && thisPort.isPortTaken()) {
             IPTextField ipTextField = new IPTextField();
             ipTextField.setIpAddress(thisPort.getIpAddress());
             ipTextField.setOnSaveClickedListener(thisPort);
