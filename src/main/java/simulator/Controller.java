@@ -169,6 +169,7 @@ public class Controller implements Initializable, PortListDialog.OnPortSelectedL
     }
 
     private void canvasMousePressed(MouseEvent mouseEvent) {
+        releaseFocus();
         engine.onMousePressed((int) mouseEvent.getX(), (int) mouseEvent.getY());
         if (mouseEvent.getButton() == MouseButton.PRIMARY) {
             engine.selectDevice((int) mouseEvent.getX(), (int) mouseEvent.getY());
@@ -267,6 +268,9 @@ public class Controller implements Initializable, PortListDialog.OnPortSelectedL
         logPanel.logError(errorMessage);
     }
 
+    private void releaseFocus() {
+        canvasPane.requestFocus();
+    }
 
     @Override
     public void onPortSelected(int portId) {

@@ -63,13 +63,17 @@ abstract public class Device {
         //TODO: check if function works properly
         if (portList.size() < numberOfPorts) {
             for (int i = portList.size(); i < numberOfPorts; i++) {
-                portList.add(new Port());
+                portList.add(new Port(i + 1));
             }
         } else if (portList.size() > numberOfPorts) {
             if (portList.size() > numberOfPorts + 1) {
                 portList.subList(numberOfPorts + 1, portList.size()).clear();
             }
         }
+    }
+
+    public boolean hasPort(Port port) {
+        return portList.contains(port);
     }
 
     public boolean hasEmptyPort() {

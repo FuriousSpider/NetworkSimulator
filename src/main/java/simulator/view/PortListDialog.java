@@ -53,12 +53,14 @@ public class PortListDialog extends Dialog<String> {
                 pane.getChildren().add(new Label("Select port"));
                 for (Port port : portList) {
                     HBox line = new HBox();
-                    line.getChildren().add(new Label(String.valueOf(port.getId())));
+                    line.getChildren().add(new Label(String.valueOf(port.getPortName())));
                     line.getChildren().add(new Label(String.valueOf(port.isPortTaken())));
-                    Button button = new Button("Select");
-                    button.setId(String.valueOf(port.getId()));
-                    button.setOnMouseClicked(this::onSelectButtonClicked);
-                    line.getChildren().add(button);
+                    if (!port.isPortTaken()) {
+                        Button button = new Button("Select");
+                        button.setId(String.valueOf(port.getId()));
+                        button.setOnMouseClicked(this::onSelectButtonClicked);
+                        line.getChildren().add(button);
+                    }
                     pane.getChildren().add(line);
                 }
 

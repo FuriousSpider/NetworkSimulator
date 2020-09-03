@@ -8,13 +8,15 @@ import java.util.List;
 
 public class Port implements IPTextField.OnSaveClickedListener, VLanTextField.OnSaveClickedListener, VLanTextField.OnChangeModeClickedListener {
     private int id;
+    private int portNumber;
     private Interface anInterface;
     private boolean isPortTaken;
     private VLan vLan;
 
     private static int idCounter;
 
-    public Port() {
+    public Port(int portNumber) {
+        this.portNumber = portNumber;
         this.id = idCounter++;
     }
 
@@ -24,6 +26,18 @@ public class Port implements IPTextField.OnSaveClickedListener, VLanTextField.On
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public int getPortNumber() {
+        return portNumber;
+    }
+
+    public void setPortNumber(int portNumber) {
+        this.portNumber = portNumber;
+    }
+
+    public String getPortName() {
+        return "Port " + portNumber;
     }
 
     public void setNewInterface() {

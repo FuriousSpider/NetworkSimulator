@@ -26,7 +26,7 @@ public class Router extends Device implements RoutingTable.OnRoutingTableChangeL
     @Override
     void initPorts() {
         for (int i = 0; i < Values.DEVICE_ROUTER_NUMBER_OF_PORTS; i++) {
-            Port port = new Port();
+            Port port = new Port(i + 1);
             port.setNewInterface();
             getPortList().add(port);
         }

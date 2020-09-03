@@ -21,7 +21,7 @@ public class EndDevice extends Device implements IPTextField.OnSaveClickedListen
 
     @Override
     void initPorts() {
-        getPortList().add(new Port());
+        getPortList().add(new Port(1));
     }
 
     @Override

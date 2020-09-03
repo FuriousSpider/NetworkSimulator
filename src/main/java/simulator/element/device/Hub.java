@@ -20,7 +20,7 @@ public class Hub extends Device {
     @Override
     void initPorts() {
         for (int i = 0; i < Values.DEVICE_HUB_NUMBER_OF_PORTS; i++) {
-            getPortList().add(new Port());
+            getPortList().add(new Port(i + 1));
         }
     }
 

@@ -180,10 +180,10 @@ public class Engine implements PortListDialog.OnPortSelectedListener {
     public void selectDevice(int x, int y) {
         Device device = getDeviceByPosition(x, y);
         if (portToConnect != null) {
-            if (device != null && device != presentlyClickedDevice && device.hasEmptyPort()) {
+            if (device != null && !device.hasPort(portToConnect) && device.hasEmptyPort()) {
                 controller.showDevicePortListDialog(device, this);
             } else {
-                if (device == presentlyClickedDevice) {
+                if (device != null && device.hasPort(portToConnect)) {
                     logError(Values.ERROR_CANNOT_CONNECT_TO_SAME_DEVICE);
                 } else if (device != null && !device.hasEmptyPort()) {
                     logError(device.getDeviceType() + Values.ERROR_NO_FREE_PORT_AVAILABLE);

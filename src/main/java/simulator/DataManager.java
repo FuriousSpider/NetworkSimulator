@@ -77,7 +77,7 @@ public class DataManager {
                                             ArrayList<Port> portList = new ArrayList<>();
                                             for (Object port : portArray) {
                                                 JSONObject portObject = (JSONObject) port;
-                                                Port resultPort = new Port();
+                                                Port resultPort = new Port(0);
                                                 Integer vLanId = null;
                                                 Boolean isVLanInTrunkMode = null;
                                                 List<Integer> vLanTrunkModeAllowedIds = null;
@@ -86,6 +86,9 @@ public class DataManager {
                                                         switch ((String) portKey) {
                                                             case "id":
                                                                 resultPort.setId(((Long) portObject.get(portKey)).intValue());
+                                                                break;
+                                                            case "portNumber":
+                                                                resultPort.setPortNumber(((Long) portObject.get(portKey)).intValue());
                                                                 break;
                                                             case "anInterface":
                                                                 resultPort.setNewInterface();
@@ -268,6 +271,7 @@ public class DataManager {
                     for (Port port : device.getPortList()) {
                         JSONObject portObject = new JSONObject();
                         portObject.put("id", port.getId());
+                        portObject.put("portNumber", port.getPortNumber());
                         if (port.hasInterface()) {
                             portObject.put("anInterface", port.getIpAddress());
                         }

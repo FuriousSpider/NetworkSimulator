@@ -25,7 +25,7 @@ public class Switch extends Device {
     @Override
     void initPorts() {
         for (int i = 0; i < Values.DEVICE_SWITCH_NUMBER_OF_PORTS; i++) {
-            Port port = new Port();
+            Port port = new Port(i + 1);
             port.setVLan();
             getPortList().add(port);
         }
