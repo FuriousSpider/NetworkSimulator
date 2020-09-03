@@ -1,11 +1,16 @@
 package simulator.element;
 
 import simulator.view.IPTextField;
+import simulator.view.VLanTextField;
+import util.Values;
 
-public class Port implements IPTextField.OnSaveClickedListener {
+import java.util.List;
+
+public class Port implements IPTextField.OnSaveClickedListener, VLanTextField.OnSaveClickedListener, VLanTextField.OnChangeModeClickedListener {
     private int id;
     private Interface anInterface;
     private boolean isPortTaken;
+    private VLan vLan;
 
     private static int idCounter;
 
@@ -27,6 +32,47 @@ public class Port implements IPTextField.OnSaveClickedListener {
 
     public boolean hasInterface() {
         return anInterface != null;
+    }
+
+    public int getVLanId() {
+        return this.vLan.getId();
+    }
+
+    public boolean isInTrunkMode() {
+        return this.vLan.isInTrunkMode();
+    }
+
+    public void setTrunkMode(boolean isInTrunkMode) {
+        if (hasVLan()) {
+            this.vLan.setInTrunkMode(isInTrunkMode);
+        }
+    }
+
+    public void setVLanTrunkModeAllowedIds(List<Integer> vLanTrunkModeAllowedIds) {
+        if (hasVLan()) {
+            this.vLan.setTrunkModeAllowedIds(vLanTrunkModeAllowedIds);
+        }
+    }
+
+    public List<Integer> getTrunkModeAllowedIds() {
+        if (hasVLan()) {
+            return this.vLan.getTrunkModeAllowedIds();
+        }
+        return null;
+    }
+
+    public void setVLan() {
+        this.vLan = new VLan(Values.PORT_DEFAULT_VLAN_ID);
+    }
+
+    public void setVLanId(int vLanId) {
+        if (hasVLan()) {
+            this.vLan.setId(vLanId);
+        }
+    }
+
+    public boolean hasVLan() {
+        return vLan != null;
     }
 
     public boolean isPortTaken() {
@@ -67,6 +113,20 @@ public class Port implements IPTextField.OnSaveClickedListener {
     public void onSaveClicked(String ipAddress) {
         if (hasInterface()) {
             anInterface.setAddress(ipAddress);
+        }
+    }
+
+    @Override
+    public void onChangeModeClicked(boolean isInTrunkMode) {
+        if (hasVLan()) {
+            vLan.setInTrunkMode(isInTrunkMode);
+        }
+    }
+
+    @Override
+    public void onSaveClicked(int vLanId) {
+        if (hasVLan()) {
+            vLan.setId(vLanId);
         }
     }
 }

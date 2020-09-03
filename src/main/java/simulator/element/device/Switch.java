@@ -25,50 +25,31 @@ public class Switch extends Device {
     @Override
     void initPorts() {
         for (int i = 0; i < Values.DEVICE_SWITCH_NUMBER_OF_PORTS; i++) {
-            getPortList().add(new Port());
+            Port port = new Port();
+            port.setVLan();
+            getPortList().add(port);
         }
     }
 
+    //TODO: check if trunk mode works properly
     @Override
     public List<Message> handleMessage(Message message, List<Connection> connectionList) {
         addNewRecord(message.getSourceMac(), message.getCurrentDestinationPort());
-        if (associationTableContainsKey(message.getDestinationMac())) {
+        List<Port> vLanPortList = getPortListByVLanAndTrunk(message.getCurrentDestinationPort().getVLanId());
+        if (associationTableContainsKey(message.getDestinationMac()) && nextHopBelongsToVLan(message.getDestinationMac(), message.getCurrentDestinationPort())) {
             Port sourcePort = getAssociationTablePort(message.getDestinationMac());
-            Port destinationPort = null;
-            for (Connection connection : connectionList) {
-                if (sourcePort != null && connection.containsPort(sourcePort)) {
-                    destinationPort = connection.getOtherPort(sourcePort);
-                }
+            Connection connection = getConnectionByPort(sourcePort, connectionList);
+            List<Message> messageList = new ArrayList<>();
+            if (connection != null && sourcePort != null) {
+                messageList.add(new Message(message, sourcePort, connection.getOtherPort(sourcePort)));
             }
-
-            if (message.getCurrentDestinationPort() != destinationPort) {
-                List<Message> messageList = new ArrayList<>();
-                messageList.add(new Message(message, sourcePort, destinationPort));
-                return messageList;
-            } else {
-                return new ArrayList<>();
-            }
+            return messageList;
         } else {
             List<Message> messageList = new ArrayList<>();
-            for (Connection connection : connectionList) {
-                if (!connection.containsPort(message.getCurrentDestinationPort())) {
-                    if (connection.getFirstElementId() == this.getId()) {
-                        messageList.add(
-                                new Message(
-                                        message,
-                                        Engine.getInstance().getPortById(connection.getPortPair().getKey()),
-                                        Engine.getInstance().getPortById(connection.getPortPair().getValue())
-                                )
-                        );
-                    } else {
-                        messageList.add(
-                                new Message(
-                                        message,
-                                        Engine.getInstance().getPortById(connection.getPortPair().getValue()),
-                                        Engine.getInstance().getPortById(connection.getPortPair().getKey())
-                                )
-                        );
-                    }
+            for (Port sourcePort : vLanPortList) {
+                Connection connection = getConnectionByPort(sourcePort, connectionList);
+                if (connection != null && !sourcePort.equals(message.getCurrentDestinationPort())) {
+                    messageList.add(new Message(message, sourcePort, connection.getOtherPort(sourcePort)));
                 }
             }
             return messageList;
@@ -76,7 +57,7 @@ public class Switch extends Device {
     }
 
     public List<Pair<String, Integer>> getAssociationTable() {
-        return getAssociationTable();
+        return associationTable;
     }
 
     private void addNewRecord(String macAddress, Port port) {
@@ -109,5 +90,33 @@ public class Switch extends Device {
             }
         }
         return null;
+    }
+
+    private List<Port> getPortListByVLanAndTrunk(int vLanId) {
+        List<Port> list = new ArrayList<>();
+        for (Port port : getPortList()) {
+            if ((port.hasVLan() && port.getVLanId() == vLanId)
+                    || (port.hasVLan() && port.getTrunkModeAllowedIds().contains(vLanId))) {
+                list.add(port);
+            }
+        }
+        return list;
+    }
+
+    private Connection getConnectionByPort(Port port, List<Connection> connectionList) {
+        for (Connection connection : connectionList) {
+            if (connection.containsPort(port)) {
+                return connection;
+            }
+        }
+        return null;
+    }
+
+    private boolean nextHopBelongsToVLan(String destinationMac, Port currentDestinationPort) {
+        Port sourcePort = getAssociationTablePort(destinationMac);
+        if (sourcePort != null && sourcePort.hasVLan()) {
+            return sourcePort.getVLanId() == currentDestinationPort.getVLanId();
+        }
+        return false;
     }
 }

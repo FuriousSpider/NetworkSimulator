@@ -66,20 +66,19 @@ abstract public class Device {
                 portList.add(new Port());
             }
         } else if (portList.size() > numberOfPorts) {
-            for (int i = portList.size() - 1; i > numberOfPorts; i--) {
-                portList.remove(i);
+            if (portList.size() > numberOfPorts + 1) {
+                portList.subList(numberOfPorts + 1, portList.size()).clear();
             }
         }
     }
 
-    public Port getEmptyPort() {
+    public boolean hasEmptyPort() {
         for (Port port : portList) {
             if (!port.isPortTaken()) {
-                port.reservePort();
-                return port;
+                return true;
             }
         }
-        return null;
+        return false;
     }
 
     public String getMacAddress() {
@@ -100,10 +99,6 @@ abstract public class Device {
 
     public void setY(int y) {
         this.y = y;
-    }
-
-    public void removePort(Port port) {
-        portList.remove(port);
     }
 
     public static int getIdCounter() {

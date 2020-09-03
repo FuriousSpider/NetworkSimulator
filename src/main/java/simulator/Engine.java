@@ -16,20 +16,21 @@ import simulator.element.Port;
 import simulator.element.device.Device;
 import simulator.element.device.EndDevice;
 import simulator.element.device.Router;
+import simulator.view.PortListDialog;
 import util.Values;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class Engine {
+public class Engine implements PortListDialog.OnPortSelectedListener {
     private static final Engine INSTANCE = new Engine();
     private Controller controller;
     private GraphicsContext ctx;
     private final List<Device> deviceList;
     private final List<Connection> connectionList;
     private final List<Message> messageList;
-    private Integer elementToConnect;
+    private Port portToConnect;
     private Device presentlyClickedDevice;
     private Device selectedDevice;
     private boolean runSimulation;
@@ -41,7 +42,6 @@ public class Engine {
         this.deviceList = new ArrayList<>();
         this.connectionList = new ArrayList<>();
         this.messageList = new ArrayList<>();
-        this.elementToConnect = null;
         this.presentlyClickedDevice = null;
         this.selectedDevice = null;
         this.runSimulation = false;
@@ -74,7 +74,6 @@ public class Engine {
         mousePosition = null;
         selectedDevice = null;
         presentlyClickedDevice = null;
-        elementToConnect = null;
         messageList.clear();
         connectionList.clear();
         deviceList.clear();
@@ -93,6 +92,17 @@ public class Engine {
         data.setDeviceArrayList(new ArrayList<>(deviceList));
         data.setConnectionArrayList(new ArrayList<>(connectionList));
         DataManager.save(data);
+    }
+
+    public void saveDataAs() {
+        DataManager.Data data = new DataManager.Data();
+        data.setDeviceArrayList(new ArrayList<>(deviceList));
+        data.setConnectionArrayList(new ArrayList<>(connectionList));
+        DataManager.saveAs(data);
+    }
+
+    public Device getSelectedDevice() {
+        return selectedDevice;
     }
 
     public Device getDeviceById(int id) {
@@ -133,6 +143,15 @@ public class Engine {
         return null;
     }
 
+    public Device getDeviceByPosition(int x, int y) {
+        for (Device device : deviceList) {
+            if (x >= device.getX() && x <= device.getX() + Values.DEVICE_SIZE && y >= device.getY() && y <= device.getY() + Values.DEVICE_SIZE) {
+                return device;
+            }
+        }
+        return null;
+    }
+
     public Port getPortById(int id) {
         for (Device device : deviceList) {
             for (Port port : device.getPortList()) {
@@ -159,19 +178,23 @@ public class Engine {
     }
 
     public void selectDevice(int x, int y) {
-        if (elementToConnect != null) {
-            connectTo(x, y);
-        } else {
-            for (Device device : deviceList) {
-                if (x >= device.getX() && x <= device.getX() + Values.DEVICE_SIZE && y >= device.getY() && y <= device.getY() + Values.DEVICE_SIZE) {
-                    if (presentlyClickedDevice != device) {
-                        presentlyClickedDevice = device;
-                        selectedDevice = presentlyClickedDevice;
-                        controller.showDeviceInfo(selectedDevice);
-                        controller.showConnectionList(selectedDevice, getDeviceConnections(selectedDevice));
-                    }
-                    break;
+        Device device = getDeviceByPosition(x, y);
+        if (portToConnect != null) {
+            if (device != null && device != presentlyClickedDevice && device.hasEmptyPort()) {
+                controller.showDevicePortListDialog(device, this);
+            } else {
+                if (device == presentlyClickedDevice) {
+                    logError(Values.ERROR_CANNOT_CONNECT_TO_SAME_DEVICE);
+                } else if (device != null && !device.hasEmptyPort()) {
+                    logError(device.getDeviceType() + Values.ERROR_NO_FREE_PORT_AVAILABLE);
                 }
+            }
+        } else {
+            if (device != null && presentlyClickedDevice != device) {
+                presentlyClickedDevice = device;
+                selectedDevice = presentlyClickedDevice;
+                controller.showDeviceInfo(selectedDevice);
+                controller.showConnectionList(selectedDevice, getDeviceConnections(selectedDevice));
             }
         }
     }
@@ -181,8 +204,8 @@ public class Engine {
     }
 
     public void dropSelection() {
-        if (elementToConnect != null) {
-            elementToConnect = null;
+        if (portToConnect != null) {
+            portToConnect = null;
         } else {
             presentlyClickedDevice = null;
             selectedDevice = null;
@@ -197,8 +220,8 @@ public class Engine {
         selectedDevice = null;
         controller.hideElementInfo();
         controller.hideConnectionList();
-        if (elementToConnect != null) {
-            elementToConnect = null;
+        if (portToConnect != null) {
+            portToConnect = null;
         }
     }
 
@@ -267,43 +290,31 @@ public class Engine {
         this.connectMousePosition = new Pair<>(x, y);
     }
 
-    public void onConnectClicked() {
+    public void onConnectClicked(int portId) {
         if (selectedDevice != null) {
-            elementToConnect = selectedDevice.getId();
+            portToConnect = getPortById(portId);
         }
     }
 
-    private void connectTo(int x, int y) {
-        for (Device device : deviceList) {
-            if (x >= device.getX() && x <= device.getX() + Values.DEVICE_SIZE && y >= device.getY() && y <= device.getY() + Values.DEVICE_SIZE) {
-                if (!elementToConnect.equals(device.getId())) {
-                    if (!connectionAlreadyExists(elementToConnect, device.getId())) {
-                        Port first = getDeviceById(elementToConnect).getEmptyPort();
-                        Port second = device.getEmptyPort();
-                        if (first != null && second != null) {
-                            connectionList.add(new Connection(first.getId(), second.getId()));
-                        } else {
-                            //TODO: change device type to device name
-                            if (first == null) {
-                                Device dev = getDeviceById(elementToConnect);
-                                controller.logError(dev.getDeviceType() + Values.ERROR_NO_FREE_PORT_AVAILABLE);
-                            }
-                            if (second == null) {
-                                controller.logError(device.getDeviceType() + Values.ERROR_NO_FREE_PORT_AVAILABLE);
-                            }
-                        }
-                    }
-                    elementToConnect = null;
-                }
-            }
+    private void connectTo(int portId) {
+        if (!connectionAlreadyExists(portToConnect.getId(), portId)) {
+            connectionList.add(new Connection(portToConnect.getId(), portId));
+            portToConnect.reservePort();
+            getPortById(portId).reservePort();
+            portToConnect = null;
+            controller.showConnectionList(selectedDevice, getDeviceConnections(selectedDevice));
         }
-        controller.showConnectionList(selectedDevice, getDeviceConnections(selectedDevice));
     }
 
-    private boolean connectionAlreadyExists(Integer id1, int id2) {
+    @Override
+    public void onPortSelected(int portId) {
+        connectTo(portId);
+    }
+
+    private boolean connectionAlreadyExists(int portId1, int portId2) {
         for (Connection connection : connectionList) {
-            if (id1.equals(connection.getFirstElementId()) && id2 == connection.getSecondElementId()
-                    || id2 == connection.getFirstElementId() && id1.equals(connection.getSecondElementId())) {
+            if ((portId1 == connection.getFirstElementId() && portId2 == connection.getSecondElementId())
+                    || (portId2 == connection.getFirstElementId() && portId1 == connection.getSecondElementId())) {
                 return true;
             }
         }
@@ -354,7 +365,7 @@ public class Engine {
     }
 
     public boolean isInConnectionMode() {
-        return elementToConnect != null;
+        return portToConnect != null;
     }
 
     public static void stopEngine() {
@@ -397,8 +408,8 @@ public class Engine {
         if (isInConnectionMode() && connectMousePosition != null) {
             ctx.setStroke(Color.BLACK);
             ctx.strokeLine(
-                    getDeviceById(elementToConnect).getX() + (Values.DEVICE_SIZE / 2.0),
-                    getDeviceById(elementToConnect).getY() + (Values.DEVICE_SIZE / 2.0),
+                    getDeviceByPort(portToConnect).getX() + (Values.DEVICE_SIZE / 2.0),
+                    getDeviceByPort(portToConnect).getY() + (Values.DEVICE_SIZE / 2.0),
                     connectMousePosition.getKey(),
                     connectMousePosition.getValue());
         }

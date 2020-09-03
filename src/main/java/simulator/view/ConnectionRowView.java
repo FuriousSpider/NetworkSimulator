@@ -33,6 +33,16 @@ public class ConnectionRowView extends HBox {
             this.getChildren().add(ipTextField);
         }
 
+        if (thisPort.hasVLan()) {
+            VLanTextField vLanTextField = new VLanTextField();
+            vLanTextField.setVLanId(thisPort.getVLanId());
+            vLanTextField.setTrunkMode(thisPort.isInTrunkMode());
+            vLanTextField.setOnChangeModeClickedListener(thisPort);
+            vLanTextField.setOnSaveClickedListener(thisPort);
+            vLanTextField.show();
+            this.getChildren().add(vLanTextField);
+        }
+
         colorLabel.setBackground(new Background(new BackgroundFill(connection.getColor(), CornerRadii.EMPTY, Insets.EMPTY)));
         colorLabel.setMinHeight(Values.LABEL_COLOR_MIN_HEIGHT);
         colorLabel.setMinWidth(Values.LABEL_COLOR_MIN_WIDTH);

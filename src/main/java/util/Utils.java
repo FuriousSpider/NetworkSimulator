@@ -85,4 +85,13 @@ public class Utils {
             return false;
         }
     }
+
+    public static boolean isVLanIdValid(String vLanId) {
+        try {
+            int vLan = Integer.parseInt(vLanId);
+            return vLan >= Values.PORT_VLAN_ID_MIN_VALUE && vLan <= Values.PORT_VLAN_ID_MAX_VALUE;
+        } catch (Exception e) {
+            return false;
+        }
+    }
 }

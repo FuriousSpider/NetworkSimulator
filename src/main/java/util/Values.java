@@ -15,6 +15,11 @@ public class Values {
     public static int DEVICE_ROUTER_NUMBER_OF_PORTS = 8;
     public static int DEVICE_SWITCH_NUMBER_OF_PORTS = 8;
 
+    public static int PORT_DEFAULT_VLAN_ID = 1;
+    public static int PORT_VLAN_ID_MIN_VALUE = 1;
+    public static int PORT_VLAN_ID_MAX_VALUE = 1001;
+
+
     public static int ENGINE_MILLISECONDS_PAUSE = 33;
 
     public static double LABEL_COLOR_MIN_HEIGHT = 20.0;
@@ -36,8 +41,11 @@ public class Values {
 
     public static String ERROR_INVALID_NETWORK_IP_ADDRESS = "Provided network address is incorrect";
     public static String ERROR_INVALID_IP_ADDRESS = "Provided ip address is incorrect";
+    public static String ERROR_INVALID_VLAN_ID = "Provided VLAN ID is incorrect";
+
     public static String ERROR_ADDRESS_IS_NOT_A_NETWORK_ADDRESS = "Provided address is not a network address";
     public static String ERROR_ADDRESS_IS_NOT_A_HOST_ADDRESS = "Provided address is not a host address";
     public static String ERROR_NO_FREE_PORT_AVAILABLE = " has no free port available";
     public static String ERROR_OPEN_FILE_ERROR = "There was an error while opening a file";
+    public static String ERROR_CANNOT_CONNECT_TO_SAME_DEVICE = "You cannot connect the device with itself";
 }

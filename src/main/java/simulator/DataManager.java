@@ -8,7 +8,10 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import simulator.element.Connection;
 import simulator.element.Port;
-import simulator.element.device.*;
+import simulator.element.device.Device;
+import simulator.element.device.EndDevice;
+import simulator.element.device.Router;
+import simulator.element.device.Switch;
 import util.Values;
 
 import java.io.File;
@@ -16,18 +19,26 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+@SuppressWarnings("unchecked")
 public class DataManager {
-    //TODO: remember to reset Device.idCounter when deviceList loaded
+    private static File file;
+
     public static void open() {
         FileChooser fileChooser = new FileChooser();
 
         FileChooser.ExtensionFilter extensionFilter = new FileChooser.ExtensionFilter("JSON files (*.json)", "*.json");
         fileChooser.getExtensionFilters().add(extensionFilter);
 
+        if (DataManager.file != null) {
+            fileChooser.setInitialDirectory(DataManager.file.getParentFile());
+        }
+
         File file = fileChooser.showOpenDialog(null);
         if (file != null) {
+            DataManager.file = file;
             try {
                 String text = Files.readString(Paths.get(file.toURI()));
                 JSONObject object = (JSONObject) new JSONParser().parse(text);
@@ -36,94 +47,118 @@ public class DataManager {
                 ArrayList<Connection> connectionResultList = new ArrayList<>();
                 for (Object key : object.keySet()) {
                     if (key instanceof String && key.equals("devices")) {
-                         JSONArray deviceArray = (JSONArray) object.get(key);
-                         for (Object device : deviceArray) {
-                             JSONObject deviceObject = (JSONObject) device;
-                             Device.Builder resultDevice = new Device.Builder();
-                             for (Object propertyKey : deviceObject.keySet()) {
-                                 if (propertyKey instanceof String) {
-                                     switch ((String)propertyKey) {
-                                         case "id":
-                                             resultDevice.id(((Long) deviceObject.get(propertyKey)).intValue());
-                                             break;
-                                         case "type":
-                                             resultDevice.deviceType((String) deviceObject.get(propertyKey));
-                                             break;
-                                         case "name":
-                                             resultDevice.name((String) deviceObject.get(propertyKey));
-                                             break;
-                                         case "x":
-                                             resultDevice.x(((Long) deviceObject.get(propertyKey)).intValue());
-                                             break;
-                                         case "y":
-                                             resultDevice.y(((Long) deviceObject.get(propertyKey)).intValue());
-                                             break;
-                                         case "macAddress":
-                                             resultDevice.macAddress((String) deviceObject.get(propertyKey));
-                                             break;
-                                         case "portList":
-                                             JSONArray portArray = (JSONArray) deviceObject.get(propertyKey);
-                                             ArrayList<Port> portList = new ArrayList<>();
-                                             for (Object port : portArray) {
-                                                 JSONObject portObject = (JSONObject) port;
-                                                 Port resultPort = new Port();
-                                                 for (Object portKey : portObject.keySet()) {
-                                                     if (portKey instanceof String) {
-                                                         switch ((String) portKey) {
-                                                             case "id":
-                                                                 resultPort.setId(((Long) portObject.get(portKey)).intValue());
-                                                                 break;
-                                                             case "anInterface":
-                                                                 resultPort.setNewInterface();
-                                                                 resultPort.setIpAddress((String) portObject.get(portKey));
-                                                                 break;
-                                                             case "isPortTaken":
-                                                                 boolean isPortTaken = (Boolean) portObject.get(portKey);
-                                                                 if (isPortTaken) {
-                                                                     resultPort.reservePort();
-                                                                 } else {
-                                                                     resultPort.releasePort();
-                                                                 }
-                                                                 break;
-                                                         }
-                                                     }
-                                                 }
-                                                 portList.add(resultPort);
-                                             }
-                                             resultDevice.portList(portList);
-                                             break;
-                                         case "anInterface":
-                                             resultDevice.ipAddress((String) deviceObject.get(propertyKey));
-                                             break;
-                                         case "associationTable":
-                                             JSONArray entryArray = ((JSONArray) deviceObject.get(propertyKey));
-                                             ArrayList<Pair<String, Integer>> associationTableResult = new ArrayList<>();
-                                             for (Object entry : entryArray) {
-                                                 JSONObject entryObject = (JSONObject) entry;
-                                                 String first = (String) entryObject.get("key");
-                                                 Integer second = ((Long) entryObject.get("value")).intValue();
-                                                 Pair<String, Integer> pair = new Pair<>(first, second);
-                                                 associationTableResult.add(pair);
-                                             }
-                                             resultDevice.associationTable(associationTableResult);
-                                             break;
-                                         case "routingTable":
-                                             JSONArray routingTableArray = ((JSONArray) deviceObject.get(propertyKey));
-                                             Map<String, String> routingTable = new HashMap<>();
-                                             for (Object entry : routingTableArray) {
-                                                 JSONObject entryObject = (JSONObject) entry;
-                                                 String first = (String) entryObject.get("key");
-                                                 String second = (String) entryObject.get("value");
-                                                 routingTable.put(first, second);
-                                             }
-                                             resultDevice.routingTable(routingTable);
-                                             break;
+                        JSONArray deviceArray = (JSONArray) object.get(key);
+                        for (Object device : deviceArray) {
+                            JSONObject deviceObject = (JSONObject) device;
+                            Device.Builder resultDevice = new Device.Builder();
+                            for (Object propertyKey : deviceObject.keySet()) {
+                                if (propertyKey instanceof String) {
+                                    switch ((String) propertyKey) {
+                                        case "id":
+                                            resultDevice.id(((Long) deviceObject.get(propertyKey)).intValue());
+                                            break;
+                                        case "type":
+                                            resultDevice.deviceType((String) deviceObject.get(propertyKey));
+                                            break;
+                                        case "name":
+                                            resultDevice.name((String) deviceObject.get(propertyKey));
+                                            break;
+                                        case "x":
+                                            resultDevice.x(((Long) deviceObject.get(propertyKey)).intValue());
+                                            break;
+                                        case "y":
+                                            resultDevice.y(((Long) deviceObject.get(propertyKey)).intValue());
+                                            break;
+                                        case "macAddress":
+                                            resultDevice.macAddress((String) deviceObject.get(propertyKey));
+                                            break;
+                                        case "portList":
+                                            JSONArray portArray = (JSONArray) deviceObject.get(propertyKey);
+                                            ArrayList<Port> portList = new ArrayList<>();
+                                            for (Object port : portArray) {
+                                                JSONObject portObject = (JSONObject) port;
+                                                Port resultPort = new Port();
+                                                Integer vLanId = null;
+                                                Boolean isVLanInTrunkMode = null;
+                                                List<Integer> vLanTrunkModeAllowedIds = null;
+                                                for (Object portKey : portObject.keySet()) {
+                                                    if (portKey instanceof String) {
+                                                        switch ((String) portKey) {
+                                                            case "id":
+                                                                resultPort.setId(((Long) portObject.get(portKey)).intValue());
+                                                                break;
+                                                            case "anInterface":
+                                                                resultPort.setNewInterface();
+                                                                resultPort.setIpAddress((String) portObject.get(portKey));
+                                                                break;
+                                                            case "isPortTaken":
+                                                                boolean isPortTaken = (Boolean) portObject.get(portKey);
+                                                                if (isPortTaken) {
+                                                                    resultPort.reservePort();
+                                                                } else {
+                                                                    resultPort.releasePort();
+                                                                }
+                                                                break;
+                                                            case "vLanId":
+                                                                vLanId = ((Long) portObject.get(portKey)).intValue();
+                                                                break;
+                                                            case "isVLanInTrunkMode":
+                                                                isVLanInTrunkMode = (Boolean) portObject.get(portKey);
+                                                                break;
+                                                            case "vLanTrunkModeAllowedIds":
+                                                                vLanTrunkModeAllowedIds = new ArrayList<>();
+                                                                JSONArray vLanTrunkModeAllowedIdsArray = (JSONArray) portObject.get(portKey);
+                                                                for (Object id : vLanTrunkModeAllowedIdsArray) {
+                                                                    if (id instanceof Integer) {
+                                                                        vLanTrunkModeAllowedIds.add((Integer) id);
+                                                                    }
+                                                                }
+                                                                break;
+                                                        }
+                                                    }
+                                                }
+                                                if (vLanId != null && isVLanInTrunkMode != null && vLanTrunkModeAllowedIds != null) {
+                                                    resultPort.setVLan();
+                                                    resultPort.setVLanId(vLanId);
+                                                    resultPort.setTrunkMode(isVLanInTrunkMode);
+                                                    resultPort.setVLanTrunkModeAllowedIds(vLanTrunkModeAllowedIds);
+                                                }
+                                                portList.add(resultPort);
+                                            }
+                                            resultDevice.portList(portList);
+                                            break;
+                                        case "anInterface":
+                                            resultDevice.ipAddress((String) deviceObject.get(propertyKey));
+                                            break;
+                                        case "associationTable":
+                                            JSONArray entryArray = ((JSONArray) deviceObject.get(propertyKey));
+                                            ArrayList<Pair<String, Integer>> associationTableResult = new ArrayList<>();
+                                            for (Object entry : entryArray) {
+                                                JSONObject entryObject = (JSONObject) entry;
+                                                String first = (String) entryObject.get("key");
+                                                Integer second = ((Long) entryObject.get("value")).intValue();
+                                                Pair<String, Integer> pair = new Pair<>(first, second);
+                                                associationTableResult.add(pair);
+                                            }
+                                            resultDevice.associationTable(associationTableResult);
+                                            break;
+                                        case "routingTable":
+                                            JSONArray routingTableArray = ((JSONArray) deviceObject.get(propertyKey));
+                                            Map<String, String> routingTable = new HashMap<>();
+                                            for (Object entry : routingTableArray) {
+                                                JSONObject entryObject = (JSONObject) entry;
+                                                String first = (String) entryObject.get("key");
+                                                String second = (String) entryObject.get("value");
+                                                routingTable.put(first, second);
+                                            }
+                                            resultDevice.routingTable(routingTable);
+                                            break;
 
-                                     }
-                                 }
-                             }
-                             deviceResultList.add(resultDevice.build());
-                         }
+                                    }
+                                }
+                            }
+                            deviceResultList.add(resultDevice.build());
+                        }
                         data.setDeviceArrayList(deviceResultList);
                     } else if (key instanceof String && key.equals("connections")) {
                         JSONArray connectionsArray = (JSONArray) object.get(key);
@@ -137,7 +172,7 @@ public class DataManager {
                                 if (propertyKey instanceof String) {
                                     switch ((String) propertyKey) {
                                         case "id":
-                                            connectionBuilder.id(((Long)connectionObject.get(propertyKey)).intValue());
+                                            connectionBuilder.id(((Long) connectionObject.get(propertyKey)).intValue());
                                             break;
                                         case "portPair":
                                             JSONObject portPairObject = (JSONObject) connectionObject.get(propertyKey);
@@ -167,15 +202,15 @@ public class DataManager {
                             JSONObject optionObject = (JSONObject) option;
                             for (Object optionKey : optionObject.keySet()) {
                                 if (optionKey instanceof String) {
-                                    switch ((String)optionKey) {
+                                    switch ((String) optionKey) {
                                         case "deviceIdCounter":
-                                            Device.setIdCounter(((Long)optionObject.get(optionKey)).intValue());
+                                            Device.setIdCounter(((Long) optionObject.get(optionKey)).intValue());
                                             break;
                                         case "portIdCounter":
-                                            Port.setIdCounter(((Long)optionObject.get(optionKey)).intValue());
+                                            Port.setIdCounter(((Long) optionObject.get(optionKey)).intValue());
                                             break;
                                         case "connectionIdCounter":
-                                            Connection.setIdCounter(((Long)optionObject.get(optionKey)).intValue());
+                                            Connection.setIdCounter(((Long) optionObject.get(optionKey)).intValue());
                                             break;
                                     }
                                 }
@@ -190,15 +225,34 @@ public class DataManager {
         }
     }
 
+    public static void saveAs(Data data) {
+        save(data, null);
+    }
+
     public static void save(Data data) {
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Save file");
+        save(data, DataManager.file);
+    }
 
-        FileChooser.ExtensionFilter extensionFilter = new FileChooser.ExtensionFilter("JSON files (*.json)", "*.json");
-        fileChooser.getExtensionFilters().add(extensionFilter);
+    private static void save(Data data, File selectedFile) {
+        File file;
+        if (selectedFile != null) {
+            file = selectedFile;
+        } else {
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.setTitle("Save file");
 
-        File file = fileChooser.showSaveDialog(null);
+            FileChooser.ExtensionFilter extensionFilter = new FileChooser.ExtensionFilter("JSON files (*.json)", "*.json");
+            fileChooser.getExtensionFilters().add(extensionFilter);
+
+            if (DataManager.file != null) {
+                fileChooser.setInitialDirectory(DataManager.file.getParentFile());
+            }
+
+            file = fileChooser.showSaveDialog(null);
+        }
+
         if (file != null) {
+            DataManager.file = file;
             try {
                 JSONObject dataObject = new JSONObject();
                 JSONArray devicesArray = new JSONArray();
@@ -216,6 +270,13 @@ public class DataManager {
                         portObject.put("id", port.getId());
                         if (port.hasInterface()) {
                             portObject.put("anInterface", port.getIpAddress());
+                        }
+                        if (port.hasVLan()) {
+                            portObject.put("vLanId", port.getVLanId());
+                            portObject.put("isVLanInTrunkMode", port.isInTrunkMode());
+                            JSONArray trunkModeAllowedIds = new JSONArray();
+                            trunkModeAllowedIds.addAll(port.getTrunkModeAllowedIds());
+                            portObject.put("vLanTrunkModeAllowedIds", trunkModeAllowedIds);
                         }
                         portObject.put("isPortTaken", port.isPortTaken());
                         portArray.add(portObject);
@@ -255,9 +316,9 @@ public class DataManager {
                     portPairObject.put("first", connection.getPortPair().getKey());
                     portPairObject.put("second", connection.getPortPair().getValue());
                     connectionObject.put("portPair", portPairObject);
-                    connectionObject.put("colorRed",  connection.getColor().getRed());
-                    connectionObject.put("colorGreen",  connection.getColor().getGreen());
-                    connectionObject.put("colorBlue",  connection.getColor().getBlue());
+                    connectionObject.put("colorRed", connection.getColor().getRed());
+                    connectionObject.put("colorGreen", connection.getColor().getGreen());
+                    connectionObject.put("colorBlue", connection.getColor().getBlue());
                     connectionsArray.add(connectionObject);
                 }
                 dataObject.put("connections", connectionsArray);
@@ -280,7 +341,7 @@ public class DataManager {
                 optionsArray.add(optionObject);
 
                 dataObject.put("options", optionsArray);
-                //TODO: save macAddressTable from utils
+
                 Files.writeString(Paths.get(file.toURI()), dataObject.toJSONString());
             } catch (Exception e) {
                 e.printStackTrace();

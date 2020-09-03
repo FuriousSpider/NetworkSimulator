@@ -25,7 +25,7 @@ import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
 
-public class Controller implements Initializable {
+public class Controller implements Initializable, PortListDialog.OnPortSelectedListener {
     @FXML
     private BorderPane root;
     @FXML
@@ -101,7 +101,13 @@ public class Controller implements Initializable {
 
     @FXML
     private void handleConnectElementsButtonClick() {
-        engine.onConnectClicked();
+        Device selectedDevice = engine.getSelectedDevice();
+        if (selectedDevice != null) {
+            PortListDialog dialog = new PortListDialog();
+            dialog.setPortList(selectedDevice.getPortList());
+            dialog.setOnPortSelectedListener(this);
+            dialog.start();
+        }
     }
 
     @FXML
@@ -111,7 +117,7 @@ public class Controller implements Initializable {
 
     @FXML
     private void handleStartSimulationButtonClick() {
-        //TODO: when sourceMac TextField focused you cannot use key shorcuts on canvas
+        //TODO: when sourceMac TextField focused you cannot use key shortcuts on canvas
         engine.startSimulation(simulationSourceIPAddress.getText(), simulationDestinationIPAddress.getText());
     }
 
@@ -153,7 +159,7 @@ public class Controller implements Initializable {
 
     @FXML
     private void handleMenuSaveAsClick() {
-
+        engine.saveDataAs();
     }
 
     @FXML
@@ -196,7 +202,7 @@ public class Controller implements Initializable {
         } else if (keyEvent.getCode() == KeyCode.ESCAPE) {
             engine.dropSelection();
         } else if (keyEvent.getCode() == KeyCode.C) {
-            engine.onConnectClicked();
+            handleConnectElementsButtonClick();
         }
     }
 
@@ -211,6 +217,7 @@ public class Controller implements Initializable {
         } else {
             elementInfoIpAddress.hide();
         }
+
         if (selectedDevice instanceof Router) {
             Router router = (Router) selectedDevice;
             routingTableView.show();
@@ -225,6 +232,7 @@ public class Controller implements Initializable {
         elementInfo.setVisible(false);
     }
 
+    //TODO: show ports rather than connections only
     public void showConnectionList(Device selectedDevice, List<Connection> connectionList) {
         connectionsInfo.getChildren().clear();
         for (Connection connection : connectionList) {
@@ -234,6 +242,13 @@ public class Controller implements Initializable {
             connectionsInfo.getChildren().add(connectionRowView);
         }
         connectionsInfo.setVisible(true);
+    }
+
+    public void showDevicePortListDialog(Device device, PortListDialog.OnPortSelectedListener listener) {
+        PortListDialog portListDialog = new PortListDialog();
+        portListDialog.setPortList(device.getPortList());
+        portListDialog.setOnPortSelectedListener(listener);
+        portListDialog.start();
     }
 
     public void hideConnectionList() {
@@ -250,5 +265,11 @@ public class Controller implements Initializable {
 
     public void logError(String errorMessage) {
         logPanel.logError(errorMessage);
+    }
+
+
+    @Override
+    public void onPortSelected(int portId) {
+        engine.onConnectClicked(portId);
     }
 }
