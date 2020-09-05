@@ -10,6 +10,8 @@ public class Values {
     public static int DEVICE_DEFAULT_POSITION = 100;
     public static int DEVICE_STROKE = 1;
 
+    public static int FONT_SIZE = 16;
+
     public static int DEVICE_SWITCH_ASSOCIATION_TABLE_SIZE_LIMIT = 1000;
 
     public static int DEVICE_FIREWALL_NUMBER_OF_PORTS = 2;
@@ -20,7 +22,6 @@ public class Values {
     public static int PORT_DEFAULT_VLAN_ID = 1;
     public static int PORT_VLAN_ID_MIN_VALUE = 1;
     public static int PORT_VLAN_ID_MAX_VALUE = 1001;
-
 
     public static int ENGINE_MILLISECONDS_PAUSE = 33;
 

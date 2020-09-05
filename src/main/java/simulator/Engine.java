@@ -5,10 +5,13 @@ import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
+import javafx.geometry.VPos;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.TextAlignment;
 import javafx.util.Duration;
 import javafx.util.Pair;
 import simulator.element.Connection;
@@ -71,6 +74,9 @@ public class Engine implements PortListDialog.OnPortSelectedListener {
     private void setCtxConfig() {
         ctx.setStroke(Color.BLACK);
         ctx.setLineWidth(2.0);
+        ctx.setTextAlign(TextAlignment.CENTER);
+        ctx.setTextBaseline(VPos.CENTER);
+        ctx.setFont(new Font(Font.getFamilies().get(0), Values.FONT_SIZE));
     }
 
     public void startNewProject() {
@@ -415,11 +421,52 @@ public class Engine implements PortListDialog.OnPortSelectedListener {
             Device device2 = getDeviceById(connection.getSecondElementId());
             if (device1 != null && device2 != null) {
                 ctx.setStroke(connection.getColor());
+                double x1 = device1.getX() + (Values.DEVICE_SIZE / 2.0);
+                double y1 = device1.getY() + (Values.DEVICE_SIZE / 2.0);
+                double x2 = device2.getX() + (Values.DEVICE_SIZE / 2.0);
+                double y2 = device2.getY() + (Values.DEVICE_SIZE / 2.0);
                 ctx.strokeLine(
-                        device1.getX() + (Values.DEVICE_SIZE / 2.0),
-                        device1.getY() + (Values.DEVICE_SIZE / 2.0),
-                        device2.getX() + (Values.DEVICE_SIZE / 2.0),
-                        device2.getY() + (Values.DEVICE_SIZE / 2.0));
+                        x1,
+                        y1,
+                        x2,
+                        y2);
+
+                Pair<Integer, Integer> portPair = connection.getPortPair();
+                Port port1 = getPortById(portPair.getKey());
+                Port port2 = getPortById(portPair.getValue());
+
+                if (!device1.hasPort(port1)) {
+                    port1 = getPortById(portPair.getValue());
+                    port2 = getPortById(portPair.getKey());
+                }
+
+                double dx = Math.abs(x1 - x2);
+                double dy = Math.abs(y1 - y2);
+                double port1X, port1Y, port2X, port2Y;
+                double multiplier = 0.3;
+                double ipAddressTopPadding = 20.0;
+                if (x1 < x2) {
+                    port1X = Math.min(x1 + dx * multiplier, x1 + Values.DEVICE_SIZE * 2);
+                    port2X = Math.max(x2 - dx * multiplier, x2 - Values.DEVICE_SIZE * 2);
+                } else {
+                    port1X = Math.max(x1 - dx * multiplier, x1 - Values.DEVICE_SIZE * 2);
+                    port2X = Math.min(x2 + dx * multiplier, x2 + Values.DEVICE_SIZE * 2);
+                }
+                if (y1 < y2) {
+                    port1Y = Math.min(y1 + dy * multiplier, y1 + Values.DEVICE_SIZE * 2);
+                    port2Y = Math.max(y2 - dy * multiplier, y2 - Values.DEVICE_SIZE * 2);
+                } else {
+                    port1Y = Math.max(y1 - dy * multiplier, y1 - Values.DEVICE_SIZE * 2);
+                    port2Y = Math.min(y2 + dy * multiplier, y2 + Values.DEVICE_SIZE * 2);
+                }
+                ctx.fillText(port1.getPortName(), port1X, port1Y);
+                if (port1.hasInterface()) {
+                    ctx.fillText(port1.getIpAddress(), port1X, port1Y + ipAddressTopPadding);
+                }
+                ctx.fillText(port2.getPortName(), port2X, port2Y);
+                if (port2.hasInterface()) {
+                    ctx.fillText(port2.getIpAddress(), port2X, port2Y + ipAddressTopPadding);
+                }
             }
         }
         if (isInConnectionMode() && connectMousePosition != null) {
@@ -446,6 +493,10 @@ public class Engine implements PortListDialog.OnPortSelectedListener {
                 );
             }
             ctx.drawImage(element.getImage(), element.getX(), element.getY(), Values.DEVICE_SIZE, Values.DEVICE_SIZE);
+            ctx.fillText("!Hejlou!", element.getX() + Values.DEVICE_SIZE / 2.0, element.getY() + Values.DEVICE_SIZE * 1.2);
+            if (element instanceof EndDevice) {
+                ctx.fillText(((EndDevice) element).getIpAddress(), element.getX() + Values.DEVICE_SIZE / 2.0, element.getY() + Values.DEVICE_SIZE * 1.2 + 20.0);
+            }
         }
     }
 
