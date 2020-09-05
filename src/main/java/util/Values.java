@@ -5,6 +5,8 @@ public class Values {
     public static int APPLICATION_MIN_HEIGHT = 600;
 
     public static int DEVICE_SIZE = 50;
+    public static int DEVICE_MIN_SIZE = 50;
+    public static int DEVICE_MAX_SIZE = 100;
     public static int DEVICE_DEFAULT_POSITION = 100;
     public static int DEVICE_STROKE = 1;
 
@@ -26,14 +28,18 @@ public class Values {
     public static double LABEL_COLOR_MIN_WIDTH = 50.0;
 
     public static int MESSAGE_SIZE = 50;
-    public static int MESSAGE_PROGRESS_MAX = 100;
-    public static int MESSAGE_PROGRESS_STEP = 3;
+    public static int MESSAGE_PROGRESS_MAX = 1000;
+    public static int MESSAGE_PROGRESS_STEP = 30;
+    public static int MESSAGE_PROGRESS_MIN_STEP = 10;
+    public static int MESSAGE_PROGRESS_MAX_STEP = 300;
 
     public static String DIALOG_NEW_TITLE = "Start new project";
     public static String DIALOG_NEW_CONTENT = "Do you want to create a new project?\nAll unsaved data will be lost.";
 
     public static String DIALOG_OPEN_TITLE = "Open project";
     public static String DIALOG_OPEN_CONTENT = "Do you want to open a project?\nAll unsaved data will be lost.";
+
+    public static int DIALOG_OPTIONS_MIN_WIDTH = 400;
 
     public static String REGEX_IP_ADDRESS_WITH_MASK = "^([01]?\\d\\d?|2[0-4]\\d|25[0-5])(?:\\.[01]?\\d\\d?|\\.2[0-4]\\d|\\.25[0-5]){3}(?:/[0-2]\\d|/3[0-2])?$";
 

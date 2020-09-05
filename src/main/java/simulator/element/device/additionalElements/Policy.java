@@ -68,6 +68,14 @@ public class Policy {
         this.rule = rule;
     }
 
+    public static int getIdCounter() {
+        return idCounter;
+    }
+
+    public static void setIdCounter(int counter) {
+        idCounter = counter;
+    }
+
     public enum Application {
         UDP,
         TCP

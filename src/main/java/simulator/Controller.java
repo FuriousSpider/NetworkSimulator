@@ -1,12 +1,10 @@
 package simulator;
 
 import javafx.application.Platform;
+import javafx.beans.Observable;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
@@ -169,6 +167,11 @@ public class Controller implements Initializable, PortListDialog.OnPortSelectedL
         Platform.exit();
     }
 
+    @FXML
+    private void handleMenuOptionsClick() {
+        new OptionsDialog().show();
+    }
+
     private void canvasMousePressed(MouseEvent mouseEvent) {
         releaseFocus();
         engine.onMousePressed((int) mouseEvent.getX(), (int) mouseEvent.getY());
@@ -243,6 +246,9 @@ public class Controller implements Initializable, PortListDialog.OnPortSelectedL
 
     public void hideElementInfo() {
         elementInfo.setVisible(false);
+        connectionsInfo.setVisible(false);
+        routingTableView.hide();
+        firewallPoliciesView.hide();
     }
 
     //TODO: show ports rather than connections only
@@ -262,10 +268,6 @@ public class Controller implements Initializable, PortListDialog.OnPortSelectedL
         portListDialog.setPortList(device.getPortList());
         portListDialog.setOnPortSelectedListener(listener);
         portListDialog.start();
-    }
-
-    public void hideConnectionList() {
-        connectionsInfo.setVisible(false);
     }
 
     private void onDeleteConnection(int id) {

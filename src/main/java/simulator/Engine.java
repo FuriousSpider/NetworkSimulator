@@ -79,7 +79,6 @@ public class Engine implements PortListDialog.OnPortSelectedListener {
         connectionList.clear();
         deviceList.clear();
         controller.hideElementInfo();
-        controller.hideConnectionList();
     }
 
     public void loadData(DataManager.Data data) {
@@ -211,7 +210,6 @@ public class Engine implements PortListDialog.OnPortSelectedListener {
             presentlyClickedDevice = null;
             selectedDevice = null;
             controller.hideElementInfo();
-            controller.hideConnectionList();
         }
     }
 
@@ -220,7 +218,6 @@ public class Engine implements PortListDialog.OnPortSelectedListener {
         deviceList.remove(selectedDevice);
         selectedDevice = null;
         controller.hideElementInfo();
-        controller.hideConnectionList();
         if (portToConnect != null) {
             portToConnect = null;
         }

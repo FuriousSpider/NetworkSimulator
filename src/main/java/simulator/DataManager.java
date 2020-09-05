@@ -228,20 +228,26 @@ public class DataManager {
                         JSONArray optionsArray = (JSONArray) object.get(key);
                         for (Object option : optionsArray) {
                             JSONObject optionObject = (JSONObject) option;
-                            for (Object optionKey : optionObject.keySet()) {
-                                if (optionKey instanceof String) {
-                                    switch ((String) optionKey) {
-                                        case "deviceIdCounter":
-                                            Device.setIdCounter(((Long) optionObject.get(optionKey)).intValue());
-                                            break;
-                                        case "portIdCounter":
-                                            Port.setIdCounter(((Long) optionObject.get(optionKey)).intValue());
-                                            break;
-                                        case "connectionIdCounter":
-                                            Connection.setIdCounter(((Long) optionObject.get(optionKey)).intValue());
-                                            break;
-                                    }
-                                }
+                            String keyName = (String) optionObject.get("key");
+                            switch(keyName) {
+                                case "deviceIdCounter":
+                                    Device.setIdCounter(((Long) optionObject.get("value")).intValue());
+                                    break;
+                                case "portIdCounter":
+                                    Port.setIdCounter(((Long) optionObject.get("value")).intValue());
+                                    break;
+                                case "connectionIdCounter":
+                                    Connection.setIdCounter(((Long) optionObject.get("value")).intValue());
+                                    break;
+                                case "policyIdCounter":
+                                    Policy.setIdCounter(((Long) optionObject.get("value")).intValue());
+                                    break;
+                                case "deviceSizeOption":
+                                    Values.DEVICE_SIZE = ((Long) optionObject.get("value")).intValue();
+                                    break;
+                                case "simulationSpeedOption":
+                                    Values.MESSAGE_PROGRESS_STEP = ((Long) optionObject.get("value")).intValue();
+                                    break;
                             }
                         }
                     }
@@ -386,10 +392,22 @@ public class DataManager {
                 optionObject.put("value", Connection.getIdCounter());
                 optionsArray.add(optionObject);
 
+                optionObject = new JSONObject();
+                optionObject.put("key", "policyIdCounter");
+                optionObject.put("value", Policy.getIdCounter());
+                optionsArray.add(optionObject);
+
+                optionObject = new JSONObject();
+                optionObject.put("key", "deviceSizeOption");
+                optionObject.put("value", Values.DEVICE_SIZE);
+                optionsArray.add(optionObject);
+
+                optionObject = new JSONObject();
+                optionObject.put("key", "simulationSpeedOption");
+                optionObject.put("value", Values.MESSAGE_PROGRESS_STEP);
+                optionsArray.add(optionObject);
+
                 dataObject.put("options", optionsArray);
-
-                //TODO: add Firewall policies
-
 
                 Files.writeString(Paths.get(file.toURI()), dataObject.toJSONString());
             } catch (Exception e) {
