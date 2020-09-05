@@ -7,20 +7,15 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import simulator.element.Connection;
-import simulator.element.Port;
-import simulator.element.device.Device;
-import simulator.element.device.EndDevice;
-import simulator.element.device.Router;
-import simulator.element.device.Switch;
+import simulator.element.device.*;
+import simulator.element.device.additionalElements.Policy;
+import simulator.element.device.additionalElements.Port;
 import util.Values;
 
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @SuppressWarnings("unchecked")
 public class DataManager {
@@ -156,7 +151,37 @@ public class DataManager {
                                             }
                                             resultDevice.routingTable(routingTable);
                                             break;
-
+                                        case "policyList":
+                                            JSONArray policiesArray = ((JSONArray) deviceObject.get(propertyKey));
+                                            List<Policy> policyList = new ArrayList<>();
+                                            for (Object entry : policiesArray) {
+                                                JSONObject entryObject = (JSONObject) entry;
+                                                Policy policy = new Policy();
+                                                String sourceNetworkAddress = (String) entryObject.get("sourceNetworkAddress");
+                                                if (sourceNetworkAddress != null && !sourceNetworkAddress.isBlank()) {
+                                                    policy.setSourceNetworkAddress(sourceNetworkAddress);
+                                                }
+                                                String destinationNetworkAddress = (String) entryObject.get("destinationNetworkAddress");
+                                                if (destinationNetworkAddress != null && !destinationNetworkAddress.isBlank()) {
+                                                    policy.setDestinationNetworkAddress(destinationNetworkAddress);
+                                                }
+                                                JSONArray applicationSetArray = (JSONArray) entryObject.get("applicationSet");
+                                                Set<Policy.Application> applicationSet = new HashSet<>();
+                                                for (Object application : applicationSetArray) {
+                                                    applicationSet.add(Policy.Application.valueOf((String) application));
+                                                }
+                                                policy.setApplicationSet(applicationSet);
+                                                Policy.Rule rule = Policy.Rule.valueOf((String) entryObject.get("rule"));
+                                                policy.setRule(rule);
+                                                policyList.add(policy);
+                                            }
+                                            resultDevice.policyList(policyList);
+                                            break;
+                                        case "defaultRule":
+                                            String defaultRuleString = (String) deviceObject.get("defaultRule");
+                                            Policy.Rule rule = Policy.Rule.valueOf(defaultRuleString);
+                                            resultDevice.defaultRule(rule);
+                                            break;
                                     }
                                 }
                             }
@@ -306,6 +331,23 @@ public class DataManager {
                             routingTableArray.add(routingTableObject);
                         }
                         deviceObject.put("routingTable", routingTableArray);
+                    } else if (device instanceof Firewall) {
+                        Firewall firewall = (Firewall) device;
+                        JSONArray policiesArray = new JSONArray();
+                        for (Policy policy : firewall.getPolicyList()) {
+                            JSONObject policyObject = new JSONObject();
+                            policyObject.put("sourceNetworkAddress", policy.getSourceNetworkAddress());
+                            policyObject.put("destinationNetworkAddress", policy.getDestinationNetworkAddress());
+                            JSONArray applicationArray = new JSONArray();
+                            for (Policy.Application application : policy.getApplicationSet()) {
+                                applicationArray.add(application.name());
+                            }
+                            policyObject.put("applicationSet", applicationArray);
+                            policyObject.put("rule", policy.getRule().name());
+                            policiesArray.add(policyObject);
+                        }
+                        deviceObject.put("policyList", policiesArray);
+                        deviceObject.put("defaultRule", firewall.getDefaultRule().name());
                     }
 
                     devicesArray.add(deviceObject);
@@ -345,6 +387,9 @@ public class DataManager {
                 optionsArray.add(optionObject);
 
                 dataObject.put("options", optionsArray);
+
+                //TODO: add Firewall policies
+
 
                 Files.writeString(Paths.get(file.toURI()), dataObject.toJSONString());
             } catch (Exception e) {

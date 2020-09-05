@@ -8,7 +8,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import simulator.Engine;
-import simulator.element.Port;
+import simulator.element.device.additionalElements.Port;
 import util.Values;
 
 import java.util.ArrayList;

@@ -9,6 +9,7 @@
 <?import simulator.view.TitleLabel?>
 <?import simulator.view.IPTextField?>
 <?import simulator.view.RoutingTable?>
+<?import simulator.view.FirewallPoliciesView?>
 <BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="simulator.Controller" styleClass="layout" fx:id="root">
     <stylesheets>
         <URL value="@Styles.css"/>
@@ -45,6 +46,7 @@
                 </StackPane>
                 <VBox fx:id="connectionsInfo"/>
                 <RoutingTable fx:id="routingTableView" visible="false"/>
+                <FirewallPoliciesView fx:id="firewallPoliciesView" visible="false"/>
                 <Region VBox.vgrow="ALWAYS"/>
                 <VBox>
                     <GridPane>

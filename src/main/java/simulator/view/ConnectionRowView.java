@@ -10,7 +10,7 @@ import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.HBox;
 import simulator.Engine;
 import simulator.element.Connection;
-import simulator.element.Port;
+import simulator.element.device.additionalElements.Port;
 import util.Values;
 
 public class ConnectionRowView extends HBox {

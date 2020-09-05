@@ -1,4 +1,4 @@
-package simulator.element;
+package simulator.element.device.additionalElements;
 
 public class Interface {
     private String address;

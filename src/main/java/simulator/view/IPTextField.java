@@ -40,8 +40,8 @@ public class IPTextField extends VBox {
         this.secondLine.getChildren().add(editButton);
         this.secondLine.getChildren().add(cancelButton);
 
-        editButton.setOnMouseClicked(this::onEditButtonClicked);
-        cancelButton.setOnMouseClicked(this::onCancelButtonClicked);
+        this.editButton.setOnMouseClicked(this::onEditButtonClicked);
+        this.cancelButton.setOnMouseClicked(this::onCancelButtonClicked);
 
         this.isInEditMode = true;
         changeState();

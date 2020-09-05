@@ -2,20 +2,27 @@ package simulator.element.device;
 
 import simulator.element.Connection;
 import simulator.element.Message;
-import simulator.element.Port;
+import simulator.element.device.additionalElements.Policy;
+import simulator.element.device.additionalElements.Port;
+import simulator.view.FirewallPoliciesView;
+import util.Utils;
 import util.Values;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
-public class Firewall extends Device {
+public class Firewall extends Device implements FirewallPoliciesView.OnPoliciesListUpdatedListener{
     public static String fileName = "/firewall.png";
     public static String deviceType = "Firewall";
+    private final List<Policy> policyList;
+    private Policy.Rule defaultRule;
 
     public Firewall(int x, int y) {
         super(fileName, x, y, deviceType);
+        this.policyList = new ArrayList<>();
+        this.defaultRule = Policy.Rule.DENY;
     }
-
 
     @Override
     void initPorts() {
@@ -26,6 +33,76 @@ public class Firewall extends Device {
 
     @Override
     public List<Message> handleMessage(Message message, List<Connection> connectionList) {
+        for (Port sourcePort : getPortList()) {
+            if (!message.getCurrentDestinationPort().equals(sourcePort)) {
+                Connection connection = getConnectionByPort(sourcePort, connectionList);
+                if (connection != null) {
+                    Port destinationPort = connection.getOtherPort(sourcePort);
+                    for (Policy policy : policyList) {
+                        String sourceNetworkAddress = policy.getSourceNetworkAddress();
+                        String destinationNetworkAddress = policy.getDestinationNetworkAddress();
+                        Set<Policy.Application> applicationSet = policy.getApplicationSet();
+
+                        //TODO: check if works properly
+                        if (!(sourceNetworkAddress == null || !sourceNetworkAddress.equals(Utils.getNetworkAddressFromIp(message.getSourceIpAddress())))) {
+                            continue;
+                        }
+                        if (!(destinationNetworkAddress == null || !destinationNetworkAddress.equals(Utils.getNetworkAddressFromIp(message.getDestinationIpAddress())))) {
+                            continue;
+                        }
+                        if (!applicationSet.isEmpty() && !applicationSet.contains(message.getApplication())) {
+                            continue;
+                        }
+
+                        return executePolicy(policy.getRule(), message, sourcePort, destinationPort);
+                    }
+                    return executePolicy(defaultRule, message, sourcePort, destinationPort);
+                }
+            }
+        }
         return new ArrayList<>();
+    }
+
+    private List<Message> executePolicy(Policy.Rule rule, Message message, Port sourcePort, Port destinationPort) {
+        if (rule.equals(Policy.Rule.PERMIT)) {
+            List<Message> messageList = new ArrayList<>();
+            messageList.add(new Message(message, sourcePort, destinationPort));
+            return messageList;
+        } else {
+            return new ArrayList<>();
+        }
+    }
+
+    private Connection getConnectionByPort(Port port, List<Connection> connectionList) {
+        for (Connection connection : connectionList) {
+            if (connection.containsPort(port)) {
+                return connection;
+            }
+        }
+        return null;
+    }
+
+    public List<Policy> getPolicyList() {
+        return new ArrayList<>(policyList);
+    }
+
+    public void setPolicyList(List<Policy> policyList) {
+        this.policyList.clear();
+        this.policyList.addAll(policyList);
+    }
+
+    public Policy.Rule getDefaultRule() {
+        return defaultRule;
+    }
+
+    public void setDefaultRule(Policy.Rule defaultRule) {
+        this.defaultRule = defaultRule;
+    }
+
+    @Override
+    public void onPoliciesListUpdated(List<Policy> policyList, Policy.Rule defaultRule) {
+        this.policyList.clear();
+        this.policyList.addAll(policyList);
+        this.defaultRule = defaultRule;
     }
 }

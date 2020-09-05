@@ -1,4 +1,4 @@
-package simulator.element;
+package simulator.element.device.additionalElements;
 
 import java.util.ArrayList;
 import java.util.List;

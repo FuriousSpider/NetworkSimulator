@@ -3,7 +3,7 @@ package simulator.element.device;
 import simulator.Engine;
 import simulator.element.Connection;
 import simulator.element.Message;
-import simulator.element.Port;
+import simulator.element.device.additionalElements.Port;
 import simulator.view.RoutingTable;
 import util.Utils;
 import util.Values;

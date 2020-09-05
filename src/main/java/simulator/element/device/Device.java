@@ -4,7 +4,8 @@ import javafx.scene.image.Image;
 import javafx.util.Pair;
 import simulator.element.Connection;
 import simulator.element.Message;
-import simulator.element.Port;
+import simulator.element.device.additionalElements.Policy;
+import simulator.element.device.additionalElements.Port;
 import util.Utils;
 
 import java.util.ArrayList;
@@ -128,6 +129,8 @@ abstract public class Device {
         private String ipAddress;
         private Map<String, String> routingTable;
         private List<Pair<String, Integer>> associationTable;
+        private List<Policy> policyList;
+        private Policy.Rule defaultRule;
 
         public Builder id(int id) {
             this.id = id;
@@ -191,10 +194,26 @@ abstract public class Device {
             return this;
         }
 
+        public Builder policyList(List<Policy> policyList) {
+            if (this.portList == null) {
+                this.policyList = new ArrayList<>();
+            }
+            this.policyList.clear();
+            this.policyList.addAll(policyList);
+            return this;
+        }
+
+        public Builder defaultRule(Policy.Rule defaultRule) {
+            this.defaultRule = defaultRule;
+            return this;
+        }
+
         public Device build() {
             Device device;
             if (this.deviceType.equals(Firewall.deviceType)) {
                 device = new Firewall(this.x, this.y);
+                ((Firewall) device).setPolicyList(this.policyList);
+                ((Firewall) device).setDefaultRule(this.defaultRule);
             } else if (this.deviceType.equals(Hub.deviceType)) {
                 device = new Hub(this.x, this.y);
             } else if (this.deviceType.equals(Router.deviceType)) {

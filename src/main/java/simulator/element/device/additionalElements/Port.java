@@ -1,4 +1,4 @@
-package simulator.element;
+package simulator.element.device.additionalElements;
 
 import simulator.view.IPTextField;
 import simulator.view.VLanTextField;

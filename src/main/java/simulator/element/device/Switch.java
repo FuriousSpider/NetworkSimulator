@@ -4,7 +4,7 @@ import javafx.util.Pair;
 import simulator.Engine;
 import simulator.element.Connection;
 import simulator.element.Message;
-import simulator.element.Port;
+import simulator.element.device.additionalElements.Port;
 import util.Values;
 
 import java.util.ArrayList;

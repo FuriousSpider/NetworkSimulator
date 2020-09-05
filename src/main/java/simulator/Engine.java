@@ -12,7 +12,8 @@ import javafx.util.Duration;
 import javafx.util.Pair;
 import simulator.element.Connection;
 import simulator.element.Message;
-import simulator.element.Port;
+import simulator.element.device.additionalElements.Policy;
+import simulator.element.device.additionalElements.Port;
 import simulator.element.device.Device;
 import simulator.element.device.EndDevice;
 import simulator.element.device.Router;
@@ -478,13 +479,15 @@ public class Engine implements PortListDialog.OnPortSelectedListener {
                             }
                         }
 
+                        //TODO: set application from "label"
                         messageList.add(new Message(
                                 sourceIPAddressWithMask,
                                 destinationIPAddressWithMask,
                                 sourceDevice.getMacAddress(),
                                 destinationDevice.getMacAddress(),
                                 port,
-                                getConnectionByPort(port).getOtherPort(port)
+                                getConnectionByPort(port).getOtherPort(port),
+                                Policy.Application.UDP
                         ));
                     }
                 } else {

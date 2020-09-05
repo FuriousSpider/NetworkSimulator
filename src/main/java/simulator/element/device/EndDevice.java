@@ -1,9 +1,9 @@
 package simulator.element.device;
 
 import simulator.element.Connection;
-import simulator.element.Interface;
+import simulator.element.device.additionalElements.Interface;
 import simulator.element.Message;
-import simulator.element.Port;
+import simulator.element.device.additionalElements.Port;
 import simulator.view.IPTextField;
 
 import java.util.ArrayList;

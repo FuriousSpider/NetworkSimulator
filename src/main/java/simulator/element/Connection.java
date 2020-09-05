@@ -3,6 +3,7 @@ package simulator.element;
 import javafx.scene.paint.Color;
 import javafx.util.Pair;
 import simulator.Engine;
+import simulator.element.device.additionalElements.Port;
 
 import java.util.List;
 

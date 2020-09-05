@@ -15,7 +15,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import simulator.element.Connection;
-import simulator.element.Port;
+import simulator.element.device.additionalElements.Port;
 import simulator.element.device.*;
 import simulator.view.*;
 import util.Values;
@@ -44,6 +44,8 @@ public class Controller implements Initializable, PortListDialog.OnPortSelectedL
     private IPTextField elementInfoIpAddress;
     @FXML
     private RoutingTable routingTableView;
+    @FXML
+    private FirewallPoliciesView firewallPoliciesView;
     @FXML
     private TextField simulationSourceIPAddress;
     @FXML
@@ -117,7 +119,6 @@ public class Controller implements Initializable, PortListDialog.OnPortSelectedL
 
     @FXML
     private void handleStartSimulationButtonClick() {
-        //TODO: when sourceMac TextField focused you cannot use key shortcuts on canvas
         engine.startSimulation(simulationSourceIPAddress.getText(), simulationDestinationIPAddress.getText());
     }
 
@@ -211,6 +212,7 @@ public class Controller implements Initializable, PortListDialog.OnPortSelectedL
         elementInfo.setVisible(true);
         elementInfoDeviceType.setValue(selectedDevice.getDeviceType());
         elementInfoMacAddress.setText(selectedDevice.getMacAddress());
+
         if (selectedDevice instanceof EndDevice) {
             elementInfoIpAddress.show();
             elementInfoIpAddress.setIpAddress(((EndDevice) selectedDevice).getIpAddress());
@@ -226,6 +228,16 @@ public class Controller implements Initializable, PortListDialog.OnPortSelectedL
             routingTableView.setOnRoutingTableChangeListener(router);
         } else {
             routingTableView.hide();
+        }
+
+        if (selectedDevice instanceof Firewall) {
+            Firewall firewall = (Firewall) selectedDevice;
+            firewallPoliciesView.show();
+            firewallPoliciesView.setPolicies(firewall.getPolicyList());
+            firewallPoliciesView.setDefaultRule(firewall.getDefaultRule());
+            firewallPoliciesView.setOnPoliciesListUpdatedListener(firewall);
+        } else {
+            firewallPoliciesView.hide();
         }
     }
 

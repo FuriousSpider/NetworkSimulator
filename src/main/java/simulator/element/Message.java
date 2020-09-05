@@ -3,6 +3,8 @@ package simulator.element;
 import javafx.scene.image.Image;
 import simulator.Engine;
 import simulator.element.device.Device;
+import simulator.element.device.additionalElements.Policy;
+import simulator.element.device.additionalElements.Port;
 import util.Values;
 
 import java.util.ArrayList;
@@ -20,8 +22,9 @@ public class Message {
     private final List<Message> history;
     private int progress;
     private final Image image;
+    private final Policy.Application application;
 
-    public Message(String sourceIpAddress, String destinationIpAddress, String sourceMac, String destinationMac, Port currentSourcePort, Port currentDestinationPort) {
+    public Message(String sourceIpAddress, String destinationIpAddress, String sourceMac, String destinationMac, Port currentSourcePort, Port currentDestinationPort, Policy.Application application) {
         this.sourceIpAddress = sourceIpAddress;
         this.destinationIpAddress = destinationIpAddress;
         this.sourceMac = sourceMac;
@@ -31,6 +34,7 @@ public class Message {
         this.history = new ArrayList<>();
         this.progress = 0;
         this.image = new Image(fileName);
+        this.application = application;
     }
 
     public Message(Message message, Port currentSourcePort, Port currentDestinationPort) {
@@ -44,6 +48,7 @@ public class Message {
         history.add(message);
         this.progress = 0;
         this.image = new Image(fileName);
+        this.application = message.application;
     }
 
     public int getX() {
@@ -92,5 +97,9 @@ public class Message {
 
     public void nextStep() {
         progress += Values.MESSAGE_PROGRESS_STEP;
+    }
+
+    public Policy.Application getApplication() {
+        return application;
     }
 }
