@@ -1,5 +1,6 @@
 package simulator.element.device;
 
+import javafx.application.Platform;
 import simulator.Engine;
 import simulator.element.Connection;
 import simulator.element.Message;
@@ -33,7 +34,22 @@ public class Router extends Device implements RoutingTable.OnRoutingTableChangeL
     }
 
     @Override
+    void initName() {
+        setDeviceName(deviceType);
+    }
+
+    @Override
     public List<Message> handleMessage(Message message, List<Connection> connectionList) {
+        switch (message.getType()) {
+            case NORMAL:
+                return handleNormalMessage(message, connectionList);
+            case TEST:
+                return handleTestMessage(message, connectionList);
+        }
+        return new ArrayList<>();
+    }
+
+    private List<Message> handleNormalMessage(Message message, List<Connection> connectionList) {
         for (Port port : getPortList()) {
             if (Utils.belongToTheSameNetwork(message.getDestinationIpAddress(), port.getIpAddress())) {
                 List<Message> messageList = new ArrayList<>();
@@ -63,6 +79,23 @@ public class Router extends Device implements RoutingTable.OnRoutingTableChangeL
                     }
                 }
             }
+        }
+        return new ArrayList<>();
+    }
+
+    private List<Message> handleTestMessage(Message message, List<Connection> connectionList) {
+        if (!Utils.belongToTheSameNetwork(message.getCurrentDestinationPort().getIpAddress(), message.getSourceIpAddress())) {
+            Device otherDevice = Engine.getInstance().getDeviceByIPAddress(message.getSourceIpAddress());
+            if (otherDevice == null) {
+                otherDevice = Engine.getInstance().getDeviceByPortIpAddress(message.getSourceIpAddress());
+            }
+            String errorMessage = "Wrong network configuration\n" +
+                    getDeviceName() +
+                    " and " +
+                    otherDevice.getDeviceName() +
+                    " should belong to the same network";
+            Platform.runLater(() -> Engine.getInstance().logError(errorMessage));
+            Engine.setTestNetworkSuccessful(false);
         }
         return new ArrayList<>();
     }

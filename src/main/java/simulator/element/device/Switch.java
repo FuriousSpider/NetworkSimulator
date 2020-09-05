@@ -31,9 +31,24 @@ public class Switch extends Device {
         }
     }
 
+    @Override
+    void initName() {
+        setDeviceName(deviceType);
+    }
+
     //TODO: check if trunk mode works properly
     @Override
     public List<Message> handleMessage(Message message, List<Connection> connectionList) {
+        switch (message.getType()) {
+            case NORMAL:
+                return handleNormalMessage(message, connectionList);
+            case TEST:
+                return handleTestMessage(message, connectionList);
+        }
+        return new ArrayList<>();
+    }
+
+    private List<Message> handleNormalMessage(Message message, List<Connection> connectionList) {
         addNewRecord(message.getSourceMac(), message.getCurrentDestinationPort());
         List<Port> vLanPortList = getPortListByVLanAndTrunk(message.getCurrentDestinationPort().getVLanId());
         if (associationTableContainsKey(message.getDestinationMac()) && nextHopBelongsToVLan(message.getDestinationMac(), message.getCurrentDestinationPort())) {
@@ -50,6 +65,36 @@ public class Switch extends Device {
                 Connection connection = getConnectionByPort(sourcePort, connectionList);
                 if (connection != null && !sourcePort.equals(message.getCurrentDestinationPort())) {
                     messageList.add(new Message(message, sourcePort, connection.getOtherPort(sourcePort)));
+                }
+            }
+            return messageList;
+        }
+    }
+
+    private List<Message> handleTestMessage(Message message, List<Connection> connectionList) {
+        if (message.getTestHistory().contains(this)) {
+            return new ArrayList<>();
+        } else {
+            List<Message> messageList = new ArrayList<>();
+            for (Connection connection : connectionList) {
+                if (!connection.containsPort(message.getCurrentDestinationPort())) {
+                    if (connection.getFirstElementId() == this.getId()) {
+                        messageList.add(
+                                new Message(
+                                        message,
+                                        Engine.getInstance().getPortById(connection.getPortPair().getKey()),
+                                        Engine.getInstance().getPortById(connection.getPortPair().getValue())
+                                )
+                        );
+                    } else {
+                        messageList.add(
+                                new Message(
+                                        message,
+                                        Engine.getInstance().getPortById(connection.getPortPair().getValue()),
+                                        Engine.getInstance().getPortById(connection.getPortPair().getKey())
+                                )
+                        );
+                    }
                 }
             }
             return messageList;

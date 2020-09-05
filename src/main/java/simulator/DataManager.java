@@ -294,7 +294,7 @@ public class DataManager {
                     JSONObject deviceObject = new JSONObject();
                     deviceObject.put("id", device.getId());
                     deviceObject.put("type", device.getDeviceType());
-                    deviceObject.put("name", device.getName());
+                    deviceObject.put("name", device.getDeviceName());
                     deviceObject.put("x", device.getX());
                     deviceObject.put("y", device.getY());
                     deviceObject.put("macAddress", device.getMacAddress());

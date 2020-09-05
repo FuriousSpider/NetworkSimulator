@@ -1,7 +1,6 @@
 package simulator;
 
 import javafx.application.Platform;
-import javafx.beans.Observable;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
@@ -31,7 +30,7 @@ public class Controller implements Initializable, PortListDialog.OnPortSelectedL
     @FXML
     private VBox elementInfo;
     @FXML
-    private EditableLabel elementInfoDeviceName;
+    private DeviceNameLabel elementInfoDeviceName;
     @FXML
     private VBox connectionsInfo;
     @FXML
@@ -213,6 +212,7 @@ public class Controller implements Initializable, PortListDialog.OnPortSelectedL
 
     public void showDeviceInfo(Device selectedDevice) {
         elementInfo.setVisible(true);
+        elementInfoDeviceName.setDeviceName(selectedDevice.getDeviceName());
         elementInfoDeviceType.setValue(selectedDevice.getDeviceType());
         elementInfoMacAddress.setText(selectedDevice.getMacAddress());
 

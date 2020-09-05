@@ -23,8 +23,10 @@ public class Message {
     private int progress;
     private final Image image;
     private final Policy.Application application;
+    private final Type type;
+    private final List<Device> testHistory;
 
-    public Message(String sourceIpAddress, String destinationIpAddress, String sourceMac, String destinationMac, Port currentSourcePort, Port currentDestinationPort, Policy.Application application) {
+    public Message(String sourceIpAddress, String destinationIpAddress, String sourceMac, String destinationMac, Port currentSourcePort, Port currentDestinationPort, Policy.Application application, Type type) {
         this.sourceIpAddress = sourceIpAddress;
         this.destinationIpAddress = destinationIpAddress;
         this.sourceMac = sourceMac;
@@ -35,6 +37,9 @@ public class Message {
         this.progress = 0;
         this.image = new Image(fileName);
         this.application = application;
+        this.type = type;
+        this.testHistory = new ArrayList<>();
+        this.testHistory.add(Engine.getInstance().getDeviceByPort(currentSourcePort));
     }
 
     public Message(Message message, Port currentSourcePort, Port currentDestinationPort) {
@@ -49,6 +54,9 @@ public class Message {
         this.progress = 0;
         this.image = new Image(fileName);
         this.application = message.application;
+        this.type = message.type;
+        this.testHistory = message.testHistory;
+        testHistory.add(Engine.getInstance().getDeviceByPort(message.getCurrentSourcePort()));
     }
 
     public int getX() {
@@ -101,5 +109,18 @@ public class Message {
 
     public Policy.Application getApplication() {
         return application;
+    }
+
+    public List<Device> getTestHistory() {
+        return testHistory;
+    }
+
+    public Type getType() {
+        return this.type;
+    }
+
+    public enum Type {
+        TEST,
+        NORMAL
     }
 }

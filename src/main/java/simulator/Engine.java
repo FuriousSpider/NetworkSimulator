@@ -2,6 +2,7 @@ package simulator;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.application.Platform;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.scene.canvas.GraphicsContext;
@@ -12,6 +13,7 @@ import javafx.util.Duration;
 import javafx.util.Pair;
 import simulator.element.Connection;
 import simulator.element.Message;
+import simulator.element.device.Firewall;
 import simulator.element.device.additionalElements.Policy;
 import simulator.element.device.additionalElements.Port;
 import simulator.element.device.Device;
@@ -38,6 +40,7 @@ public class Engine implements PortListDialog.OnPortSelectedListener {
     private Pair<Integer, Integer> mousePosition;
     private Pair<Integer, Integer> connectMousePosition;
     private static Timeline timeline;
+    private static boolean testNetworkSuccessful;
 
     private Engine() {
         this.deviceList = new ArrayList<>();
@@ -47,6 +50,7 @@ public class Engine implements PortListDialog.OnPortSelectedListener {
         this.selectedDevice = null;
         this.runSimulation = false;
         this.mousePosition = null;
+        testNetworkSuccessful = false;
     }
 
     public static Engine getInstance() {
@@ -138,6 +142,17 @@ public class Engine implements PortListDialog.OnPortSelectedListener {
         for (Device device : deviceList) {
             if (device instanceof EndDevice && ((EndDevice) device).getIpAddress().split("/")[0].equals(ipAddress)) {
                 return (EndDevice) device;
+            }
+        }
+        return null;
+    }
+
+    public Device getDeviceByPortIpAddress(String ipAddress) {
+        for (Device device : deviceList) {
+            for (Port port : device.getPortList()) {
+                if (port.hasInterface() && port.getIpAddress().equals(ipAddress)) {
+                    return device;
+                }
             }
         }
         return null;
@@ -366,6 +381,10 @@ public class Engine implements PortListDialog.OnPortSelectedListener {
         return portToConnect != null;
     }
 
+    public static void setTestNetworkSuccessful(boolean successful) {
+        testNetworkSuccessful = successful;
+    }
+
     public static void stopEngine() {
         timeline.stop();
     }
@@ -444,15 +463,67 @@ public class Engine implements PortListDialog.OnPortSelectedListener {
                 return new Task<>() {
                     @Override
                     protected Void call() throws Exception {
-                        prepareSimulation(sourceIPAddress, destinationIPAddress);
-                        while (runSimulation) {
-                            nextSimulationStep();
-                            checkSimulationProgress();
-                            Thread.sleep(Values.ENGINE_MILLISECONDS_PAUSE);
+                        testNetwork();
+                        if (testNetworkSuccessful) {
+                            Platform.runLater(() -> Engine.getInstance().log("Network configured properly"));
+                            prepareSimulation(sourceIPAddress, destinationIPAddress);
+                            while (runSimulation) {
+                                nextSimulationStep();
+                                checkSimulationProgress();
+                                Thread.sleep(Values.ENGINE_MILLISECONDS_PAUSE);
+                            }
                         }
                         return null;
                     }
                 };
+            }
+
+            private void testNetwork() {
+                try {
+                    testNetworkSuccessful = true;
+                    messageList.clear();
+                    for (Device device : deviceList) {
+                        if (device instanceof EndDevice) {
+                            EndDevice endDevice = (EndDevice) device;
+                            Port sourcePort = device.getPortList().get(0);
+                            if (sourcePort.isPortTaken()) {
+                                messageList.add(new Message(
+                                        endDevice.getIpAddress(),
+                                        endDevice.getIpAddress(),
+                                        endDevice.getMacAddress(),
+                                        endDevice.getMacAddress(),
+                                        sourcePort,
+                                        getConnectionByPort(sourcePort).getOtherPort(sourcePort),
+                                        Policy.Application.UDP,
+                                        Message.Type.TEST
+                                ));
+                            }
+                        } else if (device instanceof Router || device instanceof Firewall) {
+                            for (Port port : device.getPortList()) {
+                                if (port.isPortTaken()) {
+                                    messageList.add(new Message(
+                                            port.getIpAddress(),
+                                            port.getIpAddress(),
+                                            device.getMacAddress(),
+                                            device.getMacAddress(),
+                                            port,
+                                            getConnectionByPort(port).getOtherPort(port),
+                                            Policy.Application.UDP,
+                                            Message.Type.TEST
+                                    ));
+                                }
+                            }
+                        }
+                    }
+                    while (!messageList.isEmpty()) {
+                        nextSimulationStep();
+                        if (!testNetworkSuccessful) {
+                            break;
+                        }
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
 
             private void prepareSimulation(String sourceIPAddress, String destinationIPAddress) {
@@ -484,7 +555,8 @@ public class Engine implements PortListDialog.OnPortSelectedListener {
                                 destinationDevice.getMacAddress(),
                                 port,
                                 getConnectionByPort(port).getOtherPort(port),
-                                Policy.Application.UDP
+                                Policy.Application.UDP,
+                                Message.Type.NORMAL
                         ));
                     }
                 } else {

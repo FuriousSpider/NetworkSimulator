@@ -4,7 +4,7 @@
 <?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
 <?import java.net.URL?>
-<?import simulator.view.EditableLabel?>
+<?import simulator.view.DeviceNameLabel?>
 <?import simulator.view.LogPanel?>
 <?import simulator.view.TitleLabel?>
 <?import simulator.view.IPTextField?>
@@ -38,7 +38,7 @@
                         <VBox fx:id="elementInfo">
                             <Label text="Device info"/>
                             <TitleLabel fx:id="elementInfoDeviceType" title="Device type: "/>
-                            <EditableLabel fx:id="elementInfoDeviceName" title="Device name: " defaultValue="Why are you running?"/>
+                            <DeviceNameLabel fx:id="elementInfoDeviceName" title="Device name: "/>
                             <Label text="MAC address: "/>
                             <Label fx:id="elementInfoMacAddress" onMouseClicked="#handleElementInfoMacAddressClick"/>
                             <IPTextField fx:id="elementInfoIpAddress"/>

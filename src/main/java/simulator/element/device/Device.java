@@ -32,9 +32,9 @@ abstract public class Device {
         this.deviceType = deviceType;
         this.macAddress = Utils.generateMacAddress();
         this.id = idCounter++;
-        this.name = String.valueOf(this.id);
         this.portList = new ArrayList<>();
         initPorts();
+        initName();
     }
 
     public int getId() {
@@ -53,8 +53,12 @@ abstract public class Device {
         return y;
     }
 
-    public String getName() {
+    public String getDeviceName() {
         return name;
+    }
+
+    public void setDeviceName(String name) {
+        this.name = name;
     }
 
     public int getNumberOfPorts() {
@@ -116,6 +120,8 @@ abstract public class Device {
     }
 
     abstract void initPorts();
+
+    abstract void initName();
 
     public abstract List<Message> handleMessage(Message message, List<Connection> connectionList);
 

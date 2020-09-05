@@ -25,7 +25,22 @@ public class Hub extends Device {
     }
 
     @Override
+    void initName() {
+        setDeviceName(deviceType);
+    }
+
+    @Override
     public List<Message> handleMessage(Message message, List<Connection> connectionList) {
+        switch (message.getType()) {
+            case NORMAL:
+                return handleNormalMessage(message, connectionList);
+            case TEST:
+                return handleTestMessage(message, connectionList);
+        }
+        return new ArrayList<>();
+    }
+
+    private List<Message> handleNormalMessage(Message message, List<Connection> connectionList) {
         List<Message> messageList = new ArrayList<>();
         for (Connection connection : connectionList) {
             if (!connection.containsPort(message.getCurrentDestinationPort())) {
@@ -49,5 +64,13 @@ public class Hub extends Device {
             }
         }
         return messageList;
+    }
+
+    private List<Message> handleTestMessage(Message message, List<Connection> connectionList) {
+        if (message.getTestHistory().contains(this)) {
+            return new ArrayList<>();
+        } else {
+            return handleNormalMessage(message, connectionList);
+        }
     }
 }

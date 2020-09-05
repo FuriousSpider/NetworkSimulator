@@ -1,5 +1,7 @@
 package simulator.element.device;
 
+import javafx.application.Platform;
+import simulator.Engine;
 import simulator.element.Connection;
 import simulator.element.Message;
 import simulator.element.device.additionalElements.Policy;
@@ -27,12 +29,30 @@ public class Firewall extends Device implements FirewallPoliciesView.OnPoliciesL
     @Override
     void initPorts() {
         for (int i = 0; i < Values.DEVICE_FIREWALL_NUMBER_OF_PORTS; i++) {
-            getPortList().add(new Port(i + 1));
+            Port port = new Port(i + 1);
+            port.setNewInterface();
+            getPortList().add(port);
         }
     }
 
     @Override
+    void initName() {
+        setDeviceName(deviceType);
+    }
+
+    @Override
     public List<Message> handleMessage(Message message, List<Connection> connectionList) {
+        switch (message.getType()) {
+            case NORMAL:
+                return handleNormalMessage(message, connectionList);
+            case TEST:
+                return handleTestMessage(message, connectionList);
+        }
+        return new ArrayList<>();
+    }
+
+    //TODO: add
+    private List<Message> handleNormalMessage(Message message, List<Connection> connectionList) {
         for (Port sourcePort : getPortList()) {
             if (!message.getCurrentDestinationPort().equals(sourcePort)) {
                 Connection connection = getConnectionByPort(sourcePort, connectionList);
@@ -59,6 +79,23 @@ public class Firewall extends Device implements FirewallPoliciesView.OnPoliciesL
                     return executePolicy(defaultRule, message, sourcePort, destinationPort);
                 }
             }
+        }
+        return new ArrayList<>();
+    }
+
+    private List<Message> handleTestMessage(Message message, List<Connection> connectionList) {
+        if (!Utils.belongToTheSameNetwork(message.getCurrentDestinationPort().getIpAddress(), message.getSourceIpAddress())) {
+            Device otherDevice = Engine.getInstance().getDeviceByIPAddress(message.getSourceIpAddress());
+            if (otherDevice == null) {
+                otherDevice = Engine.getInstance().getDeviceByPortIpAddress(message.getSourceIpAddress());
+            }
+            String errorMessage = "Wrong network configuration\n" +
+                    getDeviceName() +
+                    " and " +
+                    otherDevice.getDeviceName() +
+                    " should belong to the same network";
+            Platform.runLater(() -> Engine.getInstance().logError(errorMessage));
+            Engine.setTestNetworkSuccessful(false);
         }
         return new ArrayList<>();
     }

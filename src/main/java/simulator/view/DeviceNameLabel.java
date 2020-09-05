@@ -10,7 +10,8 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import simulator.Engine;
 
-public class EditableLabel extends VBox {
+public class DeviceNameLabel extends VBox {
+    //TODO: reimplement this, add listener etc
     private String value;
 
     private final HBox firstLine;
@@ -21,7 +22,7 @@ public class EditableLabel extends VBox {
     private final Button editButton;
     private final Button copyButton;
 
-    public EditableLabel() {
+    public DeviceNameLabel() {
         this.firstLine = new HBox();
         this.secondLine = new HBox();
         this.titleLabel = new Label();
@@ -45,7 +46,7 @@ public class EditableLabel extends VBox {
         this.textField.textProperty().addListener(this::onTextChangedListener);
     }
 
-    public EditableLabel(@NamedArg("title") String title, @NamedArg("defaultValue") String defaultValue) {
+    public DeviceNameLabel(@NamedArg("title") String title, @NamedArg("defaultValue") String defaultValue) {
         this();
         if (title != null) {
             this.titleLabel.setText(title);
@@ -78,6 +79,11 @@ public class EditableLabel extends VBox {
 
     private void onCopyButtonClicked(MouseEvent mouseEvent) {
         Engine.getInstance().copyToClipboard(value);
+    }
+
+    public void setDeviceName(String name) {
+        this.value = name;
+        this.textField.setText(name);
     }
 
     private void onTextChangedListener(Observable observable) {
