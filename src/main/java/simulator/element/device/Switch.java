@@ -4,6 +4,7 @@ import javafx.util.Pair;
 import simulator.Engine;
 import simulator.element.Connection;
 import simulator.element.Message;
+import simulator.element.device.additionalElements.History;
 import simulator.element.device.additionalElements.Port;
 import util.Values;
 
@@ -56,7 +57,14 @@ public class Switch extends Device {
             Connection connection = getConnectionByPort(sourcePort, connectionList);
             List<Message> messageList = new ArrayList<>();
             if (connection != null && sourcePort != null) {
-                messageList.add(new Message(message, sourcePort, connection.getOtherPort(sourcePort)));
+                messageList.add(new Message(
+                        message,
+                        sourcePort,
+                        connection.getOtherPort(sourcePort),
+                        this,
+                        History.Decision.SWITCH_FORWARD_ASSOCIATION_TABLE,
+                        "by association table entry"
+                ));
             }
             return messageList;
         } else {
@@ -64,7 +72,14 @@ public class Switch extends Device {
             for (Port sourcePort : vLanPortList) {
                 Connection connection = getConnectionByPort(sourcePort, connectionList);
                 if (connection != null && !sourcePort.equals(message.getCurrentDestinationPort())) {
-                    messageList.add(new Message(message, sourcePort, connection.getOtherPort(sourcePort)));
+                    messageList.add(new Message(
+                            message,
+                            sourcePort,
+                            connection.getOtherPort(sourcePort),
+                            this,
+                            History.Decision.SWITCH_FORWARD,
+                            ""
+                    ));
                 }
             }
             return messageList;
@@ -83,7 +98,10 @@ public class Switch extends Device {
                                 new Message(
                                         message,
                                         Engine.getInstance().getPortById(connection.getPortPair().getKey()),
-                                        Engine.getInstance().getPortById(connection.getPortPair().getValue())
+                                        Engine.getInstance().getPortById(connection.getPortPair().getValue()),
+                                        this,
+                                        History.Decision.SWITCH_FORWARD,
+                                        ""
                                 )
                         );
                     } else {
@@ -91,7 +109,10 @@ public class Switch extends Device {
                                 new Message(
                                         message,
                                         Engine.getInstance().getPortById(connection.getPortPair().getValue()),
-                                        Engine.getInstance().getPortById(connection.getPortPair().getKey())
+                                        Engine.getInstance().getPortById(connection.getPortPair().getKey()),
+                                        this,
+                                        History.Decision.SWITCH_FORWARD,
+                                        ""
                                 )
                         );
                     }

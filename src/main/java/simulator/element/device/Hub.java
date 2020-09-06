@@ -3,6 +3,7 @@ package simulator.element.device;
 import simulator.Engine;
 import simulator.element.Connection;
 import simulator.element.Message;
+import simulator.element.device.additionalElements.History;
 import simulator.element.device.additionalElements.Port;
 import util.Values;
 
@@ -49,7 +50,10 @@ public class Hub extends Device {
                             new Message(
                                     message,
                                     Engine.getInstance().getPortById(connection.getPortPair().getKey()),
-                                    Engine.getInstance().getPortById(connection.getPortPair().getValue())
+                                    Engine.getInstance().getPortById(connection.getPortPair().getValue()),
+                                    this,
+                                    History.Decision.HUB_FORWARD,
+                                    ""
                             )
                     );
                 } else {
@@ -57,7 +61,10 @@ public class Hub extends Device {
                             new Message(
                                     message,
                                     Engine.getInstance().getPortById(connection.getPortPair().getValue()),
-                                    Engine.getInstance().getPortById(connection.getPortPair().getKey())
+                                    Engine.getInstance().getPortById(connection.getPortPair().getKey()),
+                                    this,
+                                    History.Decision.HUB_FORWARD,
+                                    ""
                             )
                     );
                 }

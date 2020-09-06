@@ -3,6 +3,7 @@ package simulator.element;
 import javafx.scene.image.Image;
 import simulator.Engine;
 import simulator.element.device.Device;
+import simulator.element.device.additionalElements.History;
 import simulator.element.device.additionalElements.Policy;
 import simulator.element.device.additionalElements.Port;
 import util.Values;
@@ -19,11 +20,11 @@ public class Message {
     private final String destinationMac;
     private final Port currentSourcePort;
     private final Port currentDestinationPort;
-    private final List<Message> history;
     private int progress;
     private final Image image;
     private final Policy.Application application;
     private final Type type;
+    private final List<History> history;
     private final List<Device> testHistory;
 
     public Message(String sourceIpAddress, String destinationIpAddress, String sourceMac, String destinationMac, Port currentSourcePort, Port currentDestinationPort, Policy.Application application, Type type) {
@@ -42,19 +43,19 @@ public class Message {
         this.testHistory.add(Engine.getInstance().getDeviceByPort(currentSourcePort));
     }
 
-    public Message(Message message, Port currentSourcePort, Port currentDestinationPort) {
+    public Message(Message message, Port currentSourcePort, Port currentDestinationPort, Device device, History.Decision decision, String decisionValue) {
         this.sourceIpAddress = message.sourceIpAddress;
         this.destinationIpAddress = message.destinationIpAddress;
         this.sourceMac = message.sourceMac;
         this.destinationMac = message.destinationMac;
         this.currentSourcePort = currentSourcePort;
         this.currentDestinationPort = currentDestinationPort;
-        this.history = message.history;
-        history.add(message);
         this.progress = 0;
         this.image = new Image(fileName);
         this.application = message.application;
         this.type = message.type;
+        this.history = message.history;
+        history.add(new History(this, device, decision, decisionValue, message.getCurrentDestinationPort(), currentSourcePort));
         this.testHistory = message.testHistory;
         testHistory.add(Engine.getInstance().getDeviceByPort(message.getCurrentSourcePort()));
     }
@@ -117,6 +118,10 @@ public class Message {
 
     public Type getType() {
         return this.type;
+    }
+
+    public List<History> getHistoryList() {
+        return history;
     }
 
     public enum Type {

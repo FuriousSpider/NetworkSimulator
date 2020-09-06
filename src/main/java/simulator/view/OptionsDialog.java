@@ -56,6 +56,8 @@ public class OptionsDialog extends Dialog<String> {
 
         this.getDialogPane().setMinWidth(Values.DIALOG_OPTIONS_MIN_WIDTH);
         this.getDialogPane().getButtonTypes().addAll(ButtonType.CLOSE);
+
+        this.setTitle("Options");
     }
 
     private void onElementSizeChange(Observable observable, Number oldValue, Number newValue) {

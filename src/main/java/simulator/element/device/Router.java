@@ -4,6 +4,7 @@ import javafx.application.Platform;
 import simulator.Engine;
 import simulator.element.Connection;
 import simulator.element.Message;
+import simulator.element.device.additionalElements.History;
 import simulator.element.device.additionalElements.Port;
 import simulator.view.RoutingTable;
 import util.Utils;
@@ -57,7 +58,14 @@ public class Router extends Device implements RoutingTable.OnRoutingTableChangeL
                 for (Connection connection : connectionList) {
                     if (connection.containsPort(port) && port != message.getCurrentDestinationPort()) {
                         destinationPort = connection.getOtherPort(port);
-                        messageList.add(new Message(message, port, destinationPort));
+                        messageList.add(new Message(
+                                message,
+                                port,
+                                destinationPort,
+                                this,
+                                History.Decision.ROUTER_FORWARD,
+                                "direct connection"
+                        ));
                         return messageList;
                     }
                 }
@@ -68,11 +76,19 @@ public class Router extends Device implements RoutingTable.OnRoutingTableChangeL
             if (key.contains(Utils.getNetworkAddressFromIp(message.getDestinationIpAddress()))) {
                 String nextHop = routingTable.get(key);
                 for (Port port : getPortList()) {
-                    if (Utils.belongToTheSameNetwork(port.getIpAddress(), Engine.getInstance().getIpWithMaskByIp(nextHop))) {
+//                    if (Utils.belongToTheSameNetwork(port.getIpAddress(), Engine.getInstance().getIpWithMaskByIp(nextHop))) {
+                    if (Utils.belongToTheSameNetwork(port.getIpAddress(), nextHop)) {
                         for (Connection connection : connectionList) {
                             if (connection.containsPort(port) && port != message.getCurrentDestinationPort()) {
                                 List<Message> messageList = new ArrayList<>();
-                                messageList.add(new Message(message, port, connection.getOtherPort(port)));
+                                messageList.add(new Message(
+                                        message,
+                                        port,
+                                        connection.getOtherPort(port),
+                                        this,
+                                        History.Decision.ROUTER_FORWARD_ROUTING_TABLE,
+                                        "by routing table entry"
+                                ));
                                 return messageList;
                             }
                         }

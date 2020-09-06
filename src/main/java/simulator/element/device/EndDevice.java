@@ -45,6 +45,9 @@ public class EndDevice extends Device implements IPTextField.OnSaveClickedListen
 
     private List<Message> handleNormalMessage(Message message, List<Connection> connectionList) {
         //TODO: check if proper message received and handle message -> end simulation (or send confirmation)
+        if (message.getDestinationIpAddress().equals(getIpAddress())) {
+            Engine.getInstance().finishSimulation(message.getHistoryList());
+        }
         return new ArrayList<>();
     }
 

@@ -4,6 +4,7 @@ import javafx.application.Platform;
 import simulator.Engine;
 import simulator.element.Connection;
 import simulator.element.Message;
+import simulator.element.device.additionalElements.History;
 import simulator.element.device.additionalElements.Policy;
 import simulator.element.device.additionalElements.Port;
 import simulator.view.FirewallPoliciesView;
@@ -74,9 +75,21 @@ public class Firewall extends Device implements FirewallPoliciesView.OnPoliciesL
                             continue;
                         }
 
-                        return executePolicy(policy.getRule(), message, sourcePort, destinationPort);
+                        return executePolicy(
+                                policy.getRule(),
+                                message,
+                                sourcePort,
+                                destinationPort,
+                                History.Decision.FIREWALL_FORWARD_POLICY,
+                                "by policy number :" + policyList.indexOf(policy) + 1);
                     }
-                    return executePolicy(defaultRule, message, sourcePort, destinationPort);
+                    return executePolicy(
+                            defaultRule,
+                            message,
+                            sourcePort,
+                            destinationPort,
+                            History.Decision.FIREWALL_FORWARD_DEFAULT_RULE,
+                            "by default rule: " + defaultRule);
                 }
             }
         }
@@ -100,10 +113,10 @@ public class Firewall extends Device implements FirewallPoliciesView.OnPoliciesL
         return new ArrayList<>();
     }
 
-    private List<Message> executePolicy(Policy.Rule rule, Message message, Port sourcePort, Port destinationPort) {
+    private List<Message> executePolicy(Policy.Rule rule, Message message, Port sourcePort, Port destinationPort, History.Decision decision, String decisionValue) {
         if (rule.equals(Policy.Rule.PERMIT)) {
             List<Message> messageList = new ArrayList<>();
-            messageList.add(new Message(message, sourcePort, destinationPort));
+            messageList.add(new Message(message, sourcePort, destinationPort, this, decision, decisionValue));
             return messageList;
         } else {
             return new ArrayList<>();

@@ -17,6 +17,7 @@ import javafx.util.Pair;
 import simulator.element.Connection;
 import simulator.element.Message;
 import simulator.element.device.Firewall;
+import simulator.element.device.additionalElements.History;
 import simulator.element.device.additionalElements.Policy;
 import simulator.element.device.additionalElements.Port;
 import simulator.element.device.Device;
@@ -501,7 +502,8 @@ public class Engine implements PortListDialog.OnPortSelectedListener {
     }
 
     private void drawMessages() {
-        for (Message message : messageList) {
+        List<Message> tempMessageList = new ArrayList<>(messageList);
+        for (Message message : tempMessageList) {
             ctx.drawImage(message.getImage(), message.getX(), message.getY(), Values.MESSAGE_SIZE, Values.MESSAGE_SIZE);
         }
     }
@@ -647,5 +649,11 @@ public class Engine implements PortListDialog.OnPortSelectedListener {
 
     public void stopSimulation() {
         this.runSimulation = false;
+        this.messageList.clear();
+    }
+
+    public void finishSimulation(List<History> historyList) {
+        stopSimulation();
+        Platform.runLater(() -> controller.showResultDiagram(historyList));
     }
 }

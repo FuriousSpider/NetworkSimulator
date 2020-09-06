@@ -12,6 +12,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import simulator.element.Connection;
+import simulator.element.device.additionalElements.History;
 import simulator.element.device.additionalElements.Port;
 import simulator.element.device.*;
 import simulator.view.*;
@@ -268,6 +269,12 @@ public class Controller implements Initializable, PortListDialog.OnPortSelectedL
         portListDialog.setPortList(device.getPortList());
         portListDialog.setOnPortSelectedListener(listener);
         portListDialog.start();
+    }
+
+    public void showResultDiagram(List<History> historyList) {
+        SimulationResultDiagram simulationResultDiagram = new SimulationResultDiagram();
+        simulationResultDiagram.setContent(historyList);
+        simulationResultDiagram.start();
     }
 
     private void onDeleteConnection(int id) {
