@@ -12,6 +12,9 @@ public class Values {
 
     public static int FONT_SIZE = 16;
 
+    public static boolean SHOW_DEVICE_NAME = true;
+    public static boolean SHOW_PORTS = true;
+
     public static int DEVICE_SWITCH_ASSOCIATION_TABLE_SIZE_LIMIT = 1000;
 
     public static int DEVICE_FIREWALL_NUMBER_OF_PORTS = 2;

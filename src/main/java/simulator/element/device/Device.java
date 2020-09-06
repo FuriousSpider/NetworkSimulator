@@ -6,15 +6,15 @@ import simulator.element.Connection;
 import simulator.element.Message;
 import simulator.element.device.additionalElements.Policy;
 import simulator.element.device.additionalElements.Port;
+import simulator.view.DeviceNameLabel;
 import util.Utils;
-import util.Values;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-abstract public class Device {
+abstract public class Device implements DeviceNameLabel.OnSaveDeviceNameClickedListener {
     private int id;
     private final Image image;
     private int x;
@@ -124,6 +124,11 @@ abstract public class Device {
     abstract void initName();
 
     public abstract List<Message> handleMessage(Message message, List<Connection> connectionList);
+
+    @Override
+    public void onSaveDeviceNameClicked(String name) {
+        setDeviceName(name);
+    }
 
     public static final class Builder {
         private int id;

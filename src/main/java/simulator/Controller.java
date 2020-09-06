@@ -214,6 +214,7 @@ public class Controller implements Initializable, PortListDialog.OnPortSelectedL
     public void showDeviceInfo(Device selectedDevice) {
         elementInfo.setVisible(true);
         elementInfoDeviceName.setDeviceName(selectedDevice.getDeviceName());
+        elementInfoDeviceName.setOnSaveDeviceNameClickedListener(selectedDevice);
         elementInfoDeviceType.setValue(selectedDevice.getDeviceType());
         elementInfoMacAddress.setText(selectedDevice.getMacAddress());
 

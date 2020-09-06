@@ -109,6 +109,18 @@ public class Firewall extends Device implements FirewallPoliciesView.OnPoliciesL
                     " should belong to the same network";
             Platform.runLater(() -> Engine.getInstance().logError(errorMessage));
             Engine.setTestNetworkSuccessful(false);
+        } else if (message.getCurrentDestinationPort().getIpAddress().equals(message.getSourceIpAddress()) ) {
+            Device otherDevice = Engine.getInstance().getDeviceByIPAddress(message.getSourceIpAddress());
+            if (otherDevice == null) {
+                otherDevice = Engine.getInstance().getDeviceByPortIpAddress(message.getSourceIpAddress());
+            }
+            String errorMessage = "Wrong network configuration\n" +
+                    getDeviceName() +
+                    " and " +
+                    otherDevice.getDeviceName() +
+                    " should not have the same ip address";
+            Platform.runLater(() -> Engine.getInstance().logError(errorMessage));
+            Engine.setTestNetworkSuccessful(false);
         }
         return new ArrayList<>();
     }

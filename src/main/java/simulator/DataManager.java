@@ -248,6 +248,11 @@ public class DataManager {
                                 case "simulationSpeedOption":
                                     Values.MESSAGE_PROGRESS_STEP = ((Long) optionObject.get("value")).intValue();
                                     break;
+                                case "showDeviceName":
+                                    Values.SHOW_DEVICE_NAME = (Boolean) optionObject.get("value");
+                                    break;
+                                case "showPorts":
+                                    Values.SHOW_PORTS = (Boolean) optionObject.get("value");
                             }
                         }
                     }
@@ -405,6 +410,16 @@ public class DataManager {
                 optionObject = new JSONObject();
                 optionObject.put("key", "simulationSpeedOption");
                 optionObject.put("value", Values.MESSAGE_PROGRESS_STEP);
+                optionsArray.add(optionObject);
+
+                optionObject = new JSONObject();
+                optionObject.put("key", "showDeviceName");
+                optionObject.put("value", Values.SHOW_DEVICE_NAME);
+                optionsArray.add(optionObject);
+
+                optionObject = new JSONObject();
+                optionObject.put("key", "showPorts");
+                optionObject.put("value", Values.SHOW_PORTS);
                 optionsArray.add(optionObject);
 
                 dataObject.put("options", optionsArray);

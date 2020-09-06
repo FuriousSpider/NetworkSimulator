@@ -432,41 +432,43 @@ public class Engine implements PortListDialog.OnPortSelectedListener {
                         x2,
                         y2);
 
-                Pair<Integer, Integer> portPair = connection.getPortPair();
-                Port port1 = getPortById(portPair.getKey());
-                Port port2 = getPortById(portPair.getValue());
+                if (Values.SHOW_PORTS) {
+                    Pair<Integer, Integer> portPair = connection.getPortPair();
+                    Port port1 = getPortById(portPair.getKey());
+                    Port port2 = getPortById(portPair.getValue());
 
-                if (!device1.hasPort(port1)) {
-                    port1 = getPortById(portPair.getValue());
-                    port2 = getPortById(portPair.getKey());
-                }
+                    if (!device1.hasPort(port1)) {
+                        port1 = getPortById(portPair.getValue());
+                        port2 = getPortById(portPair.getKey());
+                    }
 
-                double dx = Math.abs(x1 - x2);
-                double dy = Math.abs(y1 - y2);
-                double port1X, port1Y, port2X, port2Y;
-                double multiplier = 0.3;
-                double ipAddressTopPadding = 20.0;
-                if (x1 < x2) {
-                    port1X = Math.min(x1 + dx * multiplier, x1 + Values.DEVICE_SIZE * 2);
-                    port2X = Math.max(x2 - dx * multiplier, x2 - Values.DEVICE_SIZE * 2);
-                } else {
-                    port1X = Math.max(x1 - dx * multiplier, x1 - Values.DEVICE_SIZE * 2);
-                    port2X = Math.min(x2 + dx * multiplier, x2 + Values.DEVICE_SIZE * 2);
-                }
-                if (y1 < y2) {
-                    port1Y = Math.min(y1 + dy * multiplier, y1 + Values.DEVICE_SIZE * 2);
-                    port2Y = Math.max(y2 - dy * multiplier, y2 - Values.DEVICE_SIZE * 2);
-                } else {
-                    port1Y = Math.max(y1 - dy * multiplier, y1 - Values.DEVICE_SIZE * 2);
-                    port2Y = Math.min(y2 + dy * multiplier, y2 + Values.DEVICE_SIZE * 2);
-                }
-                ctx.fillText(port1.getPortName(), port1X, port1Y);
-                if (port1.hasInterface()) {
-                    ctx.fillText(port1.getIpAddress(), port1X, port1Y + ipAddressTopPadding);
-                }
-                ctx.fillText(port2.getPortName(), port2X, port2Y);
-                if (port2.hasInterface()) {
-                    ctx.fillText(port2.getIpAddress(), port2X, port2Y + ipAddressTopPadding);
+                    double dx = Math.abs(x1 - x2);
+                    double dy = Math.abs(y1 - y2);
+                    double port1X, port1Y, port2X, port2Y;
+                    double multiplier = 0.3;
+                    double ipAddressTopPadding = 20.0;
+                    if (x1 < x2) {
+                        port1X = Math.min(x1 + dx * multiplier, x1 + Values.DEVICE_SIZE * 2);
+                        port2X = Math.max(x2 - dx * multiplier, x2 - Values.DEVICE_SIZE * 2);
+                    } else {
+                        port1X = Math.max(x1 - dx * multiplier, x1 - Values.DEVICE_SIZE * 2);
+                        port2X = Math.min(x2 + dx * multiplier, x2 + Values.DEVICE_SIZE * 2);
+                    }
+                    if (y1 < y2) {
+                        port1Y = Math.min(y1 + dy * multiplier, y1 + Values.DEVICE_SIZE * 2);
+                        port2Y = Math.max(y2 - dy * multiplier, y2 - Values.DEVICE_SIZE * 2);
+                    } else {
+                        port1Y = Math.max(y1 - dy * multiplier, y1 - Values.DEVICE_SIZE * 2);
+                        port2Y = Math.min(y2 + dy * multiplier, y2 + Values.DEVICE_SIZE * 2);
+                    }
+                    ctx.fillText(port1.getPortName(), port1X, port1Y);
+                    if (port1.hasInterface()) {
+                        ctx.fillText(port1.getIpAddress(), port1X, port1Y + ipAddressTopPadding);
+                    }
+                    ctx.fillText(port2.getPortName(), port2X, port2Y);
+                    if (port2.hasInterface()) {
+                        ctx.fillText(port2.getIpAddress(), port2X, port2Y + ipAddressTopPadding);
+                    }
                 }
             }
         }
@@ -494,9 +496,11 @@ public class Engine implements PortListDialog.OnPortSelectedListener {
                 );
             }
             ctx.drawImage(element.getImage(), element.getX(), element.getY(), Values.DEVICE_SIZE, Values.DEVICE_SIZE);
-            ctx.fillText("!Hejlou!", element.getX() + Values.DEVICE_SIZE / 2.0, element.getY() + Values.DEVICE_SIZE * 1.2);
-            if (element instanceof EndDevice) {
-                ctx.fillText(((EndDevice) element).getIpAddress(), element.getX() + Values.DEVICE_SIZE / 2.0, element.getY() + Values.DEVICE_SIZE * 1.2 + 20.0);
+            if (Values.SHOW_DEVICE_NAME) {
+                ctx.fillText(element.getDeviceName(), element.getX() + Values.DEVICE_SIZE / 2.0, element.getY() + Values.DEVICE_SIZE * 1.2);
+                if (element instanceof EndDevice) {
+                    ctx.fillText(((EndDevice) element).getIpAddress(), element.getX() + Values.DEVICE_SIZE / 2.0, element.getY() + Values.DEVICE_SIZE * 1.2 + 20.0);
+                }
             }
         }
     }

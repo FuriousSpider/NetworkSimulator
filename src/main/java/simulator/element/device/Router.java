@@ -76,7 +76,6 @@ public class Router extends Device implements RoutingTable.OnRoutingTableChangeL
             if (key.contains(Utils.getNetworkAddressFromIp(message.getDestinationIpAddress()))) {
                 String nextHop = routingTable.get(key);
                 for (Port port : getPortList()) {
-//                    if (Utils.belongToTheSameNetwork(port.getIpAddress(), Engine.getInstance().getIpWithMaskByIp(nextHop))) {
                     if (Utils.belongToTheSameNetwork(port.getIpAddress(), nextHop)) {
                         for (Connection connection : connectionList) {
                             if (connection.containsPort(port) && port != message.getCurrentDestinationPort()) {
@@ -110,6 +109,18 @@ public class Router extends Device implements RoutingTable.OnRoutingTableChangeL
                     " and " +
                     otherDevice.getDeviceName() +
                     " should belong to the same network";
+            Platform.runLater(() -> Engine.getInstance().logError(errorMessage));
+            Engine.setTestNetworkSuccessful(false);
+        } else if (message.getCurrentDestinationPort().getIpAddress().equals(message.getSourceIpAddress()) ) {
+            Device otherDevice = Engine.getInstance().getDeviceByIPAddress(message.getSourceIpAddress());
+            if (otherDevice == null) {
+                otherDevice = Engine.getInstance().getDeviceByPortIpAddress(message.getSourceIpAddress());
+            }
+            String errorMessage = "Wrong network configuration\n" +
+                    getDeviceName() +
+                    " and " +
+                    otherDevice.getDeviceName() +
+                    " should not have the same ip address";
             Platform.runLater(() -> Engine.getInstance().logError(errorMessage));
             Engine.setTestNetworkSuccessful(false);
         }

@@ -38,7 +38,7 @@
                         <VBox fx:id="elementInfo">
                             <Label text="Device info"/>
                             <TitleLabel fx:id="elementInfoDeviceType" title="Device type: "/>
-                            <DeviceNameLabel fx:id="elementInfoDeviceName" title="Device name: "/>
+                            <DeviceNameLabel fx:id="elementInfoDeviceName"/>
                             <Label text="MAC address: "/>
                             <Label fx:id="elementInfoMacAddress" onMouseClicked="#handleElementInfoMacAddressClick"/>
                             <IPTextField fx:id="elementInfoIpAddress"/>

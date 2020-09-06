@@ -29,7 +29,7 @@ public class EndDevice extends Device implements IPTextField.OnSaveClickedListen
 
     @Override
     void initName() {
-        setDeviceName(deviceType);
+        setDeviceName("PC");
     }
 
     @Override
@@ -62,6 +62,18 @@ public class EndDevice extends Device implements IPTextField.OnSaveClickedListen
                     " and " +
                     otherDevice.getDeviceName() +
                     " should belong to the same network";
+            Platform.runLater(() -> Engine.getInstance().logError(errorMessage));
+            Engine.setTestNetworkSuccessful(false);
+        } else if (getIpAddress().equals(message.getSourceIpAddress())) {
+            Device otherDevice = Engine.getInstance().getDeviceByIPAddress(message.getSourceIpAddress());
+            if (otherDevice == null) {
+                otherDevice = Engine.getInstance().getDeviceByPortIpAddress(message.getSourceIpAddress());
+            }
+            String errorMessage = "Wrong network configuration\n" +
+                    getDeviceName() +
+                    " and " +
+                    otherDevice.getDeviceName() +
+                    " should not have the same ip address";
             Platform.runLater(() -> Engine.getInstance().logError(errorMessage));
             Engine.setTestNetworkSuccessful(false);
         }
