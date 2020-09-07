@@ -4,7 +4,6 @@ import javafx.util.Pair;
 import simulator.Engine;
 import simulator.element.Connection;
 import simulator.element.Message;
-import simulator.element.device.additionalElements.History;
 import simulator.element.device.additionalElements.Port;
 import util.Values;
 
@@ -63,7 +62,6 @@ public class Switch extends Device {
                         connection.getOtherPort(sourcePort),
                         this,
                         message.getCurrentIpDestinationAddress(),
-                        History.Decision.SWITCH_FORWARD_ASSOCIATION_TABLE,
                         "by association table entry"
                 ));
             }
@@ -79,7 +77,6 @@ public class Switch extends Device {
                             connection.getOtherPort(sourcePort),
                             this,
                             message.getCurrentIpDestinationAddress(),
-                            History.Decision.SWITCH_FORWARD,
                             ""
                     ));
                 }
@@ -103,7 +100,6 @@ public class Switch extends Device {
                                         Engine.getInstance().getPortById(connection.getPortPair().getValue()),
                                         this,
                                         message.getCurrentIpDestinationAddress(),
-                                        History.Decision.SWITCH_FORWARD,
                                         ""
                                 )
                         );
@@ -115,7 +111,6 @@ public class Switch extends Device {
                                         Engine.getInstance().getPortById(connection.getPortPair().getKey()),
                                         this,
                                         message.getCurrentIpDestinationAddress(),
-                                        History.Decision.SWITCH_FORWARD,
                                         ""
                                 )
                         );

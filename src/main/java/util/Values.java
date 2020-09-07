@@ -50,6 +50,8 @@ public class Values {
 
     public static String MESSAGE_RECORD_ADDED = "Record has been added";
 
+    public static String ERROR_CANNOT_FIND_DEVICE = "Device hasn't been found";
+
     public static String ERROR_INVALID_NETWORK_IP_ADDRESS = "Provided network address is incorrect";
     public static String ERROR_INVALID_IP_ADDRESS = "Provided ip address is incorrect";
     public static String ERROR_INVALID_VLAN_ID = "Provided VLAN ID is incorrect";

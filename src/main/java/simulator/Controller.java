@@ -3,10 +3,7 @@ package simulator;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
@@ -26,7 +23,7 @@ import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
 
-public class Controller implements Initializable, PortListDialog.OnPortSelectedListener {
+public class Controller implements Initializable, PortListDialog.OnPortSelectedListener, SimulationView.OnStartSimulationButtonClickedListener, SimulationView.OnStopSimulationButtonClickedListener {
     @FXML
     private BorderPane root;
     @FXML
@@ -50,9 +47,7 @@ public class Controller implements Initializable, PortListDialog.OnPortSelectedL
     @FXML
     private FirewallPoliciesView firewallPoliciesView;
     @FXML
-    private TextField simulationSourceIPAddress;
-    @FXML
-    private TextField simulationDestinationIPAddress;
+    private SimulationView simulationView;
     @FXML
     private LogPanel logPanel;
     private Engine engine;
@@ -70,6 +65,9 @@ public class Controller implements Initializable, PortListDialog.OnPortSelectedL
         canvas.getCanvas().setOnMouseReleased(this::canvasMouseReleased);
         canvas.getCanvas().setOnMouseMoved(this::canvasMouseMoved);
         root.setOnKeyPressed(this::keyPressed);
+
+        simulationView.setOnStartSimulationButtonClickedListener(this);
+        simulationView.setOnStopSimulationButtonClickedListener(this);
 
         hideElementInfo();
     }
@@ -118,16 +116,6 @@ public class Controller implements Initializable, PortListDialog.OnPortSelectedL
     @FXML
     private void handleElementInfoMacAddressClick() {
         engine.copyToClipboard(elementInfoMacAddress.getText());
-    }
-
-    @FXML
-    private void handleStartSimulationButtonClick() {
-        engine.startSimulation(simulationSourceIPAddress.getText(), simulationDestinationIPAddress.getText());
-    }
-
-    @FXML
-    private void handleStopSimulationButtonClick() {
-        engine.stopSimulation();
     }
 
     @FXML
@@ -307,5 +295,19 @@ public class Controller implements Initializable, PortListDialog.OnPortSelectedL
     @Override
     public void onPortSelected(int portId) {
         engine.onConnectClicked(portId);
+    }
+
+    @Override
+    public void onStartSimulationClicked() {
+        engine.startSimulation(
+                simulationView.getSourceIpAddress(),
+                simulationView.getDestinationIpAddress(),
+                simulationView.getApplication()
+        );
+    }
+
+    @Override
+    public void onStopSimulationClicked() {
+        engine.stopSimulation();
     }
 }

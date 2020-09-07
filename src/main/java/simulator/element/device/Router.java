@@ -4,7 +4,6 @@ import javafx.application.Platform;
 import simulator.Engine;
 import simulator.element.Connection;
 import simulator.element.Message;
-import simulator.element.device.additionalElements.History;
 import simulator.element.device.additionalElements.Port;
 import simulator.view.RoutingTable;
 import util.Utils;
@@ -65,7 +64,6 @@ public class Router extends Device implements RoutingTable.OnRoutingTableChangeL
                                     destinationPort,
                                     this,
                                     "0.0.0.0",
-                                    History.Decision.ROUTER_FORWARD,
                                     "direct connection"
                             ));
                             return messageList;
@@ -88,7 +86,6 @@ public class Router extends Device implements RoutingTable.OnRoutingTableChangeL
                                             connection.getOtherPort(port),
                                             this,
                                             Utils.getIpAddressWithoutMask(nextHop),
-                                            History.Decision.ROUTER_FORWARD_ROUTING_TABLE,
                                             "by routing table entry"
                                     ));
                                     return messageList;

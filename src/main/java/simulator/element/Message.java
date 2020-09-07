@@ -24,11 +24,12 @@ public class Message {
     private int progress;
     private final Image image;
     private final Policy.Application application;
+    private final boolean isConfirmationMessage;
     private final Type type;
-    private List<History> history;
+    private final List<History> history;
     private final List<Device> testHistory;
 
-    public Message(String sourceIpAddress, String destinationIpAddress, String sourceMac, String destinationMac, Port currentSourcePort, Port currentDestinationPort, String currentIpDestinationAddress, Policy.Application application, Type type) {
+    public Message(String sourceIpAddress, String destinationIpAddress, String sourceMac, String destinationMac, Port currentSourcePort, Port currentDestinationPort, String currentIpDestinationAddress, Policy.Application application, boolean isConfirmationMessage, Type type, List<History> historyList) {
         this.sourceIpAddress = sourceIpAddress;
         this.destinationIpAddress = destinationIpAddress;
         this.sourceMac = sourceMac;
@@ -36,16 +37,21 @@ public class Message {
         this.currentSourcePort = currentSourcePort;
         this.currentDestinationPort = currentDestinationPort;
         this.currentIpDestinationAddress = currentIpDestinationAddress;
-        this.history = new ArrayList<>();
+        if (historyList != null) {
+            this.history = new ArrayList<>(historyList);
+        } else {
+            this.history = new ArrayList<>();
+        }
         this.progress = 0;
         this.image = new Image(fileName);
         this.application = application;
+        this.isConfirmationMessage = isConfirmationMessage;
         this.type = type;
         this.testHistory = new ArrayList<>();
         this.testHistory.add(Engine.getInstance().getDeviceByPort(currentSourcePort));
     }
 
-    public Message(Message message, Port currentSourcePort, Port currentDestinationPort, Device device, String currentIpDestinationAddress, History.Decision decision, String decisionValue) {
+    public Message(Message message, Port currentSourcePort, Port currentDestinationPort, Device device, String currentIpDestinationAddress, String decisionValue) {
         this.sourceIpAddress = message.sourceIpAddress;
         this.destinationIpAddress = message.destinationIpAddress;
         this.sourceMac = message.sourceMac;
@@ -57,8 +63,9 @@ public class Message {
         this.image = new Image(fileName);
         this.application = message.application;
         this.type = message.type;
+        this.isConfirmationMessage = message.isConfirmationMessage;
         this.history = new ArrayList<>(message.history);
-        history.add(new History(this, device, decision, decisionValue, message.getCurrentDestinationPort(), currentSourcePort));
+        history.add(new History(this, device, decisionValue, message.getCurrentDestinationPort(), currentSourcePort));
         this.testHistory = message.testHistory;
         testHistory.add(Engine.getInstance().getDeviceByPort(message.getCurrentSourcePort()));
     }
@@ -117,6 +124,10 @@ public class Message {
 
     public Policy.Application getApplication() {
         return application;
+    }
+
+    public boolean isConfirmationMessage() {
+        return isConfirmationMessage;
     }
 
     public List<Device> getTestHistory() {

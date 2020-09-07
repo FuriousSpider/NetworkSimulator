@@ -4,7 +4,9 @@ import javafx.application.Platform;
 import simulator.Engine;
 import simulator.element.Connection;
 import simulator.element.Message;
+import simulator.element.device.additionalElements.History;
 import simulator.element.device.additionalElements.Interface;
+import simulator.element.device.additionalElements.Policy;
 import simulator.element.device.additionalElements.Port;
 import simulator.view.DefaultGatewayView;
 import simulator.view.IPTextField;
@@ -48,9 +50,34 @@ public class EndDevice extends Device implements IPTextField.OnSaveClickedListen
     }
 
     private List<Message> handleNormalMessage(Message message, List<Connection> connectionList) {
-        //TODO: check if proper message received and handle message -> end simulation (or send confirmation)
         if (message.getDestinationIpAddress().equals(getIpAddress())) {
-            Engine.getInstance().finishSimulation(message.getHistoryList());
+            if (message.getApplication().equals(Policy.Application.TCP) && !message.isConfirmationMessage()) {
+                List<Message> messageList = new ArrayList<>();
+                List<History> historyList = message.getHistoryList();
+                historyList.add(new History(
+                        message,
+                        this,
+                        "send confirmation",
+                        message.getCurrentDestinationPort(),
+                        message.getCurrentDestinationPort()
+                ));
+                messageList.add(new Message(message.getDestinationIpAddress(),
+                        message.getSourceIpAddress(),
+                        message.getDestinationMac(),
+                        message.getSourceMac(),
+                        this.getPortList().get(0),
+                        connectionList.get(0).getOtherPort(getPortList().get(0)),
+                        this.getGateway(),
+                        message.getApplication(),
+                        true,
+                        Message.Type.NORMAL,
+                        historyList));
+                return messageList;
+            } else if (message.getApplication().equals(Policy.Application.TCP) && message.isConfirmationMessage()) {
+                Engine.getInstance().finishSimulation(message.getHistoryList());
+            } else if (message.getApplication().equals(Policy.Application.UDP)) {
+                Engine.getInstance().finishSimulation(message.getHistoryList());
+            }
         }
         return new ArrayList<>();
     }

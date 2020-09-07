@@ -3,7 +3,6 @@ package simulator.element.device;
 import simulator.Engine;
 import simulator.element.Connection;
 import simulator.element.Message;
-import simulator.element.device.additionalElements.History;
 import simulator.element.device.additionalElements.Port;
 import util.Values;
 
@@ -53,7 +52,6 @@ public class Hub extends Device {
                                     Engine.getInstance().getPortById(connection.getPortPair().getValue()),
                                     this,
                                     message.getCurrentIpDestinationAddress(),
-                                    History.Decision.HUB_FORWARD,
                                     ""
                             )
                     );
@@ -65,7 +63,6 @@ public class Hub extends Device {
                                     Engine.getInstance().getPortById(connection.getPortPair().getKey()),
                                     this,
                                     message.getCurrentIpDestinationAddress(),
-                                    History.Decision.HUB_FORWARD,
                                     ""
                             )
                     );

@@ -517,7 +517,7 @@ public class Engine implements PortListDialog.OnPortSelectedListener {
         }
     }
 
-    public void startSimulation(String sourceIPAddress, String destinationIPAddress) {
+    public void startSimulation(String sourceIPAddress, String destinationIPAddress, Policy.Application application) {
         if (runSimulation) return;
         Service<Void> service = new Service<>() {
             @Override
@@ -528,7 +528,7 @@ public class Engine implements PortListDialog.OnPortSelectedListener {
                         testNetwork();
                         if (testNetworkSuccessful) {
                             Platform.runLater(() -> Engine.getInstance().log("Network configured properly"));
-                            prepareSimulation(sourceIPAddress, destinationIPAddress);
+                            prepareSimulation(sourceIPAddress, destinationIPAddress, application);
                             while (runSimulation) {
                                 nextSimulationStep();
                                 checkSimulationProgress();
@@ -558,7 +558,9 @@ public class Engine implements PortListDialog.OnPortSelectedListener {
                                         getConnectionByPort(sourcePort).getOtherPort(sourcePort),
                                         "",
                                         Policy.Application.UDP,
-                                        Message.Type.TEST
+                                        false,
+                                        Message.Type.TEST,
+                                        null
                                 ));
                             }
                         } else if (device instanceof Router || device instanceof Firewall) {
@@ -573,7 +575,9 @@ public class Engine implements PortListDialog.OnPortSelectedListener {
                                             getConnectionByPort(port).getOtherPort(port),
                                             "",
                                             Policy.Application.UDP,
-                                            Message.Type.TEST
+                                            false,
+                                            Message.Type.TEST,
+                                            null
                                     ));
                                 }
                             }
@@ -590,12 +594,12 @@ public class Engine implements PortListDialog.OnPortSelectedListener {
                 }
             }
 
-            private void prepareSimulation(String sourceIPAddress, String destinationIPAddress) {
+            private void prepareSimulation(String sourceIPAddress, String destinationIPAddress, Policy.Application application) {
                 runSimulation = true;
                 messageList.clear();
                 EndDevice sourceDevice = getDeviceByIPAddress(sourceIPAddress);
                 EndDevice destinationDevice = getDeviceByIPAddress(destinationIPAddress);
-                if (sourceDevice != null) {
+                if (sourceDevice != null && destinationDevice != null && application != null) {
                     for (Port port : sourceDevice.getPortList()) {
                         String sourceIPAddressWithMask = null;
                         String destinationIPAddressWithMask = null;
@@ -613,7 +617,8 @@ public class Engine implements PortListDialog.OnPortSelectedListener {
                             }
                         }
 
-                        //TODO: set application from "label"
+
+
                         messageList.add(new Message(
                                 sourceIPAddressWithMask,
                                 destinationIPAddressWithMask,
@@ -622,8 +627,10 @@ public class Engine implements PortListDialog.OnPortSelectedListener {
                                 port,
                                 getConnectionByPort(port).getOtherPort(port),
                                 currentDestinationIpAddress,
-                                Policy.Application.UDP,
-                                Message.Type.NORMAL
+                                application,
+                                false,
+                                Message.Type.NORMAL,
+                                null
                         ));
                     }
                 } else {
