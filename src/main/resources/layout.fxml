@@ -10,6 +10,7 @@
 <?import simulator.view.IPTextField?>
 <?import simulator.view.RoutingTable?>
 <?import simulator.view.FirewallPoliciesView?>
+<?import simulator.view.DefaultGatewayView?>
 <BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="simulator.Controller" styleClass="layout" fx:id="root">
     <stylesheets>
         <URL value="@Styles.css"/>
@@ -42,6 +43,7 @@
                             <Label text="MAC address: "/>
                             <Label fx:id="elementInfoMacAddress" onMouseClicked="#handleElementInfoMacAddressClick"/>
                             <IPTextField fx:id="elementInfoIpAddress"/>
+                            <DefaultGatewayView fx:id="elementDefaultGateway"/>
                             <Button onAction="#handleConnectElementsButtonClick" text="Connect"/>
                             <Button onAction="#handleRemoveElementButtonClick" text="Remove"/>
                         </VBox>

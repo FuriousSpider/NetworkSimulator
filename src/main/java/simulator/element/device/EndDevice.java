@@ -3,23 +3,27 @@ package simulator.element.device;
 import javafx.application.Platform;
 import simulator.Engine;
 import simulator.element.Connection;
-import simulator.element.device.additionalElements.Interface;
 import simulator.element.Message;
+import simulator.element.device.additionalElements.Interface;
 import simulator.element.device.additionalElements.Port;
+import simulator.view.DefaultGatewayView;
 import simulator.view.IPTextField;
 import util.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class EndDevice extends Device implements IPTextField.OnSaveClickedListener {
+public class EndDevice extends Device implements IPTextField.OnSaveClickedListener, DefaultGatewayView.OnDefaultGatewayChangeListener {
     public static String fileName = "/endDevice.png";
     public static String deviceType = "End Device";
     private final Interface anInterface;
+    private final Interface gateway;
 
     public EndDevice(int x, int y) {
         super(fileName, x, y, deviceType);
         this.anInterface = new Interface();
+        this.gateway = new Interface();
+        this.gateway.setAddress("");
     }
 
     @Override
@@ -88,8 +92,21 @@ public class EndDevice extends Device implements IPTextField.OnSaveClickedListen
         anInterface.setAddress(ipAddress);
     }
 
+    public String getGateway() {
+        return gateway.getAddress();
+    }
+
+    public void setGateway(String gatewayAddress) {
+        gateway.setAddress(gatewayAddress);
+    }
+
     @Override
     public void onSaveClicked(String ipAddress) {
         anInterface.setAddress(ipAddress);
+    }
+
+    @Override
+    public void onDefaultGatewayChanged(String defaultGateway) {
+        gateway.setAddress(defaultGateway);
     }
 }

@@ -46,6 +46,7 @@ public class Values {
     public static int DIALOG_OPTIONS_MIN_WIDTH = 400;
 
     public static String REGEX_IP_ADDRESS_WITH_MASK = "^([01]?\\d\\d?|2[0-4]\\d|25[0-5])(?:\\.[01]?\\d\\d?|\\.2[0-4]\\d|\\.25[0-5]){3}(?:/[0-2]\\d|/3[0-2])?$";
+    public static String REGEX_IP_ADDRESS_WITHOUT_MASK = "^([01]?\\d\\d?|2[0-4]\\d|25[0-5])(?:\\.[01]?\\d\\d?|\\.2[0-4]\\d|\\.25[0-5]){3}$";
 
     public static String MESSAGE_RECORD_ADDED = "Record has been added";
 

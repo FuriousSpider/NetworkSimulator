@@ -52,6 +52,7 @@ public class Hub extends Device {
                                     Engine.getInstance().getPortById(connection.getPortPair().getKey()),
                                     Engine.getInstance().getPortById(connection.getPortPair().getValue()),
                                     this,
+                                    message.getCurrentIpDestinationAddress(),
                                     History.Decision.HUB_FORWARD,
                                     ""
                             )
@@ -63,6 +64,7 @@ public class Hub extends Device {
                                     Engine.getInstance().getPortById(connection.getPortPair().getValue()),
                                     Engine.getInstance().getPortById(connection.getPortPair().getKey()),
                                     this,
+                                    message.getCurrentIpDestinationAddress(),
                                     History.Decision.HUB_FORWARD,
                                     ""
                             )

@@ -62,6 +62,7 @@ public class Switch extends Device {
                         sourcePort,
                         connection.getOtherPort(sourcePort),
                         this,
+                        message.getCurrentIpDestinationAddress(),
                         History.Decision.SWITCH_FORWARD_ASSOCIATION_TABLE,
                         "by association table entry"
                 ));
@@ -77,6 +78,7 @@ public class Switch extends Device {
                             sourcePort,
                             connection.getOtherPort(sourcePort),
                             this,
+                            message.getCurrentIpDestinationAddress(),
                             History.Decision.SWITCH_FORWARD,
                             ""
                     ));
@@ -100,6 +102,7 @@ public class Switch extends Device {
                                         Engine.getInstance().getPortById(connection.getPortPair().getKey()),
                                         Engine.getInstance().getPortById(connection.getPortPair().getValue()),
                                         this,
+                                        message.getCurrentIpDestinationAddress(),
                                         History.Decision.SWITCH_FORWARD,
                                         ""
                                 )
@@ -111,6 +114,7 @@ public class Switch extends Device {
                                         Engine.getInstance().getPortById(connection.getPortPair().getValue()),
                                         Engine.getInstance().getPortById(connection.getPortPair().getKey()),
                                         this,
+                                        message.getCurrentIpDestinationAddress(),
                                         History.Decision.SWITCH_FORWARD,
                                         ""
                                 )

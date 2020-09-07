@@ -139,6 +139,7 @@ abstract public class Device implements DeviceNameLabel.OnSaveDeviceNameClickedL
         private String macAddress;
         private List<Port> portList;
         private String ipAddress;
+        private String defaultGateway;
         private Map<String, String> routingTable;
         private List<Pair<String, Integer>> associationTable;
         private List<Policy> policyList;
@@ -185,6 +186,11 @@ abstract public class Device implements DeviceNameLabel.OnSaveDeviceNameClickedL
 
         public Builder ipAddress(String ipAddress) {
             this.ipAddress = ipAddress;
+            return this;
+        }
+
+        public Builder defaultGateway(String defaultGateway) {
+            this.defaultGateway = defaultGateway;
             return this;
         }
 
@@ -237,6 +243,7 @@ abstract public class Device implements DeviceNameLabel.OnSaveDeviceNameClickedL
             } else {
                 device = new EndDevice(this.x, this.y);
                 ((EndDevice) device).setIpAddress(this.ipAddress);
+                ((EndDevice) device).setGateway(this.defaultGateway);
             }
             device.id = this.id;
             device.name = this.name;

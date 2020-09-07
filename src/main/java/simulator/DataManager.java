@@ -128,6 +128,9 @@ public class DataManager {
                                         case "anInterface":
                                             resultDevice.ipAddress((String) deviceObject.get(propertyKey));
                                             break;
+                                        case "defaultGateway":
+                                            resultDevice.defaultGateway((String) deviceObject.get(propertyKey));
+                                            break;
                                         case "associationTable":
                                             JSONArray entryArray = ((JSONArray) deviceObject.get(propertyKey));
                                             ArrayList<Pair<String, Integer>> associationTableResult = new ArrayList<>();
@@ -229,7 +232,7 @@ public class DataManager {
                         for (Object option : optionsArray) {
                             JSONObject optionObject = (JSONObject) option;
                             String keyName = (String) optionObject.get("key");
-                            switch(keyName) {
+                            switch (keyName) {
                                 case "deviceIdCounter":
                                     Device.setIdCounter(((Long) optionObject.get("value")).intValue());
                                     break;
@@ -323,7 +326,9 @@ public class DataManager {
                     }
                     deviceObject.put("portList", portArray);
                     if (device instanceof EndDevice) {
-                        deviceObject.put("anInterface", ((EndDevice) device).getIpAddress());
+                        EndDevice endDevice = (EndDevice) device;
+                        deviceObject.put("anInterface", endDevice.getIpAddress());
+                        deviceObject.put("defaultGateway", endDevice.getGateway());
                     } else if (device instanceof Switch) {
                         JSONArray associationTableArray = new JSONArray();
                         for (Pair<String, Integer> pair : ((Switch) device).getAssociationTable()) {

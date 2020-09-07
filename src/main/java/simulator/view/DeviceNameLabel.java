@@ -24,7 +24,7 @@ public class DeviceNameLabel extends VBox {
     public DeviceNameLabel() {
         this.firstLine = new HBox();
         this.secondLine = new HBox();
-        this.titleLabel = new Label();
+        this.titleLabel = new Label("Device name: ");
         this.label = new Label();
         this.textField = new TextField();
         this.editButton = new Button("Edit");

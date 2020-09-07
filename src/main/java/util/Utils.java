@@ -1,5 +1,7 @@
 package util;
 
+import simulator.Engine;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -28,20 +30,24 @@ public class Utils {
     }
 
     public static String getNetworkAddressFromIp(String ipAddress) {
+        String ipAddressWithMask = ipAddress;
+        if (Utils.isIpAddressWithoutMask(ipAddressWithMask)) {
+            ipAddressWithMask = Engine.getInstance().getIpWithMaskByIp(ipAddressWithMask);
+        }
         List<StringBuilder> ipAddressList = new ArrayList<>();
         StringBuilder ipAddressString = new StringBuilder();
         StringBuilder maskString = new StringBuilder();
         StringBuilder binaryResult = new StringBuilder();
         StringBuilder result = new StringBuilder();
 
-        for (String str : ipAddress.split("[./]")) {
+        for (String str : ipAddressWithMask.split("[./]")) {
             StringBuilder octet = new StringBuilder(Integer.toBinaryString(Integer.parseInt(str)));
             while (octet.length() < 8) {
                 octet.insert(0, "0");
             }
             ipAddressList.add(octet);
         }
-        int mask = Integer.parseInt(ipAddress.split("[/]")[1]);
+        int mask = Integer.parseInt(ipAddressWithMask.split("[/]")[1]);
         maskString.append("1".repeat(Math.max(0, mask)));
         maskString.append("0".repeat(Math.max(0, 32 - mask)));
         for (int i = 0; i < 4; i++) {
@@ -86,6 +92,11 @@ public class Utils {
         }
     }
 
+    public static boolean isIpAddressWithoutMask(String ipAddress) {
+        Pattern pattern = Pattern.compile(Values.REGEX_IP_ADDRESS_WITHOUT_MASK);
+        return pattern.matcher(ipAddress).matches();
+    }
+
     public static boolean isVLanIdValid(String vLanId) {
         try {
             int vLan = Integer.parseInt(vLanId);
@@ -93,5 +104,9 @@ public class Utils {
         } catch (Exception e) {
             return false;
         }
+    }
+
+    public static String getIpAddressWithoutMask(String ipAddress) {
+        return ipAddress.split("/")[0];
     }
 }

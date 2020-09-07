@@ -51,44 +51,48 @@ public class Router extends Device implements RoutingTable.OnRoutingTableChangeL
     }
 
     private List<Message> handleNormalMessage(Message message, List<Connection> connectionList) {
-        for (Port port : getPortList()) {
-            if (Utils.belongToTheSameNetwork(message.getDestinationIpAddress(), port.getIpAddress())) {
-                List<Message> messageList = new ArrayList<>();
-                Port destinationPort;
-                for (Connection connection : connectionList) {
-                    if (connection.containsPort(port) && port != message.getCurrentDestinationPort()) {
-                        destinationPort = connection.getOtherPort(port);
-                        messageList.add(new Message(
-                                message,
-                                port,
-                                destinationPort,
-                                this,
-                                History.Decision.ROUTER_FORWARD,
-                                "direct connection"
-                        ));
-                        return messageList;
+        if (isProperRecipient(message)) {
+            for (Port port : getPortList()) {
+                if (Utils.belongToTheSameNetwork(message.getDestinationIpAddress(), port.getIpAddress())) {
+                    List<Message> messageList = new ArrayList<>();
+                    Port destinationPort;
+                    for (Connection connection : connectionList) {
+                        if (connection.containsPort(port) && port != message.getCurrentDestinationPort()) {
+                            destinationPort = connection.getOtherPort(port);
+                            messageList.add(new Message(
+                                    message,
+                                    port,
+                                    destinationPort,
+                                    this,
+                                    "0.0.0.0",
+                                    History.Decision.ROUTER_FORWARD,
+                                    "direct connection"
+                            ));
+                            return messageList;
+                        }
                     }
-                }
 
+                }
             }
-        }
-        for (String key : routingTable.keySet()) {
-            if (key.contains(Utils.getNetworkAddressFromIp(message.getDestinationIpAddress()))) {
-                String nextHop = routingTable.get(key);
-                for (Port port : getPortList()) {
-                    if (Utils.belongToTheSameNetwork(port.getIpAddress(), nextHop)) {
-                        for (Connection connection : connectionList) {
-                            if (connection.containsPort(port) && port != message.getCurrentDestinationPort()) {
-                                List<Message> messageList = new ArrayList<>();
-                                messageList.add(new Message(
-                                        message,
-                                        port,
-                                        connection.getOtherPort(port),
-                                        this,
-                                        History.Decision.ROUTER_FORWARD_ROUTING_TABLE,
-                                        "by routing table entry"
-                                ));
-                                return messageList;
+            for (String key : routingTable.keySet()) {
+                if (key.contains(Utils.getNetworkAddressFromIp(message.getDestinationIpAddress()))) {
+                    String nextHop = routingTable.get(key);
+                    for (Port port : getPortList()) {
+                        if (Utils.belongToTheSameNetwork(port.getIpAddress(), nextHop)) {
+                            for (Connection connection : connectionList) {
+                                if (connection.containsPort(port) && port != message.getCurrentDestinationPort()) {
+                                    List<Message> messageList = new ArrayList<>();
+                                    messageList.add(new Message(
+                                            message,
+                                            port,
+                                            connection.getOtherPort(port),
+                                            this,
+                                            Utils.getIpAddressWithoutMask(nextHop),
+                                            History.Decision.ROUTER_FORWARD_ROUTING_TABLE,
+                                            "by routing table entry"
+                                    ));
+                                    return messageList;
+                                }
                             }
                         }
                     }
@@ -111,7 +115,7 @@ public class Router extends Device implements RoutingTable.OnRoutingTableChangeL
                     " should belong to the same network";
             Platform.runLater(() -> Engine.getInstance().logError(errorMessage));
             Engine.setTestNetworkSuccessful(false);
-        } else if (message.getCurrentDestinationPort().getIpAddress().equals(message.getSourceIpAddress()) ) {
+        } else if (message.getCurrentDestinationPort().getIpAddress().equals(message.getSourceIpAddress())) {
             Device otherDevice = Engine.getInstance().getDeviceByIPAddress(message.getSourceIpAddress());
             if (otherDevice == null) {
                 otherDevice = Engine.getInstance().getDeviceByPortIpAddress(message.getSourceIpAddress());
@@ -140,6 +144,12 @@ public class Router extends Device implements RoutingTable.OnRoutingTableChangeL
         this.routingTable.putAll(routingTable);
     }
 
+    private boolean isProperRecipient(Message message) {
+        return (!message.getCurrentIpDestinationAddress().isEmpty()
+                && message.getCurrentDestinationPort().getIpAddress().contains(message.getCurrentIpDestinationAddress())
+                && !Utils.belongToTheSameNetwork(message.getDestinationIpAddress(), message.getCurrentDestinationPort().getIpAddress())
+                || message.getCurrentIpDestinationAddress().equals("0.0.0.0"));
+    }
 
     @Override
     public void onRoutingTableChange(Map<String, String> routingTable) {

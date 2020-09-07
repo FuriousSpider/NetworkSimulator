@@ -16,13 +16,13 @@ import javafx.util.Duration;
 import javafx.util.Pair;
 import simulator.element.Connection;
 import simulator.element.Message;
+import simulator.element.device.Device;
+import simulator.element.device.EndDevice;
 import simulator.element.device.Firewall;
+import simulator.element.device.Router;
 import simulator.element.device.additionalElements.History;
 import simulator.element.device.additionalElements.Policy;
 import simulator.element.device.additionalElements.Port;
-import simulator.element.device.Device;
-import simulator.element.device.EndDevice;
-import simulator.element.device.Router;
 import simulator.view.PortListDialog;
 import util.Values;
 
@@ -364,9 +364,8 @@ public class Engine implements PortListDialog.OnPortSelectedListener {
         for (Device device : deviceList) {
             if (device instanceof EndDevice && ((EndDevice) device).getIpAddress().contains(address)) {
                 return ((EndDevice) device).getIpAddress();
-            } else if (device instanceof Router) {
-                Router router = (Router) device;
-                for (Port port : router.getPortList()) {
+            } else if (device instanceof Router || device instanceof Firewall) {
+                for (Port port : device.getPortList()) {
                     if (port.hasInterface() && port.getIpAddress().contains(address)) {
                         return port.getIpAddress();
                     }
@@ -469,6 +468,12 @@ public class Engine implements PortListDialog.OnPortSelectedListener {
                     if (port2.hasInterface()) {
                         ctx.fillText(port2.getIpAddress(), port2X, port2Y + ipAddressTopPadding);
                     }
+                    if (port1.hasVLan()) {
+                        ctx.fillText("vlan " + port1.getVLanId(), port1X, port1Y + ipAddressTopPadding);
+                    }
+                    if (port2.hasVLan()) {
+                        ctx.fillText("vlan " + port2.getVLanId(), port1X, port1Y + ipAddressTopPadding);
+                    }
                 }
             }
         }
@@ -551,6 +556,7 @@ public class Engine implements PortListDialog.OnPortSelectedListener {
                                         endDevice.getMacAddress(),
                                         sourcePort,
                                         getConnectionByPort(sourcePort).getOtherPort(sourcePort),
+                                        "",
                                         Policy.Application.UDP,
                                         Message.Type.TEST
                                 ));
@@ -565,6 +571,7 @@ public class Engine implements PortListDialog.OnPortSelectedListener {
                                             device.getMacAddress(),
                                             port,
                                             getConnectionByPort(port).getOtherPort(port),
+                                            "",
                                             Policy.Application.UDP,
                                             Message.Type.TEST
                                     ));
@@ -592,11 +599,13 @@ public class Engine implements PortListDialog.OnPortSelectedListener {
                     for (Port port : sourceDevice.getPortList()) {
                         String sourceIPAddressWithMask = null;
                         String destinationIPAddressWithMask = null;
+                        String currentDestinationIpAddress = "";
 
                         for (Device device : deviceList) {
                             if (device instanceof EndDevice) {
                                 if (((EndDevice) device).getIpAddress().contains(sourceIPAddress)) {
                                     sourceIPAddressWithMask = ((EndDevice) device).getIpAddress();
+                                    currentDestinationIpAddress = ((EndDevice) device).getGateway();
                                 }
                                 if (((EndDevice) device).getIpAddress().contains(destinationIPAddress)) {
                                     destinationIPAddressWithMask = ((EndDevice) device).getIpAddress();
@@ -612,6 +621,7 @@ public class Engine implements PortListDialog.OnPortSelectedListener {
                                 destinationDevice.getMacAddress(),
                                 port,
                                 getConnectionByPort(port).getOtherPort(port),
+                                currentDestinationIpAddress,
                                 Policy.Application.UDP,
                                 Message.Type.NORMAL
                         ));

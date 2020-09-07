@@ -3,7 +3,10 @@ package simulator;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
@@ -12,9 +15,9 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import simulator.element.Connection;
+import simulator.element.device.*;
 import simulator.element.device.additionalElements.History;
 import simulator.element.device.additionalElements.Port;
-import simulator.element.device.*;
 import simulator.view.*;
 import util.Values;
 import view.CanvasPane;
@@ -40,6 +43,8 @@ public class Controller implements Initializable, PortListDialog.OnPortSelectedL
     private Label elementInfoMacAddress;
     @FXML
     private IPTextField elementInfoIpAddress;
+    @FXML
+    private DefaultGatewayView elementDefaultGateway;
     @FXML
     private RoutingTable routingTableView;
     @FXML
@@ -222,8 +227,13 @@ public class Controller implements Initializable, PortListDialog.OnPortSelectedL
             elementInfoIpAddress.show();
             elementInfoIpAddress.setIpAddress(((EndDevice) selectedDevice).getIpAddress());
             elementInfoIpAddress.setOnSaveClickedListener(((EndDevice) selectedDevice));
+
+            elementDefaultGateway.show();
+            elementDefaultGateway.setDefaultGateway(((EndDevice) selectedDevice).getGateway());
+            elementDefaultGateway.setOnDefaultGatewayChangeListener((EndDevice) selectedDevice);
         } else {
             elementInfoIpAddress.hide();
+            elementDefaultGateway.hide();
         }
 
         if (selectedDevice instanceof Router) {

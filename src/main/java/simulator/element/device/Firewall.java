@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-public class Firewall extends Device implements FirewallPoliciesView.OnPoliciesListUpdatedListener{
+public class Firewall extends Device implements FirewallPoliciesView.OnPoliciesListUpdatedListener {
     public static String fileName = "/firewall.png";
     public static String deviceType = "Firewall";
     private final List<Policy> policyList;
@@ -54,42 +54,44 @@ public class Firewall extends Device implements FirewallPoliciesView.OnPoliciesL
 
     //TODO: add
     private List<Message> handleNormalMessage(Message message, List<Connection> connectionList) {
-        for (Port sourcePort : getPortList()) {
-            if (!message.getCurrentDestinationPort().equals(sourcePort)) {
-                Connection connection = getConnectionByPort(sourcePort, connectionList);
-                if (connection != null) {
-                    Port destinationPort = connection.getOtherPort(sourcePort);
-                    for (Policy policy : policyList) {
-                        String sourceNetworkAddress = policy.getSourceNetworkAddress();
-                        String destinationNetworkAddress = policy.getDestinationNetworkAddress();
-                        Set<Policy.Application> applicationSet = policy.getApplicationSet();
+        if (isProperRecipient(message)) {
+            for (Port sourcePort : getPortList()) {
+                if (!message.getCurrentDestinationPort().equals(sourcePort)) {
+                    Connection connection = getConnectionByPort(sourcePort, connectionList);
+                    if (connection != null) {
+                        Port destinationPort = connection.getOtherPort(sourcePort);
+                        for (Policy policy : policyList) {
+                            String sourceNetworkAddress = policy.getSourceNetworkAddress();
+                            String destinationNetworkAddress = policy.getDestinationNetworkAddress();
+                            Set<Policy.Application> applicationSet = policy.getApplicationSet();
 
-                        //TODO: check if works properly
-                        if (!(sourceNetworkAddress == null || !sourceNetworkAddress.equals(Utils.getNetworkAddressFromIp(message.getSourceIpAddress())))) {
-                            continue;
-                        }
-                        if (!(destinationNetworkAddress == null || !destinationNetworkAddress.equals(Utils.getNetworkAddressFromIp(message.getDestinationIpAddress())))) {
-                            continue;
-                        }
-                        if (!applicationSet.isEmpty() && !applicationSet.contains(message.getApplication())) {
-                            continue;
-                        }
+                            //TODO: check if works properly
+                            if (!(sourceNetworkAddress == null || !sourceNetworkAddress.equals(Utils.getNetworkAddressFromIp(message.getSourceIpAddress())))) {
+                                continue;
+                            }
+                            if (!(destinationNetworkAddress == null || !destinationNetworkAddress.equals(Utils.getNetworkAddressFromIp(message.getDestinationIpAddress())))) {
+                                continue;
+                            }
+                            if (!applicationSet.isEmpty() && !applicationSet.contains(message.getApplication())) {
+                                continue;
+                            }
 
+                            return executePolicy(
+                                    policy.getRule(),
+                                    message,
+                                    sourcePort,
+                                    destinationPort,
+                                    History.Decision.FIREWALL_FORWARD_POLICY,
+                                    "by policy number :" + policyList.indexOf(policy) + 1);
+                        }
                         return executePolicy(
-                                policy.getRule(),
+                                defaultRule,
                                 message,
                                 sourcePort,
                                 destinationPort,
-                                History.Decision.FIREWALL_FORWARD_POLICY,
-                                "by policy number :" + policyList.indexOf(policy) + 1);
+                                History.Decision.FIREWALL_FORWARD_DEFAULT_RULE,
+                                "by default rule: " + defaultRule);
                     }
-                    return executePolicy(
-                            defaultRule,
-                            message,
-                            sourcePort,
-                            destinationPort,
-                            History.Decision.FIREWALL_FORWARD_DEFAULT_RULE,
-                            "by default rule: " + defaultRule);
                 }
             }
         }
@@ -109,7 +111,7 @@ public class Firewall extends Device implements FirewallPoliciesView.OnPoliciesL
                     " should belong to the same network";
             Platform.runLater(() -> Engine.getInstance().logError(errorMessage));
             Engine.setTestNetworkSuccessful(false);
-        } else if (message.getCurrentDestinationPort().getIpAddress().equals(message.getSourceIpAddress()) ) {
+        } else if (message.getCurrentDestinationPort().getIpAddress().equals(message.getSourceIpAddress())) {
             Device otherDevice = Engine.getInstance().getDeviceByIPAddress(message.getSourceIpAddress());
             if (otherDevice == null) {
                 otherDevice = Engine.getInstance().getDeviceByPortIpAddress(message.getSourceIpAddress());
@@ -128,7 +130,14 @@ public class Firewall extends Device implements FirewallPoliciesView.OnPoliciesL
     private List<Message> executePolicy(Policy.Rule rule, Message message, Port sourcePort, Port destinationPort, History.Decision decision, String decisionValue) {
         if (rule.equals(Policy.Rule.PERMIT)) {
             List<Message> messageList = new ArrayList<>();
-            messageList.add(new Message(message, sourcePort, destinationPort, this, decision, decisionValue));
+            messageList.add(new Message(
+                    message,
+                    sourcePort,
+                    destinationPort,
+                    this,
+                    "0.0.0.0",
+                    decision,
+                    decisionValue));
             return messageList;
         } else {
             return new ArrayList<>();
@@ -159,6 +168,13 @@ public class Firewall extends Device implements FirewallPoliciesView.OnPoliciesL
 
     public void setDefaultRule(Policy.Rule defaultRule) {
         this.defaultRule = defaultRule;
+    }
+
+    private boolean isProperRecipient(Message message) {
+        return (!message.getCurrentIpDestinationAddress().isEmpty()
+                && message.getCurrentDestinationPort().getIpAddress().contains(message.getCurrentIpDestinationAddress())
+                && !Utils.belongToTheSameNetwork(message.getDestinationIpAddress(), message.getCurrentDestinationPort().getIpAddress())
+                || message.getCurrentIpDestinationAddress().equals("0.0.0.0"));
     }
 
     @Override
