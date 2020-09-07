@@ -5,12 +5,13 @@ import simulator.Engine;
 import simulator.element.Connection;
 import simulator.element.Message;
 import simulator.element.device.additionalElements.Port;
+import simulator.view.SwitchButtonsView;
 import util.Values;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class Switch extends Device {
+public class Switch extends Device implements SwitchButtonsView.OnClearMacTableClickedListener{
     public static String fileName = "/switch.png";
     public static String deviceType = "Switch";
     public static int nameCounter = 1;
@@ -63,7 +64,7 @@ public class Switch extends Device {
                         connection.getOtherPort(sourcePort),
                         this,
                         message.getCurrentIpDestinationAddress(),
-                        "by association table entry"
+                        "by MAC Address table entry"
                 ));
             }
             return messageList;
@@ -184,5 +185,10 @@ public class Switch extends Device {
             return sourcePort.getVLanId() == currentDestinationPort.getVLanId();
         }
         return false;
+    }
+
+    @Override
+    public void onClearMacTableClicked() {
+        associationTable.clear();
     }
 }

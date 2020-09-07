@@ -47,6 +47,8 @@ public class Controller implements Initializable, PortListDialog.OnPortSelectedL
     @FXML
     private FirewallPoliciesView firewallPoliciesView;
     @FXML
+    private SwitchButtonsView elementSwitchButtonsView;
+    @FXML
     private SimulationView simulationView;
     @FXML
     private LogPanel logPanel;
@@ -238,6 +240,15 @@ public class Controller implements Initializable, PortListDialog.OnPortSelectedL
         } else {
             firewallPoliciesView.hide();
         }
+
+        if (selectedDevice instanceof Switch) {
+            Switch sw = (Switch) selectedDevice;
+            elementSwitchButtonsView.show();
+            elementSwitchButtonsView.setMacTable(sw.getAssociationTable());
+            elementSwitchButtonsView.setOnClearMacTableClickedListener(sw);
+        } else {
+            elementSwitchButtonsView.hide();
+        }
     }
 
     public void hideElementInfo() {
@@ -247,7 +258,6 @@ public class Controller implements Initializable, PortListDialog.OnPortSelectedL
         firewallPoliciesView.hide();
     }
 
-    //TODO: show ports rather than connections only
     public void showConnectionList(Device selectedDevice, List<Connection> connectionList) {
         connectionsInfo.getChildren().clear();
         for (Connection connection : connectionList) {

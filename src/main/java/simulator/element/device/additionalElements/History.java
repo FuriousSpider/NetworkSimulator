@@ -37,4 +37,8 @@ public class History {
     public String getToPort() {
         return toPort.getPortName();
     }
+
+    public boolean isConfirmationMessage() {
+        return message.isConfirmationMessage();
+    }
 }

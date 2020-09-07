@@ -13,7 +13,7 @@ public class SimulationResultDiagram extends Dialog<String> {
     private final GridPane contentView;
     private List<History> historyList;
 
-    public SimulationResultDiagram () {
+    public SimulationResultDiagram() {
         this.contentView = new GridPane();
         this.historyList = new ArrayList<>();
 
@@ -35,7 +35,8 @@ public class SimulationResultDiagram extends Dialog<String> {
         contentView.add(new Label("Device type"), 2, 0);
         contentView.add(new Label("From port"), 3, 0);
         contentView.add(new Label("To port"), 4, 0);
-        contentView.add(new Label("Action"), 5, 0);
+        contentView.add(new Label("Confirmation"), 5, 0);
+        contentView.add(new Label("Action"), 6, 0);
 
         for (History history : historyList) {
             int index = historyList.indexOf(history) + 1;
@@ -44,14 +45,24 @@ public class SimulationResultDiagram extends Dialog<String> {
             Label deviceTypeLabel = new Label(history.getDeviceType());
             Label portFromLabel = new Label(history.getFromPort());
             Label portToLabel = new Label(history.getToPort());
+            Label confirmationLabel = new Label(getConfirmationText(history.isConfirmationMessage()));
             Label decisionLabel = new Label(history.getDecisionValue());
             contentView.add(indexLabel, 0, index);
             contentView.add(deviceNameLabel, 1, index);
             contentView.add(deviceTypeLabel, 2, index);
             contentView.add(portFromLabel, 3, index);
             contentView.add(portToLabel, 4, index);
-            contentView.add(decisionLabel, 5, index);
+            contentView.add(confirmationLabel, 5, index);
+            contentView.add(decisionLabel, 6, index);
         }
         super.show();
+    }
+
+    private String getConfirmationText(boolean isConfirmationMessage) {
+        if (isConfirmationMessage) {
+            return "yes";
+        } else {
+            return "no";
+        }
     }
 }

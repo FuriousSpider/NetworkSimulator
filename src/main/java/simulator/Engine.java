@@ -16,10 +16,7 @@ import javafx.util.Duration;
 import javafx.util.Pair;
 import simulator.element.Connection;
 import simulator.element.Message;
-import simulator.element.device.Device;
-import simulator.element.device.EndDevice;
-import simulator.element.device.Firewall;
-import simulator.element.device.Router;
+import simulator.element.device.*;
 import simulator.element.device.additionalElements.History;
 import simulator.element.device.additionalElements.Policy;
 import simulator.element.device.additionalElements.Port;
@@ -643,6 +640,15 @@ public class Engine implements PortListDialog.OnPortSelectedListener {
                         ));
                     }
                 } else {
+                    if (sourceDevice == null) {
+                        Platform.runLater(() -> logError("Simulation: Invalid Source IP Address - no device found"));
+                    }
+                    if (destinationDevice == null) {
+                        Platform.runLater(() -> logError("Simulation: Invalid Destination IP Address - no device found"));
+                    }
+                    if (application == null) {
+                        Platform.runLater(() -> logError("Simulation: You have to select an application"));
+                    }
                     runSimulation = false;
                 }
             }

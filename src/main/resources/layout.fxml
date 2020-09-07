@@ -12,6 +12,7 @@
 <?import simulator.view.FirewallPoliciesView?>
 <?import simulator.view.DefaultGatewayView?>
 <?import simulator.view.SimulationView?>
+<?import simulator.view.SwitchButtonsView?>
 <BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="simulator.Controller" styleClass="layout" fx:id="root">
     <stylesheets>
         <URL value="@Styles.css"/>
@@ -44,6 +45,8 @@
                             <Label fx:id="elementInfoMacAddress" onMouseClicked="#handleElementInfoMacAddressClick"/>
                             <IPTextField fx:id="elementInfoIpAddress"/>
                             <DefaultGatewayView fx:id="elementDefaultGateway"/>
+                            <SwitchButtonsView fx:id="elementSwitchButtonsView"/>
+<!--                            <Button fx:id="elementCleanAssociationTableButton" onAction="#handleCleanAssociationTableButtonClick" text="Clear MAC Address Table"/>-->
                             <Button onAction="#handleConnectElementsButtonClick" text="Connect"/>
                             <Button onAction="#handleRemoveElementButtonClick" text="Remove"/>
                         </VBox>

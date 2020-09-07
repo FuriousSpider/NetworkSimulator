@@ -69,7 +69,11 @@ public class SimulationView extends GridPane {
     }
 
     public Policy.Application getApplication() {
-        return Policy.Application.valueOf(applicationComboBox.getValue());
+        try {
+            return Policy.Application.valueOf(applicationComboBox.getValue());
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     private void onStartSimulationClicked(MouseEvent mouseEvent) {

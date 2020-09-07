@@ -37,7 +37,7 @@ public class Port implements IPTextField.OnSaveClickedListener, VLanTextField.On
     }
 
     public String getPortName() {
-        return "Port " + portNumber;
+        return "Port" + portNumber;
     }
 
     public void setNewInterface() {
