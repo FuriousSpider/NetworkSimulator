@@ -5,6 +5,7 @@ public class Values {
     public static int APPLICATION_MIN_HEIGHT = 600;
 
     public static int DEVICE_SIZE = 50;
+    public static int DEVICE_SIZE_DEFAULT = 50;
     public static int DEVICE_MIN_SIZE = 50;
     public static int DEVICE_MAX_SIZE = 100;
     public static int DEVICE_DEFAULT_POSITION = 100;
@@ -13,7 +14,9 @@ public class Values {
     public static int FONT_SIZE = 16;
 
     public static boolean SHOW_DEVICE_NAME = true;
+    public static boolean SHOW_DEVICE_NAME_DEFAULT = true;
     public static boolean SHOW_PORTS = true;
+    public static boolean SHOW_PORTS_DEFAULT = true;
 
     public static int DEVICE_SWITCH_ASSOCIATION_TABLE_SIZE_LIMIT = 1000;
 
@@ -34,6 +37,7 @@ public class Values {
     public static int MESSAGE_SIZE = 50;
     public static int MESSAGE_PROGRESS_MAX = 1000;
     public static int MESSAGE_PROGRESS_STEP = 30;
+    public static int MESSAGE_PROGRESS_STEP_DEFAULT = 30;
     public static int MESSAGE_PROGRESS_MIN_STEP = 10;
     public static int MESSAGE_PROGRESS_MAX_STEP = 300;
 

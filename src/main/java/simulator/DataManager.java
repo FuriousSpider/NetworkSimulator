@@ -245,6 +245,21 @@ public class DataManager {
                                 case "policyIdCounter":
                                     Policy.setIdCounter(((Long) optionObject.get("value")).intValue());
                                     break;
+                                case "endDeviceNameCounter":
+                                    EndDevice.nameCounter = ((Long) optionObject.get("value")).intValue();
+                                    break;
+                                case "hubNameCounter":
+                                    Hub.nameCounter = ((Long) optionObject.get("value")).intValue();
+                                    break;
+                                case "switchNameCounter":
+                                    Switch.nameCounter = ((Long) optionObject.get("value")).intValue();
+                                    break;
+                                case "routerNameCounter":
+                                    Router.nameCounter = ((Long) optionObject.get("value")).intValue();
+                                    break;
+                                case "firewallNameCounter":
+                                    Firewall.nameCounter = ((Long) optionObject.get("value")).intValue();
+                                    break;
                                 case "deviceSizeOption":
                                     Values.DEVICE_SIZE = ((Long) optionObject.get("value")).intValue();
                                     break;
@@ -394,6 +409,31 @@ public class DataManager {
                 optionObject = new JSONObject();
                 optionObject.put("key", "policyIdCounter");
                 optionObject.put("value", Policy.getIdCounter());
+                optionsArray.add(optionObject);
+
+                optionObject = new JSONObject();
+                optionObject.put("key", "endDeviceNameCounter");
+                optionObject.put("value", EndDevice.nameCounter);
+                optionsArray.add(optionObject);
+
+                optionObject = new JSONObject();
+                optionObject.put("key", "hubNameCounter");
+                optionObject.put("value", Hub.nameCounter);
+                optionsArray.add(optionObject);
+
+                optionObject = new JSONObject();
+                optionObject.put("key", "switchNameCounter");
+                optionObject.put("value", Switch.nameCounter);
+                optionsArray.add(optionObject);
+
+                optionObject = new JSONObject();
+                optionObject.put("key", "routerNameCounter");
+                optionObject.put("value", Router.nameCounter);
+                optionsArray.add(optionObject);
+
+                optionObject = new JSONObject();
+                optionObject.put("key", "firewallNameCounter");
+                optionObject.put("value", Firewall.nameCounter);
                 optionsArray.add(optionObject);
 
                 optionObject = new JSONObject();

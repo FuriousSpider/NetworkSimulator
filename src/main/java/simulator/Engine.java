@@ -90,10 +90,22 @@ public class Engine implements PortListDialog.OnPortSelectedListener {
         connectionList.clear();
         deviceList.clear();
         controller.hideElementInfo();
+        Values.DEVICE_SIZE = Values.DEVICE_SIZE_DEFAULT;
+        Values.MESSAGE_PROGRESS_STEP = Values.MESSAGE_PROGRESS_STEP_DEFAULT;
+        Values.SHOW_DEVICE_NAME = Values.SHOW_DEVICE_NAME_DEFAULT;
+        Values.SHOW_PORTS = Values.SHOW_PORTS_DEFAULT;
     }
 
     public void loadData(DataManager.Data data) {
-        startNewProject();
+        stopSimulation();
+        connectMousePosition = null;
+        mousePosition = null;
+        selectedDevice = null;
+        presentlyClickedDevice = null;
+        messageList.clear();
+        connectionList.clear();
+        deviceList.clear();
+        controller.hideElementInfo();
         deviceList.addAll(data.getDeviceArrayList());
         connectionList.addAll(data.getConnectionArrayList());
     }
@@ -522,11 +534,15 @@ public class Engine implements PortListDialog.OnPortSelectedListener {
                         if (testNetworkSuccessful) {
                             Platform.runLater(() -> Engine.getInstance().log("Network configured properly"));
                             prepareSimulation(sourceIPAddress, destinationIPAddress, application);
+                            if (runSimulation) {
+                                controller.lockSimulationButton();
+                            }
                             while (runSimulation) {
                                 nextSimulationStep();
                                 checkSimulationProgress();
                                 Thread.sleep(Values.ENGINE_MILLISECONDS_PAUSE);
                             }
+                            controller.unlockSimulationButton();
                         }
                         return null;
                     }
@@ -664,10 +680,12 @@ public class Engine implements PortListDialog.OnPortSelectedListener {
     public void stopSimulation() {
         this.runSimulation = false;
         this.messageList.clear();
+        controller.unlockSimulationButton();
     }
 
     public void finishSimulation(List<History> historyList) {
         stopSimulation();
         Platform.runLater(() -> controller.showResultDiagram(historyList));
+        Platform.runLater(() -> controller.unlockSimulationButton());
     }
 }

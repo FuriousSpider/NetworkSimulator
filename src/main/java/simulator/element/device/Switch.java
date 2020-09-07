@@ -13,6 +13,7 @@ import java.util.List;
 public class Switch extends Device {
     public static String fileName = "/switch.png";
     public static String deviceType = "Switch";
+    public static int nameCounter = 1;
 
     private final List<Pair<String, Integer>> associationTable;
 
@@ -33,7 +34,7 @@ public class Switch extends Device {
 
     @Override
     void initName() {
-        setDeviceName(deviceType);
+        setDeviceName(deviceType + nameCounter++);
     }
 
     //TODO: check if trunk mode works properly

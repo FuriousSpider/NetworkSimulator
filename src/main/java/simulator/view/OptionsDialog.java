@@ -4,7 +4,6 @@ import javafx.beans.Observable;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
 import util.Values;
 
 public class OptionsDialog extends Dialog<String> {
@@ -25,12 +24,12 @@ public class OptionsDialog extends Dialog<String> {
         this.elementSizeTitle = new Label("Element size:");
         this.elementSizeSlider = new Slider();
         this.elementSizeValue = new Label(String.valueOf(Values.DEVICE_SIZE));
-        this.simulationSpeedTitle = new Label("Simulation speed");
+        this.simulationSpeedTitle = new Label("Simulation speed:");
         this.simulationSpeedSlider = new Slider();
         this.simulationSpeedValue = new Label(String.valueOf(Values.MESSAGE_PROGRESS_STEP));
-        this.showDeviceNameTitle = new Label("Show device name");
+        this.showDeviceNameTitle = new Label("Show device name:");
         this.showDeviceNameCheckBox = new CheckBox();
-        this.showPortsTitle = new Label("Show ports");
+        this.showPortsTitle = new Label("Show ports:");
         this.showPortsCheckBox = new CheckBox();
 
         this.content.add(elementSizeTitle, 0, 0);

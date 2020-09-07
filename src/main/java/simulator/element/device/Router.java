@@ -18,6 +18,7 @@ public class Router extends Device implements RoutingTable.OnRoutingTableChangeL
     public static String fileName = "/router.png";
     public static String deviceType = "Router";
     private final Map<String, String> routingTable;
+    public static int nameCounter = 1;
 
     public Router(int x, int y) {
         super(fileName, x, y, deviceType);
@@ -35,7 +36,7 @@ public class Router extends Device implements RoutingTable.OnRoutingTableChangeL
 
     @Override
     void initName() {
-        setDeviceName(deviceType);
+        setDeviceName(deviceType + nameCounter++);
     }
 
     @Override

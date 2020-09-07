@@ -53,19 +53,16 @@ public class RoutingTable extends VBox {
     private void onAddButtonClicked(MouseEvent mouseEvent) {
         Pattern ipv4Pattern = Pattern.compile(Values.REGEX_IP_ADDRESS_WITH_MASK);
         boolean areEntriesValid = true;
-        if (!ipv4Pattern.matcher(newEntryNetworkTextField.getText()).matches()) {
+        if (Utils.isIpAddressWithoutMask(newEntryNetworkTextField.getText())) {
             areEntriesValid = false;
             Engine.getInstance().logError(Values.ERROR_INVALID_NETWORK_IP_ADDRESS);
         } else if (!Utils.isNetworkAddress(newEntryNetworkTextField.getText())) {
             areEntriesValid = false;
             Engine.getInstance().logError(Values.ERROR_ADDRESS_IS_NOT_A_NETWORK_ADDRESS);
         }
-        if (!ipv4Pattern.matcher(newEntryNextHopTextField.getText()).matches()) {
+        if (!Utils.isIpAddressWithoutMask(newEntryNextHopTextField.getText())) {
             areEntriesValid = false;
             Engine.getInstance().logError(Values.ERROR_INVALID_IP_ADDRESS);
-        } else if (Utils.isNetworkAddress(newEntryNextHopTextField.getText())) {
-            areEntriesValid = false;
-            Engine.getInstance().logError(Values.ERROR_ADDRESS_IS_NOT_A_HOST_ADDRESS);
         }
 
         if (areEntriesValid) {

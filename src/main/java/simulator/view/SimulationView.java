@@ -84,6 +84,14 @@ public class SimulationView extends GridPane {
         }
     }
 
+    public void lockSimulationButton() {
+        startSimulationButton.setDisable(true);
+    }
+
+    public void unlockSimulationButton() {
+        startSimulationButton.setDisable(false);
+    }
+
     public void setOnStartSimulationButtonClickedListener(OnStartSimulationButtonClickedListener listener) {
         this.onStartSimulationButtonClickedListener = listener;
     }

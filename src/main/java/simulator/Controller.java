@@ -288,6 +288,14 @@ public class Controller implements Initializable, PortListDialog.OnPortSelectedL
         canvasPane.requestFocus();
     }
 
+    public void lockSimulationButton() {
+        simulationView.lockSimulationButton();
+    }
+
+    public void unlockSimulationButton() {
+        simulationView.unlockSimulationButton();
+    }
+
     @Override
     public void onPortSelected(int portId) {
         engine.onConnectClicked(portId);

@@ -19,6 +19,7 @@ public class Firewall extends Device implements FirewallPoliciesView.OnPoliciesL
     public static String deviceType = "Firewall";
     private final List<Policy> policyList;
     private Policy.Rule defaultRule;
+    public static int nameCounter = 1;
 
     public Firewall(int x, int y) {
         super(fileName, x, y, deviceType);
@@ -37,7 +38,7 @@ public class Firewall extends Device implements FirewallPoliciesView.OnPoliciesL
 
     @Override
     void initName() {
-        setDeviceName(deviceType);
+        setDeviceName(deviceType + nameCounter++);
     }
 
     @Override

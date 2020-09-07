@@ -20,6 +20,7 @@ public class EndDevice extends Device implements IPTextField.OnSaveClickedListen
     public static String deviceType = "End Device";
     private final Interface anInterface;
     private final Interface gateway;
+    public static int nameCounter = 1;
 
     public EndDevice(int x, int y) {
         super(fileName, x, y, deviceType);
@@ -35,7 +36,7 @@ public class EndDevice extends Device implements IPTextField.OnSaveClickedListen
 
     @Override
     void initName() {
-        setDeviceName("PC");
+        setDeviceName("PC" + nameCounter++);
     }
 
     @Override

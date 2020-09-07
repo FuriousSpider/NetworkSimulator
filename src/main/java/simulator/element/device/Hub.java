@@ -12,6 +12,7 @@ import java.util.List;
 public class Hub extends Device {
     public static String fileName = "/hub.png";
     public static String deviceType = "Hub";
+    public static int nameCounter = 1;
 
     public Hub(int x, int y) {
         super(fileName, x, y, deviceType);
@@ -26,7 +27,7 @@ public class Hub extends Device {
 
     @Override
     void initName() {
-        setDeviceName(deviceType);
+        setDeviceName(deviceType + nameCounter++);
     }
 
     @Override
