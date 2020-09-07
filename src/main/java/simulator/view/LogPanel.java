@@ -14,7 +14,7 @@ public class LogPanel extends ScrollPane {
     public LogPanel() {
         logField = new VBox();
         this.setContent(logField);
-        logField.getChildren().add(new Label("Log pannel:"));
+        logField.getChildren().add(new Label("Log panel:"));
     }
 
     public void log(String text) {
@@ -33,5 +33,6 @@ public class LogPanel extends ScrollPane {
 
     public void clear() {
         logField.getChildren().clear();
+        logField.getChildren().add(new Label("Log panel:"));
     }
 }

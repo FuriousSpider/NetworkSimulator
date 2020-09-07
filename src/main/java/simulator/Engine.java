@@ -105,13 +105,6 @@ public class Engine implements PortListDialog.OnPortSelectedListener {
         DataManager.save(data);
     }
 
-    public void saveDataAs() {
-        DataManager.Data data = new DataManager.Data();
-        data.setDeviceArrayList(new ArrayList<>(deviceList));
-        data.setConnectionArrayList(new ArrayList<>(connectionList));
-        DataManager.saveAs(data);
-    }
-
     public Device getSelectedDevice() {
         return selectedDevice;
     }
@@ -472,7 +465,7 @@ public class Engine implements PortListDialog.OnPortSelectedListener {
                         ctx.fillText("vlan " + port1.getVLanId(), port1X, port1Y + ipAddressTopPadding);
                     }
                     if (port2.hasVLan()) {
-                        ctx.fillText("vlan " + port2.getVLanId(), port1X, port1Y + ipAddressTopPadding);
+                        ctx.fillText("vlan " + port2.getVLanId(), port2X, port2Y + ipAddressTopPadding);
                     }
                 }
             }

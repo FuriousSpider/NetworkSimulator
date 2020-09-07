@@ -125,10 +125,11 @@ public class Controller implements Initializable, PortListDialog.OnPortSelectedL
         dialog.setContentText(Values.DIALOG_NEW_CONTENT);
         dialog.showAndWait().ifPresent(type -> {
             if (type.getText().equals(ButtonType.YES.getText())) {
+                DataManager.resetFile();
+                logPanel.clear();
                 engine.startNewProject();
             }
         });
-        logPanel.clear();
     }
 
     @FXML
@@ -147,11 +148,6 @@ public class Controller implements Initializable, PortListDialog.OnPortSelectedL
     @FXML
     private void handleMenuSaveClick() {
         engine.saveData();
-    }
-
-    @FXML
-    private void handleMenuSaveAsClick() {
-        engine.saveDataAs();
     }
 
     @FXML

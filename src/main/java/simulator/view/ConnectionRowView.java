@@ -13,6 +13,9 @@ import simulator.element.Connection;
 import simulator.element.device.additionalElements.Port;
 import util.Values;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class ConnectionRowView extends HBox {
     private final int id;
     private OnDeleteClickListener onDeleteClickListener;
@@ -37,7 +40,10 @@ public class ConnectionRowView extends HBox {
             VLanTextField vLanTextField = new VLanTextField();
             vLanTextField.setVLanId(thisPort.getVLanId());
             vLanTextField.setTrunkMode(thisPort.isInTrunkMode());
-            vLanTextField.setOnChangeModeClickedListener(thisPort);
+            List<VLanTextField.OnChangeModeClickedListener> bothConnectionEnds = new ArrayList<>();
+            bothConnectionEnds.add(thisPort);
+            bothConnectionEnds.add(otherPort);
+            vLanTextField.setOnChangeModeClickedListenerList(bothConnectionEnds);
             vLanTextField.setOnSaveClickedListener(thisPort);
             vLanTextField.show();
             this.getChildren().add(vLanTextField);

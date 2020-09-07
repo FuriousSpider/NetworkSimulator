@@ -25,7 +25,6 @@
                 <MenuItem text="New" onAction="#handleMenuNewClick"/>
                 <MenuItem text="Open" onAction="#handleMenuOpenClick"/>
                 <MenuItem text="Save" onAction="#handleMenuSaveClick"/>
-                <MenuItem text="Save As" onAction="#handleMenuSaveAsClick"/>
                 <MenuItem text="Options" onAction="#handleMenuOptionsClick"/>
                 <SeparatorMenuItem/>
                 <MenuItem text="Exit" onAction="#handleMenuExitClick"/>
@@ -55,18 +54,6 @@
                 </VBox>
             </ScrollPane>
             <Region VBox.vgrow="ALWAYS"/>
-<!--            <VBox>-->
-<!--                <GridPane>-->
-<!--                    <Label text="Simulation" GridPane.rowIndex="0" GridPane.columnIndex="0"/>-->
-<!--                    <Label text="Source IP Address: " GridPane.rowIndex="1" GridPane.columnIndex="0"/>-->
-<!--                    <TextField fx:id="simulationSourceIPAddress" GridPane.rowIndex="1" GridPane.columnIndex="1"/>-->
-<!--                    <Label text="Destination IP Address: " GridPane.rowIndex="2" GridPane.columnIndex="0"/>-->
-<!--                    <TextField fx:id="simulationDestinationIPAddress" GridPane.rowIndex="2" GridPane.columnIndex="1"/>-->
-<!--                    <ComboBox fx:id="simulationApplicationList" GridPane.rowIndex="3" GridPane.columnIndex="0"/>-->
-<!--                </GridPane>-->
-<!--                <Button text="Simulate" onAction="#handleStartSimulationButtonClick"/>-->
-<!--                <Button text="Stop simulation" onAction="#handleStopSimulationButtonClick"/>-->
-<!--            </VBox>-->
             <SimulationView fx:id="simulationView" styleClass="rightLayout"/>
             <LogPanel fx:id="logPanel" prefHeight="150" minHeight="150"/>
         </VBox>

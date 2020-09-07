@@ -267,31 +267,20 @@ public class DataManager {
         }
     }
 
-    public static void saveAs(Data data) {
-        save(data, null);
-    }
-
     public static void save(Data data) {
-        save(data, DataManager.file);
-    }
-
-    private static void save(Data data, File selectedFile) {
         File file;
-        if (selectedFile != null) {
-            file = selectedFile;
-        } else {
-            FileChooser fileChooser = new FileChooser();
-            fileChooser.setTitle("Save file");
 
-            FileChooser.ExtensionFilter extensionFilter = new FileChooser.ExtensionFilter("JSON files (*.json)", "*.json");
-            fileChooser.getExtensionFilters().add(extensionFilter);
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Save file");
 
-            if (DataManager.file != null) {
-                fileChooser.setInitialDirectory(DataManager.file.getParentFile());
-            }
+        FileChooser.ExtensionFilter extensionFilter = new FileChooser.ExtensionFilter("JSON files (*.json)", "*.json");
+        fileChooser.getExtensionFilters().add(extensionFilter);
 
-            file = fileChooser.showSaveDialog(null);
+        if (DataManager.file != null) {
+            fileChooser.setInitialDirectory(DataManager.file.getParentFile());
         }
+
+        file = fileChooser.showSaveDialog(null);
 
         if (file != null) {
             DataManager.file = file;
@@ -434,6 +423,10 @@ public class DataManager {
                 e.printStackTrace();
             }
         }
+    }
+
+    public static void resetFile() {
+        file = null;
     }
 
     public static class Data {

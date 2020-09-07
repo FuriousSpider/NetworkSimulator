@@ -11,6 +11,8 @@ import simulator.Engine;
 import util.Utils;
 import util.Values;
 
+import java.util.List;
+
 public class VLanTextField extends VBox {
 
     private final HBox firstLine;
@@ -24,7 +26,7 @@ public class VLanTextField extends VBox {
     private String vLanValue;
     private boolean isInEditMode;
 
-    private OnChangeModeClickedListener onChangeModeClickedListener;
+    private List<OnChangeModeClickedListener> onChangeModeClickedListenerList;
     private OnSaveClickedListener onSaveClickedListener;
 
     public VLanTextField() {
@@ -116,7 +118,9 @@ public class VLanTextField extends VBox {
     }
 
     private void onChangeModeCheckBoxClicked(MouseEvent mouseEvent) {
-        onChangeModeClickedListener.onChangeModeClicked(isInTrunkModeCheckBox.isSelected());
+        for (OnChangeModeClickedListener listener : onChangeModeClickedListenerList) {
+            listener.onChangeModeClicked(isInTrunkModeCheckBox.isSelected());
+        }
     }
 
     public void show() {
@@ -129,8 +133,8 @@ public class VLanTextField extends VBox {
         this.setManaged(false);
     }
 
-    public void setOnChangeModeClickedListener(OnChangeModeClickedListener listener) {
-        this.onChangeModeClickedListener = listener;
+    public void setOnChangeModeClickedListenerList(List<OnChangeModeClickedListener> listenerList) {
+        this.onChangeModeClickedListenerList = listenerList;
     }
 
     public void setOnSaveClickedListener(OnSaveClickedListener listener) {
