@@ -97,10 +97,7 @@ public class Firewall extends Device implements FirewallPoliciesView.OnPoliciesL
 
     private List<Message> handleTestMessage(Message message, List<Connection> connectionList) {
         if (!Utils.belongToTheSameNetwork(message.getCurrentDestinationPort().getIpAddress(), message.getSourceIpAddress())) {
-            Device otherDevice = Engine.getInstance().getDeviceByIPAddress(message.getSourceIpAddress());
-            if (otherDevice == null) {
-                otherDevice = Engine.getInstance().getDeviceByPortIpAddress(message.getSourceIpAddress());
-            }
+            Device otherDevice = Engine.getInstance().getDeviceByMacAddress(message.getSourceMac());
             String errorMessage = "Wrong network configuration\n" +
                     getDeviceName() +
                     " and " +
@@ -134,7 +131,9 @@ public class Firewall extends Device implements FirewallPoliciesView.OnPoliciesL
                     this,
                     "0.0.0.0",
                     null,
-                    decisionValue));
+                    decisionValue,
+                    true
+            ));
             return messageList;
         } else {
             return new ArrayList<>();

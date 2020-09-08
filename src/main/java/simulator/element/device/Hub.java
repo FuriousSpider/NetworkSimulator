@@ -54,7 +54,8 @@ public class Hub extends Device {
                                     this,
                                     message.getCurrentIpDestinationAddress(),
                                     message.getVLanId(),
-                                    ""
+                                    "",
+                                    true
                             )
                     );
                 } else {
@@ -66,7 +67,8 @@ public class Hub extends Device {
                                     this,
                                     message.getCurrentIpDestinationAddress(),
                                     message.getVLanId(),
-                                    ""
+                                    "",
+                                    true
                             )
                     );
                 }

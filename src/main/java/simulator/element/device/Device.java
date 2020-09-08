@@ -4,6 +4,7 @@ import javafx.scene.image.Image;
 import javafx.util.Pair;
 import simulator.element.Connection;
 import simulator.element.Message;
+import simulator.element.device.additionalElements.AssociationTableEntry;
 import simulator.element.device.additionalElements.Policy;
 import simulator.element.device.additionalElements.Port;
 import simulator.view.DeviceNameLabel;
@@ -141,7 +142,7 @@ abstract public class Device implements DeviceNameLabel.OnSaveDeviceNameClickedL
         private String ipAddress;
         private String defaultGateway;
         private Map<String, String> routingTable;
-        private List<Pair<String, Integer>> associationTable;
+        private List<AssociationTableEntry> associationTable;
         private List<Policy> policyList;
         private Policy.Rule defaultRule;
 
@@ -203,7 +204,7 @@ abstract public class Device implements DeviceNameLabel.OnSaveDeviceNameClickedL
             return this;
         }
 
-        public Builder associationTable(List<Pair<String, Integer>> associationTable) {
+        public Builder associationTable(List<AssociationTableEntry> associationTable) {
             if (this.associationTable == null) {
                 this.associationTable = new ArrayList<>();
             }

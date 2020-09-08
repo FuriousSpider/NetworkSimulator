@@ -52,9 +52,9 @@ public class Router extends Device implements RoutingTable.OnRoutingTableChangeL
 
     private List<Message> handleNormalMessage(Message message, List<Connection> connectionList) {
         if (isProperRecipient(message)) {
+            List<Message> messageList = new ArrayList<>();
             for (Port port : getPortList()) {
                 if (Utils.belongToTheSameNetwork(message.getDestinationIpAddress(), port.getIpAddress())) {
-                    List<Message> messageList = new ArrayList<>();
                     Port destinationPort;
                     for (Connection connection : connectionList) {
                         if (connection.containsPort(port) && port != message.getCurrentDestinationPort()) {
@@ -66,7 +66,8 @@ public class Router extends Device implements RoutingTable.OnRoutingTableChangeL
                                     this,
                                     "0.0.0.0",
                                     null,
-                                    "direct connection"
+                                    "direct connection",
+                                    true
                             ));
                             return messageList;
                         }
@@ -81,7 +82,6 @@ public class Router extends Device implements RoutingTable.OnRoutingTableChangeL
                         if (Utils.belongToTheSameNetwork(port.getIpAddress(), nextHop)) {
                             for (Connection connection : connectionList) {
                                 if (connection.containsPort(port) && port != message.getCurrentDestinationPort()) {
-                                    List<Message> messageList = new ArrayList<>();
                                     messageList.add(new Message(
                                             message,
                                             port,
@@ -89,7 +89,8 @@ public class Router extends Device implements RoutingTable.OnRoutingTableChangeL
                                             this,
                                             Utils.getIpAddressWithoutMask(nextHop),
                                             null,
-                                            "by routing table entry"
+                                            "by routing table entry",
+                                            true
                                     ));
                                     return messageList;
                                 }
@@ -98,16 +99,31 @@ public class Router extends Device implements RoutingTable.OnRoutingTableChangeL
                     }
                 }
             }
+
+        } else if (message.getCurrentSourcePort().isInTrunkMode()) {
+            List<Message> messageList = new ArrayList<>();
+            for (Integer vLanId : message.getCurrentSourcePort().getTrunkModeAllowedIds()) {
+                if (!vLanId.equals(message.getVLanId())) {
+                    messageList.add(new Message(
+                            message,
+                            message.getCurrentDestinationPort(),
+                            message.getCurrentSourcePort(),
+                            this,
+                            "0.0.0.0",
+                            vLanId,
+                            "by one-armed router",
+                            true
+                    ));
+                }
+            }
+            return messageList;
         }
         return new ArrayList<>();
     }
 
     private List<Message> handleTestMessage(Message message, List<Connection> connectionList) {
         if (!Utils.belongToTheSameNetwork(message.getCurrentDestinationPort().getIpAddress(), message.getSourceIpAddress())) {
-            Device otherDevice = Engine.getInstance().getDeviceByIPAddress(message.getSourceIpAddress());
-            if (otherDevice == null) {
-                otherDevice = Engine.getInstance().getDeviceByPortIpAddress(message.getSourceIpAddress());
-            }
+            Device otherDevice = Engine.getInstance().getDeviceByMacAddress(message.getSourceMac());
             String errorMessage = "Wrong network configuration\n" +
                     getDeviceName() +
                     " and " +

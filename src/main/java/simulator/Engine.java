@@ -91,6 +91,11 @@ public class Engine implements PortListDialog.OnPortSelectedListener {
         Values.MESSAGE_PROGRESS_STEP = Values.MESSAGE_PROGRESS_STEP_DEFAULT;
         Values.SHOW_DEVICE_NAME = Values.SHOW_DEVICE_NAME_DEFAULT;
         Values.SHOW_PORTS = Values.SHOW_PORTS_DEFAULT;
+        EndDevice.nameCounter = 1;
+        Hub.nameCounter = 1;
+        Switch.nameCounter = 1;
+        Router.nameCounter = 1;
+        Firewall.nameCounter = 1;
     }
 
     public void loadData(DataManager.Data data) {

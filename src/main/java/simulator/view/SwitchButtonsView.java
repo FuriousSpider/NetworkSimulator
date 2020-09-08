@@ -5,6 +5,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.util.Pair;
 import simulator.Engine;
+import simulator.element.device.additionalElements.AssociationTableEntry;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,7 +15,7 @@ public class SwitchButtonsView extends GridPane {
     private final Button showMacTableButton;
     private final Button clearMacTableButton;
 
-    private List<Pair<String, Integer>> associationTable;
+    private List<AssociationTableEntry> associationTable;
 
     private OnClearMacTableClickedListener onClearMacTableClickedListener;
 
@@ -31,7 +32,7 @@ public class SwitchButtonsView extends GridPane {
         this.add(clearMacTableButton, 1, 0);
     }
 
-    public void setMacTable(List<Pair<String, Integer>> associationTable) {
+    public void setMacTable(List<AssociationTableEntry> associationTable) {
         this.associationTable.clear();
         this.associationTable.addAll(associationTable);
     }

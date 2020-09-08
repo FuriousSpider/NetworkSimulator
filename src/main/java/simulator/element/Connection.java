@@ -39,6 +39,10 @@ public class Connection {
         return color;
     }
 
+    public void setColor(Color color) {
+        this.color = color;
+    }
+
     public boolean containsPort(Port port) {
         return portPair.getKey() == port.getId() || portPair.getValue() == port.getId();
     }

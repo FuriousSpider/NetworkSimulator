@@ -8,6 +8,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import simulator.element.Connection;
 import simulator.element.device.*;
+import simulator.element.device.additionalElements.AssociationTableEntry;
 import simulator.element.device.additionalElements.Policy;
 import simulator.element.device.additionalElements.Port;
 import util.Values;
@@ -107,8 +108,8 @@ public class DataManager {
                                                                 vLanTrunkModeAllowedIds = new ArrayList<>();
                                                                 JSONArray vLanTrunkModeAllowedIdsArray = (JSONArray) portObject.get(portKey);
                                                                 for (Object id : vLanTrunkModeAllowedIdsArray) {
-                                                                    if (id instanceof Integer) {
-                                                                        vLanTrunkModeAllowedIds.add((Integer) id);
+                                                                    if (id instanceof Long) {
+                                                                        vLanTrunkModeAllowedIds.add(((Long) id).intValue());
                                                                     }
                                                                 }
                                                                 break;
@@ -133,13 +134,14 @@ public class DataManager {
                                             break;
                                         case "associationTable":
                                             JSONArray entryArray = ((JSONArray) deviceObject.get(propertyKey));
-                                            ArrayList<Pair<String, Integer>> associationTableResult = new ArrayList<>();
+                                            ArrayList<AssociationTableEntry> associationTableResult = new ArrayList<>();
                                             for (Object entry : entryArray) {
                                                 JSONObject entryObject = (JSONObject) entry;
-                                                String first = (String) entryObject.get("key");
-                                                Integer second = ((Long) entryObject.get("value")).intValue();
-                                                Pair<String, Integer> pair = new Pair<>(first, second);
-                                                associationTableResult.add(pair);
+                                                int vLanId = ((Long) entryObject.get("vLanId")).intValue();
+                                                String macAddress = (String) entryObject.get("macAddress");
+                                                int portId = ((Long) entryObject.get("portId")).intValue();
+                                                AssociationTableEntry resultEntry = new AssociationTableEntry(vLanId, macAddress, portId);
+                                                associationTableResult.add(resultEntry);
                                             }
                                             resultDevice.associationTable(associationTableResult);
                                             break;
@@ -335,10 +337,11 @@ public class DataManager {
                         deviceObject.put("defaultGateway", endDevice.getGateway());
                     } else if (device instanceof Switch) {
                         JSONArray associationTableArray = new JSONArray();
-                        for (Pair<String, Integer> pair : ((Switch) device).getAssociationTable()) {
+                        for (AssociationTableEntry entry : ((Switch) device).getAssociationTable()) {
                             JSONObject associationTableObject = new JSONObject();
-                            associationTableObject.put("key", pair.getKey());
-                            associationTableObject.put("value", pair.getValue());
+                            associationTableObject.put("vLanId", entry.getvLanId());
+                            associationTableObject.put("macAddress", entry.getMacAddress());
+                            associationTableObject.put("portId", entry.getPortId());
                             associationTableArray.add(associationTableObject);
                         }
                         deviceObject.put("associationTable", associationTableArray);

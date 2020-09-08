@@ -53,7 +53,7 @@ public class Message {
         this.testHistory.add(Engine.getInstance().getDeviceByPort(currentSourcePort));
     }
 
-    public Message(Message message, Port currentSourcePort, Port currentDestinationPort, Device device, String currentIpDestinationAddress, Integer vLanId, String decisionValue) {
+    public Message(Message message, Port currentSourcePort, Port currentDestinationPort, Device device, String currentIpDestinationAddress, Integer vLanId, String decisionValue, boolean registerDecision) {
         this.sourceIpAddress = message.sourceIpAddress;
         this.destinationIpAddress = message.destinationIpAddress;
         this.sourceMac = message.sourceMac;
@@ -68,7 +68,9 @@ public class Message {
         this.type = message.type;
         this.isConfirmationMessage = message.isConfirmationMessage;
         this.history = new ArrayList<>(message.history);
-        history.add(new History(this, device, decisionValue, message.getCurrentDestinationPort(), currentSourcePort));
+        if (registerDecision) {
+            history.add(new History(this, device, decisionValue, message.getCurrentDestinationPort(), currentSourcePort));
+        }
         this.testHistory = message.testHistory;
         testHistory.add(Engine.getInstance().getDeviceByPort(message.getCurrentSourcePort()));
     }

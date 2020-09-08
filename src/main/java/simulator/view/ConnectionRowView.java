@@ -2,6 +2,7 @@ package simulator.view;
 
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
+import javafx.scene.control.ColorPicker;
 import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
@@ -14,16 +15,19 @@ import util.Values;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ConnectionRowView extends GridPane {
+public class ConnectionRowView extends GridPane implements ColorPickerDialog.OnColorSelectedListener {
+    private final Label colorLabel;
+    private final Connection connection;
     private final int id;
     private OnDeleteClickListener onDeleteClickListener;
 
     public ConnectionRowView(Connection connection, Port otherPort, boolean showTitle) {
+        this.colorLabel = new Label();
+        this.connection = connection;
         this.id = connection.getId();
         Port thisPort = connection.getOtherPort(otherPort);
         Engine engine = Engine.getInstance();
         Label connectedWith = new Label(engine.getDeviceByPort(otherPort).getDeviceName());
-        Label colorLabel = new Label();
         Button deleteConnection = new Button("Remove");
 
         ColumnConstraints column1 = new ColumnConstraints();
@@ -87,6 +91,7 @@ public class ConnectionRowView extends GridPane {
         colorLabel.setBackground(new Background(new BackgroundFill(connection.getColor(), CornerRadii.EMPTY, Insets.EMPTY)));
         colorLabel.setMinHeight(Values.LABEL_COLOR_MIN_HEIGHT);
         colorLabel.setMinWidth(Values.LABEL_COLOR_MIN_WIDTH);
+        colorLabel.setOnMouseClicked(this::onColorClicked);
         deleteConnection.setOnMouseClicked(this::onMouseClicked);
 
         //TODO: change to device name
@@ -122,12 +127,26 @@ public class ConnectionRowView extends GridPane {
         this.setVgap(2);
     }
 
+    private void onColorClicked(MouseEvent mouseEvent) {
+        Color color = (Color) colorLabel.getBackground().getFills().get(0).getFill();
+        ColorPickerDialog dialog = new ColorPickerDialog();
+        dialog.setColor(color);
+        dialog.setOnColorSelectedListener(this);
+        dialog.show();
+    }
+
     public void setOnDeleteClickListener(OnDeleteClickListener onDeleteClickListener) {
         this.onDeleteClickListener = onDeleteClickListener;
     }
 
     private void onMouseClicked(MouseEvent mouseEvent) {
         onDeleteClickListener.onClick(id);
+    }
+
+    @Override
+    public void onColorSelected(Color color) {
+        connection.setColor(color);
+        colorLabel.setBackground(new Background(new BackgroundFill(color, CornerRadii.EMPTY, null)));
     }
 
     public interface OnDeleteClickListener {

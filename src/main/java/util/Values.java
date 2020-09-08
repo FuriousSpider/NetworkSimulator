@@ -25,6 +25,7 @@ public class Values {
     public static int DEVICE_ROUTER_NUMBER_OF_PORTS = 8;
     public static int DEVICE_SWITCH_NUMBER_OF_PORTS = 8;
 
+    public static int PORT_EMPTY_VLAN = 0;
     public static int PORT_DEFAULT_VLAN_ID = 1;
     public static int PORT_VLAN_ID_MIN_VALUE = 1;
     public static int PORT_VLAN_ID_MAX_VALUE = 1001;
@@ -49,7 +50,7 @@ public class Values {
 
     public static int DIALOG_OPTIONS_MIN_WIDTH = 400;
 
-    public static String REGEX_IP_ADDRESS_WITH_MASK = "^([01]?\\d\\d?|2[0-4]\\d|25[0-5])(?:\\.[01]?\\d\\d?|\\.2[0-4]\\d|\\.25[0-5]){3}(?:/[0-2]\\d|/3[0-2])?$";
+    public static String REGEX_IP_ADDRESS_WITH_MASK = "^([01]?\\d\\d?|2[0-4]\\d|25[0-5])(?:\\.[01]?\\d\\d?|\\.2[0-4]\\d|\\.25[0-5]){3}/[0-2]\\d|/3[0-2]$";
     public static String REGEX_IP_ADDRESS_WITHOUT_MASK = "^([01]?\\d\\d?|2[0-4]\\d|25[0-5])(?:\\.[01]?\\d\\d?|\\.2[0-4]\\d|\\.25[0-5]){3}$";
 
     public static String MESSAGE_RECORD_ADDED = "Record has been added";
@@ -58,7 +59,7 @@ public class Values {
 
     public static String ERROR_INVALID_NETWORK_IP_ADDRESS = "Provided network address is incorrect";
     public static String ERROR_INVALID_IP_ADDRESS = "Provided ip address is incorrect";
-    public static String ERROR_INVALID_VLAN_ID = "Provided VLAN ID is incorrect";
+    public static String ERROR_INVALID_VLAN_ID = "Provided VLAN ID is incorrect. Should be in range between " + Values.PORT_VLAN_ID_MIN_VALUE + " and " + Values.PORT_VLAN_ID_MAX_VALUE;
 
     public static String ERROR_ADDRESS_IS_NOT_A_NETWORK_ADDRESS = "Provided address is not a network address";
     public static String ERROR_ADDRESS_IS_NOT_A_HOST_ADDRESS = "Provided address is not a host address";
