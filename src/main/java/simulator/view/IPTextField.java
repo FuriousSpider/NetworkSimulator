@@ -4,19 +4,18 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
 import simulator.Engine;
 import util.Utils;
 import util.Values;
 
-public class IPTextField extends VBox {
-    private final HBox firstLine;
-    private final HBox secondLine;
+public class IPTextField extends GridPane {
     private final TextField ipAddressTextField;
     private final Label ipAddressLabel;
     private final Button editButton;
     private final Button cancelButton;
+    private final HBox buttonLine;
 
     private String ipAddressValue;
     private boolean isInEditMode;
@@ -24,21 +23,19 @@ public class IPTextField extends VBox {
     private OnSaveClickedListener listener;
 
     public IPTextField() {
-        this.firstLine = new HBox();
-        this.secondLine = new HBox();
         this.ipAddressTextField = new TextField();
         this.ipAddressLabel = new Label();
         this.editButton = new Button("Edit");
         this.cancelButton = new Button("Cancel");
+        this.buttonLine = new HBox();
 
-        this.getChildren().add(firstLine);
-        this.getChildren().add(secondLine);
+        this.add(ipAddressTextField, 0, 0);
+        this.add(ipAddressLabel, 0, 0);
 
-        this.firstLine.getChildren().add(ipAddressTextField);
-        this.firstLine.getChildren().add(ipAddressLabel);
+        this.buttonLine.getChildren().add(editButton);
+        this.buttonLine.getChildren().add(cancelButton);
 
-        this.secondLine.getChildren().add(editButton);
-        this.secondLine.getChildren().add(cancelButton);
+        this.add(buttonLine, 0, 1);
 
         this.editButton.setOnMouseClicked(this::onEditButtonClicked);
         this.cancelButton.setOnMouseClicked(this::onCancelButtonClicked);

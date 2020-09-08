@@ -21,6 +21,7 @@ public class Message {
     private final Port currentSourcePort;
     private final Port currentDestinationPort;
     private final String currentIpDestinationAddress;
+    private final Integer vLanId;
     private int progress;
     private final Image image;
     private final Policy.Application application;
@@ -29,7 +30,7 @@ public class Message {
     private final List<History> history;
     private final List<Device> testHistory;
 
-    public Message(String sourceIpAddress, String destinationIpAddress, String sourceMac, String destinationMac, Port currentSourcePort, Port currentDestinationPort, String currentIpDestinationAddress, Policy.Application application, boolean isConfirmationMessage, Type type, List<History> historyList) {
+    public Message(String sourceIpAddress, String destinationIpAddress, String sourceMac, String destinationMac, Port currentSourcePort, Port currentDestinationPort, String currentIpDestinationAddress, Integer vLanId, Policy.Application application, boolean isConfirmationMessage, Type type, List<History> historyList) {
         this.sourceIpAddress = sourceIpAddress;
         this.destinationIpAddress = destinationIpAddress;
         this.sourceMac = sourceMac;
@@ -37,6 +38,7 @@ public class Message {
         this.currentSourcePort = currentSourcePort;
         this.currentDestinationPort = currentDestinationPort;
         this.currentIpDestinationAddress = currentIpDestinationAddress;
+        this.vLanId = vLanId;
         if (historyList != null) {
             this.history = new ArrayList<>(historyList);
         } else {
@@ -51,7 +53,7 @@ public class Message {
         this.testHistory.add(Engine.getInstance().getDeviceByPort(currentSourcePort));
     }
 
-    public Message(Message message, Port currentSourcePort, Port currentDestinationPort, Device device, String currentIpDestinationAddress, String decisionValue) {
+    public Message(Message message, Port currentSourcePort, Port currentDestinationPort, Device device, String currentIpDestinationAddress, Integer vLanId, String decisionValue) {
         this.sourceIpAddress = message.sourceIpAddress;
         this.destinationIpAddress = message.destinationIpAddress;
         this.sourceMac = message.sourceMac;
@@ -59,6 +61,7 @@ public class Message {
         this.currentSourcePort = currentSourcePort;
         this.currentDestinationPort = currentDestinationPort;
         this.currentIpDestinationAddress = currentIpDestinationAddress;
+        this.vLanId = vLanId;
         this.progress = 0;
         this.image = new Image(fileName);
         this.application = message.application;
@@ -108,6 +111,10 @@ public class Message {
 
     public String getCurrentIpDestinationAddress() {
         return currentIpDestinationAddress;
+    }
+
+    public Integer getVLanId() {
+        return vLanId;
     }
 
     public int getProgress() {

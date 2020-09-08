@@ -167,6 +167,15 @@ public class Engine implements PortListDialog.OnPortSelectedListener {
         return null;
     }
 
+    public Device getDeviceByMacAddress(String macAddress) {
+        for (Device device : deviceList) {
+            if (device.getMacAddress().equals(macAddress)) {
+                return device;
+            }
+        }
+        return null;
+    }
+
     public Device getDeviceByPosition(int x, int y) {
         for (Device device : deviceList) {
             if (x >= device.getX() && x <= device.getX() + Values.DEVICE_SIZE && y >= device.getY() && y <= device.getY() + Values.DEVICE_SIZE) {
@@ -470,10 +479,14 @@ public class Engine implements PortListDialog.OnPortSelectedListener {
                     if (port2.hasInterface()) {
                         ctx.fillText(port2.getIpAddress(), port2X, port2Y + ipAddressTopPadding);
                     }
-                    if (port1.hasVLan()) {
+                    if (port1.hasVLan() && port1.isInTrunkMode()) {
+                        ctx.fillText("TRUNK", port1X, port1Y + ipAddressTopPadding);
+                    } else if (port1.hasVLan()) {
                         ctx.fillText("vlan " + port1.getVLanId(), port1X, port1Y + ipAddressTopPadding);
                     }
-                    if (port2.hasVLan()) {
+                    if (port2.hasVLan() && port2.isInTrunkMode()) {
+                        ctx.fillText("TRUNK", port2X, port2Y + ipAddressTopPadding);
+                    } else if (port2.hasVLan()) {
                         ctx.fillText("vlan " + port2.getVLanId(), port2X, port2Y + ipAddressTopPadding);
                     }
                 }
@@ -563,6 +576,7 @@ public class Engine implements PortListDialog.OnPortSelectedListener {
                                         sourcePort,
                                         getConnectionByPort(sourcePort).getOtherPort(sourcePort),
                                         "",
+                                        0,
                                         Policy.Application.UDP,
                                         false,
                                         Message.Type.TEST,
@@ -580,6 +594,7 @@ public class Engine implements PortListDialog.OnPortSelectedListener {
                                             port,
                                             getConnectionByPort(port).getOtherPort(port),
                                             "",
+                                            0,
                                             Policy.Application.UDP,
                                             false,
                                             Message.Type.TEST,
@@ -633,6 +648,7 @@ public class Engine implements PortListDialog.OnPortSelectedListener {
                                 port,
                                 getConnectionByPort(port).getOtherPort(port),
                                 currentDestinationIpAddress,
+                                null,
                                 application,
                                 false,
                                 Message.Type.NORMAL,

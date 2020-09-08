@@ -52,7 +52,6 @@ public class Firewall extends Device implements FirewallPoliciesView.OnPoliciesL
         return new ArrayList<>();
     }
 
-    //TODO: add
     private List<Message> handleNormalMessage(Message message, List<Connection> connectionList) {
         if (isProperRecipient(message)) {
             for (Port sourcePort : getPortList()) {
@@ -134,6 +133,7 @@ public class Firewall extends Device implements FirewallPoliciesView.OnPoliciesL
                     destinationPort,
                     this,
                     "0.0.0.0",
+                    null,
                     decisionValue));
             return messageList;
         } else {

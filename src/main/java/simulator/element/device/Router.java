@@ -65,6 +65,7 @@ public class Router extends Device implements RoutingTable.OnRoutingTableChangeL
                                     destinationPort,
                                     this,
                                     "0.0.0.0",
+                                    null,
                                     "direct connection"
                             ));
                             return messageList;
@@ -87,6 +88,7 @@ public class Router extends Device implements RoutingTable.OnRoutingTableChangeL
                                             connection.getOtherPort(port),
                                             this,
                                             Utils.getIpAddressWithoutMask(nextHop),
+                                            null,
                                             "by routing table entry"
                                     ));
                                     return messageList;

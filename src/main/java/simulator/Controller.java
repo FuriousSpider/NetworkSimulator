@@ -9,6 +9,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import simulator.element.Connection;
@@ -35,9 +36,11 @@ public class Controller implements Initializable, PortListDialog.OnPortSelectedL
     @FXML
     private VBox connectionsInfo;
     @FXML
-    private TitleLabel elementInfoDeviceType;
+    private DeviceTypeLabel elementInfoDeviceType;
     @FXML
     private Label elementInfoMacAddress;
+    @FXML
+    private VBox elementInfoIpAddressLayout;
     @FXML
     private IPTextField elementInfoIpAddress;
     @FXML
@@ -204,12 +207,15 @@ public class Controller implements Initializable, PortListDialog.OnPortSelectedL
 
     public void showDeviceInfo(Device selectedDevice) {
         elementInfo.setVisible(true);
+        elementInfo.setManaged(true);
         elementInfoDeviceName.setDeviceName(selectedDevice.getDeviceName());
         elementInfoDeviceName.setOnSaveDeviceNameClickedListener(selectedDevice);
         elementInfoDeviceType.setValue(selectedDevice.getDeviceType());
         elementInfoMacAddress.setText(selectedDevice.getMacAddress());
 
         if (selectedDevice instanceof EndDevice) {
+            elementInfoIpAddressLayout.setVisible(true);
+            elementInfoIpAddressLayout.setManaged(true);
             elementInfoIpAddress.show();
             elementInfoIpAddress.setIpAddress(((EndDevice) selectedDevice).getIpAddress());
             elementInfoIpAddress.setOnSaveClickedListener(((EndDevice) selectedDevice));
@@ -218,6 +224,8 @@ public class Controller implements Initializable, PortListDialog.OnPortSelectedL
             elementDefaultGateway.setDefaultGateway(((EndDevice) selectedDevice).getGateway());
             elementDefaultGateway.setOnDefaultGatewayChangeListener((EndDevice) selectedDevice);
         } else {
+            elementInfoIpAddressLayout.setVisible(false);
+            elementInfoIpAddressLayout.setManaged(false);
             elementInfoIpAddress.hide();
             elementDefaultGateway.hide();
         }
@@ -253,6 +261,7 @@ public class Controller implements Initializable, PortListDialog.OnPortSelectedL
 
     public void hideElementInfo() {
         elementInfo.setVisible(false);
+        elementInfo.setManaged(false);
         connectionsInfo.setVisible(false);
         routingTableView.hide();
         firewallPoliciesView.hide();
@@ -260,9 +269,14 @@ public class Controller implements Initializable, PortListDialog.OnPortSelectedL
 
     public void showConnectionList(Device selectedDevice, List<Connection> connectionList) {
         connectionsInfo.getChildren().clear();
+
+        Label titleLabel = new Label("Connections");
+        titleLabel.getStyleClass().add("titleLabel");
+        connectionsInfo.getChildren().add(titleLabel);
+
         for (Connection connection : connectionList) {
             Port other = connection.getOtherPort(selectedDevice.getPortList());
-            ConnectionRowView connectionRowView = new ConnectionRowView(connection, other);
+            ConnectionRowView connectionRowView = new ConnectionRowView(connection, other, connectionList.indexOf(connection) == 0);
             connectionRowView.setOnDeleteClickListener(this::onDeleteConnection);
             connectionsInfo.getChildren().add(connectionRowView);
         }

@@ -1,12 +1,13 @@
 package simulator.view;
 
+import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 import simulator.Engine;
 import simulator.element.device.additionalElements.Policy;
 import util.Utils;
@@ -15,20 +16,21 @@ import util.Values;
 import java.util.HashSet;
 import java.util.Set;
 
-public class FirewallPoliciesRow extends VBox {
-    private final HBox firstLine;
-    private final HBox secondLine;
-    private final HBox thirdLine;
-    private final HBox lastLine;
+public class FirewallPoliciesRow extends GridPane {
+    private final Label priorityLabel;
     private final Label sourceIpAddressTitleLabel;
     private final Label destinationIpAddressTitleLabel;
     private final Label sourceIpAddressLabel;
     private final Label destinationIpAddressLabel;
     private final TextField sourceIpAddressTextField;
     private final TextField destinationIpAddressTextField;
+    private final Label applicationTitleLabel;
     private final VBox applicationView;
-    private final Label thenRuleLabel;
+    private final Label thenRuleTitleLabel;
+    private final Label thenRuleValueLabel;
     private final Button changeRuleButton;
+    private final HBox thenRuleLayout;
+    private final HBox buttonLine;
     private final Button editButton;
     private final Button cancelButton;
 
@@ -42,42 +44,54 @@ public class FirewallPoliciesRow extends VBox {
     private OnSaveClickedListener onSaveClickedListener;
 
     public FirewallPoliciesRow(int priorityNumber) {
-        this.firstLine = new HBox();
-        this.secondLine = new HBox();
-        this.thirdLine = new HBox();
-        this.applicationView = new VBox();
-        this.lastLine = new HBox();
+        this.priorityLabel = new Label((priorityNumber + 1) + ".");
+        this.priorityLabel.getStyleClass().add("boldLabel");
         this.sourceIpAddressTitleLabel = new Label("Source network: ");
+        this.sourceIpAddressTitleLabel.getStyleClass().add("boldLabel");
         this.destinationIpAddressTitleLabel = new Label("Destination network: ");
+        this.destinationIpAddressTitleLabel.getStyleClass().add("boldLabel");
         this.sourceIpAddressLabel = new Label();
         this.destinationIpAddressLabel = new Label();
         this.sourceIpAddressTextField = new TextField();
         this.destinationIpAddressTextField = new TextField();
-        this.thenRuleLabel = new Label();
+        this.applicationTitleLabel = new Label("Applications:");
+        this.applicationTitleLabel.getStyleClass().add("boldLabel");
+        this.applicationView = new VBox();
+        this.thenRuleTitleLabel = new Label("Then rule:");
+        this.thenRuleTitleLabel.getStyleClass().add("boldLabel");
+        this.thenRuleValueLabel = new Label();
+        this.thenRuleLayout = new HBox();
         this.changeRuleButton = new Button("Change");
+        this.buttonLine = new HBox();
         this.editButton = new Button("Edit");
         this.cancelButton = new Button("Cancel");
 
-        this.getChildren().add(firstLine);
-        this.getChildren().add(secondLine);
-        this.getChildren().add(thirdLine);
-        this.getChildren().add(applicationView);
-        this.getChildren().add(lastLine);
+        this.add(priorityLabel, 0, 0, 1, 6);
+        this.add(sourceIpAddressTitleLabel, 1, 1);
+        this.add(sourceIpAddressLabel, 2, 1);
+        this.add(sourceIpAddressTextField, 2, 1);
+        this.add(destinationIpAddressTitleLabel, 1, 2);
+        this.add(destinationIpAddressLabel, 2, 2);
+        this.add(destinationIpAddressTextField, 2, 2);
+        this.add(thenRuleTitleLabel, 1, 3);
+        this.add(thenRuleLayout, 2, 3);
+        this.add(applicationTitleLabel, 1, 4);
+        this.add(applicationView, 2, 4, 2, 1);
+        this.add(buttonLine, 1, 5, 2, 1);
 
-        this.firstLine.getChildren().add(sourceIpAddressTitleLabel);
-        this.firstLine.getChildren().add(sourceIpAddressLabel);
-        this.firstLine.getChildren().add(sourceIpAddressTextField);
-        this.secondLine.getChildren().add(destinationIpAddressTitleLabel);
-        this.secondLine.getChildren().add(destinationIpAddressLabel);
-        this.secondLine.getChildren().add(destinationIpAddressTextField);
-        this.thirdLine.getChildren().add(thenRuleLabel);
-        this.thirdLine.getChildren().add(changeRuleButton);
-        this.lastLine.getChildren().add(editButton);
-        this.lastLine.getChildren().add(cancelButton);
+        this.buttonLine.getChildren().add(editButton);
+        this.buttonLine.getChildren().add(cancelButton);
+
+        this.thenRuleLayout.getChildren().add(thenRuleValueLabel);
+        this.thenRuleLayout.getChildren().add(changeRuleButton);
+        this.thenRuleLayout.setSpacing(10);
 
         this.editButton.setOnMouseClicked(this::onEditButtonClicked);
         this.cancelButton.setOnMouseClicked(this::onCancelButtonClicked);
         this.changeRuleButton.setOnMouseClicked(this::onChangeRuleButtonClicked);
+
+        this.setHgap(10);
+        this.setVgap(4);
 
         this.priorityNumber = priorityNumber;
         this.isInEditMode = true;
@@ -137,7 +151,7 @@ public class FirewallPoliciesRow extends VBox {
             destinationIpAddressLabel.setText(destinationIpAddressValue);
         }
         if (thenRuleValue != null) {
-            thenRuleLabel.setText("Then rule: " + thenRuleValue.name());
+            thenRuleValueLabel.setText(thenRuleValue.name());
         }
     }
 

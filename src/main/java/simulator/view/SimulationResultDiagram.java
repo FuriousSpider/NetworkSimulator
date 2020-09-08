@@ -1,9 +1,11 @@
 package simulator.view;
 
+import javafx.geometry.Insets;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
-import javafx.scene.layout.GridPane;
+import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 import simulator.element.device.additionalElements.History;
 
 import java.util.ArrayList;
@@ -30,17 +32,43 @@ public class SimulationResultDiagram extends Dialog<String> {
     }
 
     public void start() {
-        contentView.add(new Label("Index"), 0, 0);
-        contentView.add(new Label("Device name"), 1, 0);
-        contentView.add(new Label("Device type"), 2, 0);
-        contentView.add(new Label("From port"), 3, 0);
-        contentView.add(new Label("To port"), 4, 0);
-        contentView.add(new Label("Confirmation"), 5, 0);
-        contentView.add(new Label("Action"), 6, 0);
+        Label indexTitleLabel = new Label("Index");
+        indexTitleLabel.getStyleClass().add("boldLabel");
+        contentView.add(indexTitleLabel, 0, 0);
+
+        Label deviceNameTitleLabel = new Label("Device name");
+        deviceNameTitleLabel.getStyleClass().add("boldLabel");
+        contentView.add(deviceNameTitleLabel, 1, 0);
+
+        Label deviceTypeTitleLabel = new Label("Device type");
+        deviceTypeTitleLabel.getStyleClass().add("boldLabel");
+        contentView.add(deviceTypeTitleLabel, 2, 0);
+
+        Label fromPortTitleLabel = new Label("From port");
+        fromPortTitleLabel.getStyleClass().add("boldLabel");
+        contentView.add(fromPortTitleLabel, 3, 0);
+
+        Label toPortTitleLabel = new Label("To port");
+        toPortTitleLabel.getStyleClass().add("boldLabel");
+        contentView.add(toPortTitleLabel, 4, 0);
+
+        Label confirmationTitleLabel = new Label("Confirmation");
+        confirmationTitleLabel.getStyleClass().add("boldLabel");
+        contentView.add(confirmationTitleLabel, 5, 0);
+
+        Label actionTitleLabel = new Label("Action");
+        actionTitleLabel.getStyleClass().add("boldLabel");
+        contentView.add(actionTitleLabel, 6, 0);
+
+        Pane pane = new Pane();
+        pane.setMinHeight(1);
+        pane.setMaxHeight(1);
+        pane.setBackground(new Background(new BackgroundFill(Color.BLACK, CornerRadii.EMPTY, Insets.EMPTY)));
+        contentView.add(pane, 0, 1, 7, 1);
 
         for (History history : historyList) {
-            int index = historyList.indexOf(history) + 1;
-            Label indexLabel = new Label(String.valueOf(index));
+            int index = historyList.indexOf(history) + 2;
+            Label indexLabel = new Label(String.valueOf(index - 1));
             Label deviceNameLabel = new Label(history.getDeviceName());
             Label deviceTypeLabel = new Label(history.getDeviceType());
             Label portFromLabel = new Label(history.getFromPort());

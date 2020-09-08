@@ -1,12 +1,13 @@
 package simulator.element.device.additionalElements;
 
 import simulator.view.IPTextField;
+import simulator.view.TrunkModeAllowedVlan;
 import simulator.view.VLanTextField;
 import util.Values;
 
 import java.util.List;
 
-public class Port implements IPTextField.OnSaveClickedListener, VLanTextField.OnSaveClickedListener, VLanTextField.OnChangeModeClickedListener {
+public class Port implements IPTextField.OnSaveClickedListener, VLanTextField.OnSaveClickedListener, VLanTextField.OnChangeModeClickedListener, TrunkModeAllowedVlan.OnAllowedVLanChangeListener {
     private int id;
     private int portNumber;
     private Interface anInterface;
@@ -141,6 +142,13 @@ public class Port implements IPTextField.OnSaveClickedListener, VLanTextField.On
     public void onSaveClicked(int vLanId) {
         if (hasVLan()) {
             vLan.setId(vLanId);
+        }
+    }
+
+    @Override
+    public void onAllowedVLanChange(List<Integer> allowedVLanList) {
+        if (hasVLan()) {
+            vLan.setTrunkModeAllowedIds(allowedVLanList);
         }
     }
 }

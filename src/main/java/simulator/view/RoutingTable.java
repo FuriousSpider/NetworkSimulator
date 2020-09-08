@@ -4,6 +4,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import simulator.Engine;
@@ -12,46 +13,49 @@ import util.Values;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.regex.Pattern;
 
-public class RoutingTable extends VBox {
-
-    private Label title;
-    private VBox entryList;
-    private HBox newEntryBox;
-    private TextField newEntryNetworkTextField;
-    private TextField newEntryNextHopTextField;
-    private Button addNewEntry;
+public class RoutingTable extends GridPane {
+    private final Label title;
+    private final Label destinationNetworkLabel;
+    private final Label nextHopLabel;
+    private final VBox entryList;
+    private final TextField newEntryNetworkTextField;
+    private final TextField newEntryNextHopTextField;
+    private final Button addNewEntry;
 
     private Map<String, String> routingTable;
 
     private OnRoutingTableChangeListener listener;
 
     public RoutingTable() {
-        this.title = new Label("Routing table");
+        this.title = new Label("Routing table (static)");
+        this.title.getStyleClass().add("titleLabel");
+        this.destinationNetworkLabel = new Label("Destination network:");
+        this.destinationNetworkLabel.getStyleClass().add("boldLabel");
+        this.nextHopLabel = new Label("Next hop:");
+        this.nextHopLabel.getStyleClass().add("boldLabel");
         this.entryList = new VBox();
-        this.newEntryBox = new HBox();
         this.newEntryNetworkTextField = new TextField();
         this.newEntryNextHopTextField = new TextField();
         this.addNewEntry = new Button("Add");
 
         this.routingTable = new HashMap<>();
 
-        this.getChildren().add(title);
-        this.getChildren().add(entryList);
-        this.getChildren().add(newEntryBox);
-        this.getChildren().add(addNewEntry);
-
-        this.newEntryBox.getChildren().add(newEntryNetworkTextField);
-        this.newEntryBox.getChildren().add(newEntryNextHopTextField);
+        this.add(title, 0, 0);
+        this.add(entryList, 0, 1, 3, 1);
+        this.add(destinationNetworkLabel, 0, 2);
+        this.add(nextHopLabel, 1, 2);
+        this.add(newEntryNetworkTextField, 0, 3);
+        this.add(newEntryNextHopTextField, 1, 3);
+        this.add(addNewEntry, 2, 3);
 
         this.addNewEntry.setOnMouseClicked(this::onAddButtonClicked);
 
         this.entryList.getChildren().clear();
+        this.setVgap(4);
     }
 
     private void onAddButtonClicked(MouseEvent mouseEvent) {
-        Pattern ipv4Pattern = Pattern.compile(Values.REGEX_IP_ADDRESS_WITH_MASK);
         boolean areEntriesValid = true;
         if (Utils.isIpAddressWithoutMask(newEntryNetworkTextField.getText())) {
             areEntriesValid = false;
@@ -78,7 +82,8 @@ public class RoutingTable extends VBox {
         this.entryList.getChildren().clear();
         for (String key : routingTable.keySet()) {
             HBox line = new HBox();
-            Label label = new Label(key + ", next hop: " + routingTable.get(key));
+            line.setSpacing(10);
+            Label label = new Label(key + " - via: " + routingTable.get(key));
             Button button = new Button("Remove");
             button.setOnMouseClicked(this::onRemoveEntryClicked);
             button.setId(key);

@@ -18,6 +18,8 @@ public class ApplicationRow extends HBox {
         this.getChildren().add(applicationName);
         this.getChildren().add(selected);
 
+        this.setSpacing(10);
+
         this.isInEditMode = true;
         changeState();
     }

@@ -23,9 +23,54 @@
 
 .rightLayout {
     -fx-background-color: silver;
-    -fx-pref-width: 400px;
+    -fx-pref-width: 500px;
+}
+
+.deviceInfo {
+    -fx-background-color: silver;
     -fx-border-color: grey;
     -fx-border-radius: 4px;
     -fx-border-width: 1px;
-    -fx-border-insets: 4px;
+    -fx-padding: 8px;
+}
+
+.connectionsInfo {
+    -fx-background-color: silver;
+    -fx-border-color: grey;
+    -fx-border-radius: 4px;
+    -fx-border-width: 1px;
+    -fx-padding: 8px;
+}
+
+.routingTable {
+    -fx-background-color: silver;
+    -fx-border-color: grey;
+    -fx-border-radius: 4px;
+    -fx-border-width: 1px;
+    -fx-padding: 8px;
+}
+
+.policiesView {
+    -fx-background-color: silver;
+    -fx-border-color: grey;
+    -fx-border-radius: 4px;
+    -fx-border-width: 1px;
+    -fx-padding: 8px;
+}
+
+.titleLabel {
+    -fx-font-size: 10pt;
+    -fx-font-weight: bold;
+}
+
+.boldLabel {
+    -fx-font-weight: bold;
+}
+
+.simulationView {
+    -fx-background-color: silver;
+    -fx-border-color: grey;
+    -fx-border-radius: 4px;
+    -fx-border-width: 1px;
+    -fx-padding: 8px;
 }

@@ -5,13 +5,10 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
 
-public class DeviceNameLabel extends VBox {
+public class DeviceNameLabel extends HBox {
     private String value;
 
-    private final HBox firstLine;
-    private final HBox secondLine;
     private final Label titleLabel;
     private final Label label;
     private final TextField textField;
@@ -22,23 +19,23 @@ public class DeviceNameLabel extends VBox {
     private OnSaveDeviceNameClickedListener onSaveDeviceNameClickedListener;
 
     public DeviceNameLabel() {
-        this.firstLine = new HBox();
-        this.secondLine = new HBox();
         this.titleLabel = new Label("Device name: ");
         this.label = new Label();
         this.textField = new TextField();
         this.editButton = new Button("Edit");
 
-        this.getChildren().add(firstLine);
-        this.getChildren().add(secondLine);
-        this.firstLine.getChildren().add(titleLabel);
-        this.firstLine.getChildren().add(label);
-        this.firstLine.getChildren().add(textField);
-        this.secondLine.getChildren().add(editButton);
+        this.getChildren().add(titleLabel);
+        this.getChildren().add(label);
+        this.getChildren().add(textField);
+        this.getChildren().add(editButton);
 
         this.textField.setVisible(false);
 
         this.editButton.setOnMouseClicked(this::onEditButtonClicked);
+
+        this.setSpacing(10);
+
+        this.titleLabel.getStyleClass().add("boldLabel");
 
         this.isInEditMode = true;
         changeState();

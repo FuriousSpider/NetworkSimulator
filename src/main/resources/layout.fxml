@@ -6,7 +6,7 @@
 <?import java.net.URL?>
 <?import simulator.view.DeviceNameLabel?>
 <?import simulator.view.LogPanel?>
-<?import simulator.view.TitleLabel?>
+<?import simulator.view.DeviceTypeLabel?>
 <?import simulator.view.IPTextField?>
 <?import simulator.view.RoutingTable?>
 <?import simulator.view.FirewallPoliciesView?>
@@ -37,27 +37,34 @@
             <ScrollPane fitToHeight="true" hbarPolicy="NEVER">
                 <VBox styleClass="rightLayout">
                     <StackPane>
-                        <VBox fx:id="elementInfo">
-                            <Label text="Device info"/>
-                            <TitleLabel fx:id="elementInfoDeviceType" title="Device type: "/>
+                        <VBox fx:id="elementInfo" styleClass="deviceInfo" spacing="8">
+                            <Label text="Device info" styleClass="titleLabel"/>
+                            <DeviceTypeLabel fx:id="elementInfoDeviceType" title="Device type: "/>
                             <DeviceNameLabel fx:id="elementInfoDeviceName"/>
-                            <Label text="MAC address: "/>
-                            <Label fx:id="elementInfoMacAddress" onMouseClicked="#handleElementInfoMacAddressClick"/>
-                            <IPTextField fx:id="elementInfoIpAddress"/>
+                            <HBox spacing="10">
+                                <Label text="MAC address: " styleClass="boldLabel"/>
+                                <Label fx:id="elementInfoMacAddress" onMouseClicked="#handleElementInfoMacAddressClick"/>
+                            </HBox>
+                            <VBox fx:id="elementInfoIpAddressLayout">
+                                <Label text="IP Address:" styleClass="boldLabel"/>
+                                <IPTextField fx:id="elementInfoIpAddress"/>
+                            </VBox>
                             <DefaultGatewayView fx:id="elementDefaultGateway"/>
                             <SwitchButtonsView fx:id="elementSwitchButtonsView"/>
-<!--                            <Button fx:id="elementCleanAssociationTableButton" onAction="#handleCleanAssociationTableButtonClick" text="Clear MAC Address Table"/>-->
-                            <Button onAction="#handleConnectElementsButtonClick" text="Connect"/>
-                            <Button onAction="#handleRemoveElementButtonClick" text="Remove"/>
+                            <HBox spacing="10">
+                                <Label text="Action:" styleClass="boldLabel"/>
+                                <Button onAction="#handleConnectElementsButtonClick" text="Connect with (C)"/>
+                                <Button onAction="#handleRemoveElementButtonClick" text="Remove device (DEL)"/>
+                            </HBox>
                         </VBox>
                     </StackPane>
-                    <VBox fx:id="connectionsInfo"/>
-                    <RoutingTable fx:id="routingTableView" visible="false"/>
-                    <FirewallPoliciesView fx:id="firewallPoliciesView" visible="false"/>
+                    <VBox fx:id="connectionsInfo" styleClass="connectionsInfo"/>
+                    <RoutingTable fx:id="routingTableView" visible="false" styleClass="routingTable"/>
+                    <FirewallPoliciesView fx:id="firewallPoliciesView" visible="false" styleClass="policiesView"/>
                 </VBox>
             </ScrollPane>
             <Region VBox.vgrow="ALWAYS"/>
-            <SimulationView fx:id="simulationView" styleClass="rightLayout"/>
+            <SimulationView fx:id="simulationView" styleClass="simulationView"/>
             <LogPanel fx:id="logPanel" prefHeight="150" minHeight="150"/>
         </VBox>
     </right>

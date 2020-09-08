@@ -69,6 +69,7 @@ public class EndDevice extends Device implements IPTextField.OnSaveClickedListen
                         this.getPortList().get(0),
                         connectionList.get(0).getOtherPort(getPortList().get(0)),
                         this.getGateway(),
+                        message.getVLanId(),
                         message.getApplication(),
                         true,
                         Message.Type.NORMAL,
@@ -97,10 +98,7 @@ public class EndDevice extends Device implements IPTextField.OnSaveClickedListen
             Platform.runLater(() -> Engine.getInstance().logError(errorMessage));
             Engine.setTestNetworkSuccessful(false);
         } else if (getIpAddress().equals(message.getSourceIpAddress())) {
-            Device otherDevice = Engine.getInstance().getDeviceByIPAddress(message.getSourceIpAddress());
-            if (otherDevice == null) {
-                otherDevice = Engine.getInstance().getDeviceByPortIpAddress(message.getSourceIpAddress());
-            }
+            Device otherDevice = Engine.getInstance().getDeviceByMacAddress(message.getSourceMac());
             String errorMessage = "Wrong network configuration\n" +
                     getDeviceName() +
                     " and " +

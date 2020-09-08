@@ -41,6 +41,8 @@ public class DefaultGatewayView extends GridPane {
         this.add(editButton, 0, 1);
         this.add(cancelButton, 1, 1);
 
+        this.defaultGatewayTitleLabel.getStyleClass().add("boldLabel");
+
         this.isInEditMode = true;
         changeState();
     }

@@ -25,11 +25,15 @@ public class SimulationView extends GridPane {
 
     public SimulationView() {
         this.simulationTitleLabel = new Label("Simulation");
+        this.simulationTitleLabel.getStyleClass().add("titleLabel");
         this.sourceIpAddressTitleLabel = new Label("Source IP Address:");
+        this.sourceIpAddressTitleLabel.getStyleClass().add("boldLabel");
         this.sourceIpAddressTextField = new TextField();
         this.destinationIpAddressTitleLabel = new Label("Destination IP Address:");
+        this.destinationIpAddressTitleLabel.getStyleClass().add("boldLabel");
         this.destinationIpAddressTextField = new TextField();
         this.applicationTitleLabel = new Label("Application:");
+        this.applicationTitleLabel.getStyleClass().add("boldLabel");
         this.applicationComboBox = new ComboBox<>();
 
         this.startSimulationButton = new Button("Simulate");

@@ -1,23 +1,23 @@
 package simulator.view;
 
+import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 import simulator.element.device.additionalElements.Policy;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class FirewallPoliciesView extends VBox implements FirewallPoliciesRow.OnSaveClickedListener {
-    private final HBox firstLine;
-    private final HBox secondLine;
-    private final HBox thirdLine;
+public class FirewallPoliciesView extends GridPane implements FirewallPoliciesRow.OnSaveClickedListener {
+    private final Label titleLabel;
     private final VBox firewallPoliciesView;
     private final Button addNewPolicyButton;
-    private final Label defaultRuleLabel;
+    private final Label defaultRuleTitleLabel;
+    private final Label defaultRuleValueLabel;
     private final Button changeDefaultRuleButton;
 
     private List<Policy> policyList;
@@ -25,26 +25,31 @@ public class FirewallPoliciesView extends VBox implements FirewallPoliciesRow.On
     private OnPoliciesListUpdatedListener onPoliciesListUpdatedListener;
 
     public FirewallPoliciesView() {
-        this.firstLine = new HBox();
-        this.secondLine = new HBox();
-        this.thirdLine = new HBox();
+        this.titleLabel = new Label("Policies");
+        this.titleLabel.getStyleClass().add("titleLabel");
         this.firewallPoliciesView = new VBox();
         this.addNewPolicyButton = new Button("Add new policy");
-        this.defaultRuleLabel = new Label("Default rule: ");
+        this.defaultRuleTitleLabel = new Label("Default rule: ");
+        this.defaultRuleTitleLabel.getStyleClass().add("boldLabel");
+        this.defaultRuleValueLabel = new Label();
         this.changeDefaultRuleButton = new Button("Change");
 
         this.policyList = new ArrayList<>();
 
-        this.getChildren().add(firstLine);
-        this.getChildren().add(secondLine);
-        this.getChildren().add(thirdLine);
-        this.firstLine.getChildren().add(firewallPoliciesView);
-        this.secondLine.getChildren().add(defaultRuleLabel);
-        this.secondLine.getChildren().add(changeDefaultRuleButton);
-        this.thirdLine.getChildren().add(addNewPolicyButton);
+        this.add(titleLabel, 0, 0);
+        this.add(firewallPoliciesView, 0, 1, 3, 1);
+        this.add(defaultRuleTitleLabel, 0, 2);
+        this.add(defaultRuleValueLabel, 1, 2);
+        this.add(changeDefaultRuleButton, 2, 2);
+        this.add(addNewPolicyButton, 0, 3);
 
         this.addNewPolicyButton.setOnMouseClicked(this::onAddNewPolicyButtonClicked);
         this.changeDefaultRuleButton.setOnMouseClicked(this::onChangeDefaultRuleButtonClicked);
+
+        firewallPoliciesView.setSpacing(4);
+
+        this.setVgap(4);
+        this.setHgap(10);
     }
 
     public void setPolicies(List<Policy> policyList) {
@@ -56,43 +61,49 @@ public class FirewallPoliciesView extends VBox implements FirewallPoliciesRow.On
 
     public void setDefaultRule(Policy.Rule rule) {
         this.defaultRuleValue = rule;
-        this.defaultRuleLabel.setText("Default rule: " + rule.name());
+        this.defaultRuleValueLabel.setText(rule.name());
     }
 
     private void refreshPolicies() {
         this.firewallPoliciesView.getChildren().clear();
         for (Policy policy : policyList) {
-            HBox row = new HBox();
+            GridPane row = new GridPane();
 
             int priorityNumber = policyList.indexOf(policy);
             FirewallPoliciesRow firewallPoliciesRow = new FirewallPoliciesRow(priorityNumber);
             firewallPoliciesRow.setPolicy(policy);
             firewallPoliciesRow.setOnSaveClickedListener(this);
-            row.getChildren().add(firewallPoliciesRow);
+            row.add(firewallPoliciesRow, 0, 0);
 
             if (priorityNumber != 0) {
                 Button upButton = new Button("Up");
                 upButton.setId(String.valueOf(priorityNumber));
                 upButton.setOnMouseClicked(this::onUpButtonClicked);
-                row.getChildren().add(upButton);
+                row.add(upButton, 1, 0);
             }
 
             if (priorityNumber != policyList.size() - 1) {
                 Button downButton = new Button("Down");
                 downButton.setId(String.valueOf(priorityNumber));
                 downButton.setOnMouseClicked(this::onDownButtonClicked);
-                row.getChildren().add(downButton);
+                row.add(downButton, 2, 0);
             }
 
             Button removeButton = new Button("Remove");
             removeButton.setId(String.valueOf(policy.getId()));
             removeButton.setOnMouseClicked(this::onRemoveButtonClicked);
 
-            row.getChildren().add(removeButton);
+            row.add(removeButton, 3, 0);
             firewallPoliciesView.getChildren().add(row);
+
+            Pane pane = new Pane();
+            pane.setMinHeight(1);
+            pane.setMaxHeight(1);
+            pane.setBackground(new Background(new BackgroundFill(Color.BLACK, CornerRadii.EMPTY, Insets.EMPTY)));
+            firewallPoliciesView.getChildren().add(pane);
         }
         if (defaultRuleValue != null) {
-            defaultRuleLabel.setText("Default rule: " + defaultRuleValue.name());
+            defaultRuleValueLabel.setText(defaultRuleValue.name());
         }
     }
 

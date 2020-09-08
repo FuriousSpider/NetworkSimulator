@@ -52,7 +52,12 @@ public class Switch extends Device implements SwitchButtonsView.OnClearMacTableC
 
     private List<Message> handleNormalMessage(Message message, List<Connection> connectionList) {
         addNewRecord(message.getSourceMac(), message.getCurrentDestinationPort());
-        List<Port> vLanPortList = getPortListByVLanAndTrunk(message.getCurrentDestinationPort().getVLanId());
+        Integer vLanId = message.getVLanId();
+        if (vLanId == null) {
+            vLanId = message.getCurrentDestinationPort().getVLanId();
+        }
+
+        List<Port> vLanPortList = getPortListByVLanAndTrunk(vLanId);
         if (associationTableContainsKey(message.getDestinationMac()) && nextHopBelongsToVLan(message.getDestinationMac(), message.getCurrentDestinationPort())) {
             Port sourcePort = getAssociationTablePort(message.getDestinationMac());
             Connection connection = getConnectionByPort(sourcePort, connectionList);
@@ -64,6 +69,7 @@ public class Switch extends Device implements SwitchButtonsView.OnClearMacTableC
                         connection.getOtherPort(sourcePort),
                         this,
                         message.getCurrentIpDestinationAddress(),
+                        vLanId,
                         "by MAC Address table entry"
                 ));
             }
@@ -79,6 +85,7 @@ public class Switch extends Device implements SwitchButtonsView.OnClearMacTableC
                             connection.getOtherPort(sourcePort),
                             this,
                             message.getCurrentIpDestinationAddress(),
+                            vLanId,
                             ""
                     ));
                 }
@@ -102,6 +109,7 @@ public class Switch extends Device implements SwitchButtonsView.OnClearMacTableC
                                         Engine.getInstance().getPortById(connection.getPortPair().getValue()),
                                         this,
                                         message.getCurrentIpDestinationAddress(),
+                                        0,
                                         ""
                                 )
                         );
@@ -113,6 +121,7 @@ public class Switch extends Device implements SwitchButtonsView.OnClearMacTableC
                                         Engine.getInstance().getPortById(connection.getPortPair().getKey()),
                                         this,
                                         message.getCurrentIpDestinationAddress(),
+                                        0,
                                         ""
                                 )
                         );
@@ -159,12 +168,13 @@ public class Switch extends Device implements SwitchButtonsView.OnClearMacTableC
         return null;
     }
 
-    private List<Port> getPortListByVLanAndTrunk(int vLanId) {
+    private List<Port> getPortListByVLanAndTrunk(Integer vLanId) {
         List<Port> list = new ArrayList<>();
         for (Port port : getPortList()) {
-            if ((port.hasVLan() && port.getVLanId() == vLanId)
-                    || (port.hasVLan() && port.getTrunkModeAllowedIds().contains(vLanId))) {
-                list.add(port);
+            if (port.isPortTaken() && port.hasVLan()) {
+                if (port.getVLanId() == vLanId || port.getTrunkModeAllowedIds().contains(vLanId)) {
+                    list.add(port);
+                }
             }
         }
         return list;

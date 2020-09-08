@@ -5,23 +5,25 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
 import simulator.Engine;
 import util.Utils;
 import util.Values;
 
 import java.util.List;
 
-public class VLanTextField extends VBox {
+public class VLanTextField extends GridPane {
 
-    private final HBox firstLine;
-    private final HBox secondLine;
+    private final Label vLanIdTitleLabel;
     private final TextField vLanTextField;
     private final Label vLanLabel;
+    private final Label trunkModeLabel;
     private final CheckBox isInTrunkModeCheckBox;
+    private final TrunkModeAllowedVlan trunkModeAllowedVLANS;
     private final Button editButton;
     private final Button cancelButton;
+    private final HBox buttonLine;
 
     private String vLanValue;
     private boolean isInEditMode;
@@ -30,27 +32,40 @@ public class VLanTextField extends VBox {
     private OnSaveClickedListener onSaveClickedListener;
 
     public VLanTextField() {
-        this.firstLine = new HBox();
-        this.secondLine = new HBox();
         this.vLanTextField = new TextField();
+        this.vLanIdTitleLabel = new Label("ID:");
         this.vLanLabel = new Label();
+        this.trunkModeLabel = new Label("TRUNK");
         this.isInTrunkModeCheckBox = new CheckBox();
+        this.trunkModeAllowedVLANS = new TrunkModeAllowedVlan();
         this.editButton = new Button("Edit");
         this.cancelButton = new Button("Cancel");
+        this.buttonLine = new HBox();
 
-        this.getChildren().add(firstLine);
-        this.getChildren().add(secondLine);
+        this.vLanTextField.setMaxWidth(50);
+        this.vLanLabel.setMaxWidth(50);
 
-        this.firstLine.getChildren().add(vLanTextField);
-        this.firstLine.getChildren().add(vLanLabel);
-        this.firstLine.getChildren().add(isInTrunkModeCheckBox);
+        this.add(vLanIdTitleLabel, 0, 0);
+        this.add(vLanTextField, 1, 0);
+        this.add(vLanLabel, 1, 0);
 
-        this.secondLine.getChildren().add(editButton);
-        this.secondLine.getChildren().add(cancelButton);
+        this.add(trunkModeLabel, 0, 0, 2, 1);
+
+        this.add(new Label("Trunk mode:"), 0, 1);
+        this.add(isInTrunkModeCheckBox, 1, 1);
+
+        this.add(trunkModeAllowedVLANS, 0, 2, 2, 1);
+
+        this.buttonLine.getChildren().add(editButton);
+        this.buttonLine.getChildren().add(cancelButton);
+
+        this.add(buttonLine, 0, 3, 2, 1);
 
         editButton.setOnMouseClicked(this::onEditButtonClicked);
         cancelButton.setOnMouseClicked(this::onCancelButtonClicked);
         isInTrunkModeCheckBox.setOnMouseClicked(this::onChangeModeCheckBoxClicked);
+
+        this.setHgap(5);
 
         this.isInEditMode = true;
         changeState();
@@ -97,6 +112,16 @@ public class VLanTextField extends VBox {
 
     public void setTrunkMode(boolean isInTrunkMode) {
         this.isInTrunkModeCheckBox.setSelected(isInTrunkMode);
+        if (isInTrunkMode) {
+            trunkModeAllowedVLANS.show();
+        } else {
+            trunkModeAllowedVLANS.hide();
+        }
+        showTrunkId();
+    }
+
+    public void setTrunkModeAllowedVLANS(List<Integer> vLanList) {
+        this.trunkModeAllowedVLANS.setAllowedVlanList(vLanList);
     }
 
     private void onEditButtonClicked(MouseEvent mouseEvent) {
@@ -121,6 +146,39 @@ public class VLanTextField extends VBox {
         for (OnChangeModeClickedListener listener : onChangeModeClickedListenerList) {
             listener.onChangeModeClicked(isInTrunkModeCheckBox.isSelected());
         }
+        if (isInTrunkModeCheckBox.isSelected()) {
+            trunkModeAllowedVLANS.show();
+        } else {
+            trunkModeAllowedVLANS.hide();
+        }
+        showTrunkId();
+    }
+
+    private void showTrunkId() {
+        if (isInTrunkModeCheckBox.isSelected()) {
+            trunkModeLabel.setVisible(true);
+            trunkModeLabel.setManaged(true);
+
+            vLanLabel.setVisible(false);
+            vLanLabel.setManaged(false);
+            vLanTextField.setVisible(false);
+            vLanTextField.setManaged(false);
+            vLanIdTitleLabel.setVisible(false);
+            vLanIdTitleLabel.setManaged(false);
+        } else {
+            trunkModeLabel.setVisible(false);
+            trunkModeLabel.setManaged(false);
+
+            vLanIdTitleLabel.setVisible(true);
+            vLanIdTitleLabel.setManaged(true);
+            if (isInEditMode) {
+                vLanTextField.setVisible(true);
+                vLanTextField.setManaged(true);
+            } else {
+                vLanLabel.setVisible(true);
+                vLanLabel.setManaged(true);
+            }
+        }
     }
 
     public void show() {
@@ -139,6 +197,10 @@ public class VLanTextField extends VBox {
 
     public void setOnSaveClickedListener(OnSaveClickedListener listener) {
         this.onSaveClickedListener = listener;
+    }
+
+    public void setOnAllowedVlanChangeListener(List<TrunkModeAllowedVlan.OnAllowedVLanChangeListener> listenerList) {
+        trunkModeAllowedVLANS.setOnAllowedVLanChangeListener(listenerList);
     }
 
     public interface OnChangeModeClickedListener {
