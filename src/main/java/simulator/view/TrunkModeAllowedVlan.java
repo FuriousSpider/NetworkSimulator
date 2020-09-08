@@ -3,6 +3,7 @@ package simulator.view;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
@@ -23,6 +24,7 @@ public class TrunkModeAllowedVlan extends GridPane implements TrunkModeAllowedVl
     public TrunkModeAllowedVlan() {
         this.allowedVlanTitleLabel = new Label("Handle vlan:");
         this.allowedVlanTitleLabel.getStyleClass().add("boldLabel");
+        this.allowedVlanTitleLabel.setTooltip(new Tooltip("1 - 1001"));
         this.allowedVlanLayout = new VBox();
         this.allowedVlanTextField = new TextField();
         this.allowedVlanTextField.setMaxWidth(50);

@@ -2,8 +2,8 @@ package simulator.view;
 
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
-import javafx.scene.control.ColorPicker;
 import javafx.scene.control.Label;
+import javafx.scene.control.Tooltip;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
@@ -45,6 +45,7 @@ public class ConnectionRowView extends GridPane implements ColorPickerDialog.OnC
             if (showTitle) {
                 Label label = new Label("IP Address:");
                 label.getStyleClass().add("boldLabel");
+                label.setTooltip(new Tooltip("x.x.x.x/x"));
                 this.add(label, 0, 0);
             }
             this.add(ipTextField, 0, 1);
@@ -80,6 +81,7 @@ public class ConnectionRowView extends GridPane implements ColorPickerDialog.OnC
             if (showTitle) {
                 Label label = new Label("VLAN:");
                 label.getStyleClass().add("boldLabel");
+                label.setTooltip(new Tooltip("1 - 1001"));
                 this.add(label, 2, 0);
             }
             this.add(vLanTextField, 2, 1);
@@ -92,6 +94,8 @@ public class ConnectionRowView extends GridPane implements ColorPickerDialog.OnC
         colorLabel.setMinHeight(Values.LABEL_COLOR_MIN_HEIGHT);
         colorLabel.setMinWidth(Values.LABEL_COLOR_MIN_WIDTH);
         colorLabel.setOnMouseClicked(this::onColorClicked);
+        colorLabel.setTooltip(new Tooltip("Click to change the connection color"));
+
         deleteConnection.setOnMouseClicked(this::onMouseClicked);
 
         //TODO: change to device name

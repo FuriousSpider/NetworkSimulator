@@ -3,6 +3,7 @@ package simulator.view;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -32,8 +33,10 @@ public class RoutingTable extends GridPane {
         this.title.getStyleClass().add("titleLabel");
         this.destinationNetworkLabel = new Label("Destination network:");
         this.destinationNetworkLabel.getStyleClass().add("boldLabel");
+        this.destinationNetworkLabel.setTooltip(new Tooltip("x.x.x.x/x"));
         this.nextHopLabel = new Label("Next hop:");
         this.nextHopLabel.getStyleClass().add("boldLabel");
+        this.nextHopLabel.setTooltip(new Tooltip("x.x.x.x"));
         this.entryList = new VBox();
         this.newEntryNetworkTextField = new TextField();
         this.newEntryNextHopTextField = new TextField();

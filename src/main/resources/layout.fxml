@@ -46,7 +46,7 @@
                                 <Label fx:id="elementInfoMacAddress" onMouseClicked="#handleElementInfoMacAddressClick"/>
                             </HBox>
                             <VBox fx:id="elementInfoIpAddressLayout">
-                                <Label text="IP Address:" styleClass="boldLabel"/>
+                                <Label fx:id="elementInfoIpAddressTitleLabel" text="IP Address:" styleClass="boldLabel"/>
                                 <IPTextField fx:id="elementInfoIpAddress"/>
                             </VBox>
                             <DefaultGatewayView fx:id="elementDefaultGateway"/>
@@ -72,38 +72,53 @@
         <HBox styleClass="bottomLayout">
             <Button onAction="#handleEndDeviceButtonClick">
                 <graphic>
-                    <ImageView>
+                    <ImageView fitWidth="50" fitHeight="50">
                         <Image url="@endDevice.png"/>
                     </ImageView>
                 </graphic>
+                <tooltip>
+                    <Tooltip text="Click to add PC to the workspace"/>
+                </tooltip>
             </Button>
             <Button onAction="#handleHubButtonClick">
                 <graphic>
-                    <ImageView>
+                    <ImageView fitWidth="50" fitHeight="50">
                         <Image url="@hub.png"/>
                     </ImageView>
                 </graphic>
+                <tooltip>
+                    <Tooltip text="Click to add Hub to the workspace"/>
+                </tooltip>
             </Button>
             <Button onAction="#handleSwitchButtonClick">
                 <graphic>
-                    <ImageView>
+                    <ImageView fitWidth="50" fitHeight="50">
                         <Image url="@switch.png"/>
                     </ImageView>
                 </graphic>
+                <tooltip>
+                    <Tooltip text="Click to add Switch to the workspace"/>
+                </tooltip>
             </Button>
             <Button onAction="#handleRouterButtonClick">
                 <graphic>
-                    <ImageView>
+                    <ImageView fitWidth="50" fitHeight="50">
                         <Image url="@router.png"/>
                     </ImageView>
                 </graphic>
+                <tooltip>
+                    <Tooltip text="Click to add Router to the workspace"/>
+                </tooltip>
             </Button>
             <Button onAction="#handleFirewallButtonClick">
                 <graphic>
-                    <ImageView>
+                    <ImageView fitWidth="50" fitHeight="50">
                         <Image url="@firewall.png"/>
                     </ImageView>
                 </graphic>
+                <tooltip>
+                    <Tooltip text="Click to add Firewall to the workspace"/>
+                </tooltip>
             </Button>
         </HBox>
     </bottom>

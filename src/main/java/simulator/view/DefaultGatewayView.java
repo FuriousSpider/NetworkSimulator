@@ -3,6 +3,7 @@ package simulator.view;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import simulator.Engine;
@@ -42,6 +43,8 @@ public class DefaultGatewayView extends GridPane {
         this.add(cancelButton, 1, 1);
 
         this.defaultGatewayTitleLabel.getStyleClass().add("boldLabel");
+
+        this.defaultGatewayTitleLabel.setTooltip(new Tooltip("x.x.x.x"));
 
         this.isInEditMode = true;
         changeState();

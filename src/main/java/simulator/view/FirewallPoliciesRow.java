@@ -5,6 +5,7 @@ import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
@@ -48,8 +49,10 @@ public class FirewallPoliciesRow extends GridPane {
         this.priorityLabel.getStyleClass().add("boldLabel");
         this.sourceIpAddressTitleLabel = new Label("Source network: ");
         this.sourceIpAddressTitleLabel.getStyleClass().add("boldLabel");
+        this.sourceIpAddressTitleLabel.setTooltip(new Tooltip("x.x.x.x/x"));
         this.destinationIpAddressTitleLabel = new Label("Destination network: ");
         this.destinationIpAddressTitleLabel.getStyleClass().add("boldLabel");
+        this.destinationIpAddressTitleLabel.setTooltip(new Tooltip("x.x.x.x/x"));
         this.sourceIpAddressLabel = new Label();
         this.destinationIpAddressLabel = new Label();
         this.sourceIpAddressTextField = new TextField();

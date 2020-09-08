@@ -1,10 +1,7 @@
 package simulator.view;
 
 import javafx.geometry.Insets;
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import simulator.element.device.additionalElements.Policy;
@@ -28,9 +25,11 @@ public class SimulationView extends GridPane {
         this.simulationTitleLabel.getStyleClass().add("titleLabel");
         this.sourceIpAddressTitleLabel = new Label("Source IP Address:");
         this.sourceIpAddressTitleLabel.getStyleClass().add("boldLabel");
+        this.sourceIpAddressTitleLabel.setTooltip(new Tooltip("x.x.x.x"));
         this.sourceIpAddressTextField = new TextField();
         this.destinationIpAddressTitleLabel = new Label("Destination IP Address:");
         this.destinationIpAddressTitleLabel.getStyleClass().add("boldLabel");
+        this.destinationIpAddressTitleLabel.setTooltip(new Tooltip("x.x.x.x"));
         this.destinationIpAddressTextField = new TextField();
         this.applicationTitleLabel = new Label("Application:");
         this.applicationTitleLabel.getStyleClass().add("boldLabel");

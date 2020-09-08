@@ -42,6 +42,8 @@ public class Controller implements Initializable, PortListDialog.OnPortSelectedL
     @FXML
     private VBox elementInfoIpAddressLayout;
     @FXML
+    private Label elementInfoIpAddressTitleLabel;
+    @FXML
     private IPTextField elementInfoIpAddress;
     @FXML
     private DefaultGatewayView elementDefaultGateway;
@@ -73,6 +75,8 @@ public class Controller implements Initializable, PortListDialog.OnPortSelectedL
 
         simulationView.setOnStartSimulationButtonClickedListener(this);
         simulationView.setOnStopSimulationButtonClickedListener(this);
+
+        Tooltip.install(elementInfoIpAddressTitleLabel, new Tooltip("x.x.x.x/x"));
 
         hideElementInfo();
     }

@@ -436,6 +436,7 @@ public class Engine implements PortListDialog.OnPortSelectedListener {
             Device device1 = getDeviceById(connection.getFirstElementId());
             Device device2 = getDeviceById(connection.getSecondElementId());
             if (device1 != null && device2 != null) {
+                ctx.setLineWidth(3.0);
                 ctx.setStroke(connection.getColor());
                 double x1 = device1.getX() + (Values.DEVICE_SIZE / 2.0);
                 double y1 = device1.getY() + (Values.DEVICE_SIZE / 2.0);
@@ -508,6 +509,7 @@ public class Engine implements PortListDialog.OnPortSelectedListener {
     }
 
     private void drawElements() {
+        ctx.setLineWidth(2.0);
         ctx.setStroke(Color.BLACK);
         List<Device> reversedList = new ArrayList<>(deviceList);
         Collections.reverse(reversedList);
