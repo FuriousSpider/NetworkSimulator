@@ -19,8 +19,8 @@
         <module name="NetworkSimulator" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel>
-      <module name="NetworkSimulator" target="1.12" />
+    <bytecodeTargetLevel target="10">
+      <module name="NetworkSimulator" target="1.10" />
     </bytecodeTargetLevel>
   </component>
 </project>

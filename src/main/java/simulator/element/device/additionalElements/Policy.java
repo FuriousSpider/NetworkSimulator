@@ -32,7 +32,7 @@ public class Policy {
     }
 
     public void setSourceNetworkAddress(String address) {
-        if (address != null && address.isBlank() || address != null && !Utils.isNetworkAddress(address)) {
+        if (address != null && address.isEmpty() || address != null && !Utils.isNetworkAddress(address)) {
             sourceNetworkAddress = null;
         } else {
             sourceNetworkAddress = address;
@@ -44,7 +44,7 @@ public class Policy {
     }
 
     public void setDestinationNetworkAddress(String address) {
-        if (address != null && address.isBlank() || address != null && !Utils.isNetworkAddress(address)) {
+        if (address != null && address.isEmpty() || address != null && !Utils.isNetworkAddress(address)) {
             destinationNetworkAddress = null;
         } else {
             destinationNetworkAddress = address;

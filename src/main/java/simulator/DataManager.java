@@ -36,7 +36,7 @@ public class DataManager {
         if (file != null) {
             DataManager.file = file;
             try {
-                String text = Files.readString(Paths.get(file.toURI()));
+                String text = new String(Files.readAllBytes(Paths.get(file.toURI())));
                 JSONObject object = (JSONObject) new JSONParser().parse(text);
                 Data data = new Data();
                 ArrayList<Device> deviceResultList = new ArrayList<>();
@@ -163,11 +163,11 @@ public class DataManager {
                                                 JSONObject entryObject = (JSONObject) entry;
                                                 Policy policy = new Policy();
                                                 String sourceNetworkAddress = (String) entryObject.get("sourceNetworkAddress");
-                                                if (sourceNetworkAddress != null && !sourceNetworkAddress.isBlank()) {
+                                                if (sourceNetworkAddress != null && !sourceNetworkAddress.isEmpty()) {
                                                     policy.setSourceNetworkAddress(sourceNetworkAddress);
                                                 }
                                                 String destinationNetworkAddress = (String) entryObject.get("destinationNetworkAddress");
-                                                if (destinationNetworkAddress != null && !destinationNetworkAddress.isBlank()) {
+                                                if (destinationNetworkAddress != null && !destinationNetworkAddress.isEmpty()) {
                                                     policy.setDestinationNetworkAddress(destinationNetworkAddress);
                                                 }
                                                 JSONArray applicationSetArray = (JSONArray) entryObject.get("applicationSet");
@@ -461,7 +461,7 @@ public class DataManager {
 
                 dataObject.put("options", optionsArray);
 
-                Files.writeString(Paths.get(file.toURI()), dataObject.toJSONString());
+                Files.write(Paths.get(file.toURI()), dataObject.toJSONString().getBytes());
             } catch (Exception e) {
                 e.printStackTrace();
             }

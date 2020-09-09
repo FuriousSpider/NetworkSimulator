@@ -163,11 +163,11 @@ public class FirewallPoliciesRow extends GridPane {
             String source = sourceIpAddressTextField.getText();
             String destination = destinationIpAddressTextField.getText();
 
-            if (source != null && !source.isBlank() && !Utils.isNetworkAddress(source)) {
+            if (source != null && !source.isEmpty() && !Utils.isNetworkAddress(source)) {
                 Engine.getInstance().logError(Values.ERROR_INVALID_NETWORK_IP_ADDRESS);
                 return;
             }
-            if (destination != null && !destination.isBlank() && !Utils.isNetworkAddress(destination)) {
+            if (destination != null && !destination.isEmpty() && !Utils.isNetworkAddress(destination)) {
                 Engine.getInstance().logError(Values.ERROR_INVALID_NETWORK_IP_ADDRESS);
                 return;
             }
@@ -177,10 +177,10 @@ public class FirewallPoliciesRow extends GridPane {
             if (onSaveClickedListener != null) {
                 Policy policy = new Policy();
                 policy.setId(policyId);
-                if (source != null && !source.isBlank()) {
+                if (source != null && !source.isEmpty()) {
                     policy.setSourceNetworkAddress(source);
                 }
-                if (destination != null && !destination.isBlank()) {
+                if (destination != null && !destination.isEmpty()) {
                     policy.setDestinationNetworkAddress(destination);
                 }
 

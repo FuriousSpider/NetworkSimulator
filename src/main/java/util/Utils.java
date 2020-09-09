@@ -48,8 +48,12 @@ public class Utils {
             ipAddressList.add(octet);
         }
         int mask = Integer.parseInt(ipAddressWithMask.split("[/]")[1]);
-        maskString.append("1".repeat(Math.max(0, mask)));
-        maskString.append("0".repeat(Math.max(0, 32 - mask)));
+        for (int i = 0; i < mask; i++) {
+            maskString.append("1");
+        }
+        for (int i = mask; i < 32; i++) {
+            maskString.append("0");
+        }
         for (int i = 0; i < 4; i++) {
             ipAddressString.append(ipAddressList.get(i));
         }
