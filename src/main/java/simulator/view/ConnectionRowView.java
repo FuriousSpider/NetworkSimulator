@@ -9,6 +9,8 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import simulator.Engine;
 import simulator.element.Connection;
+import simulator.element.device.Device;
+import simulator.element.device.Switch;
 import simulator.element.device.additionalElements.Port;
 import util.Values;
 
@@ -20,13 +22,16 @@ public class ConnectionRowView extends GridPane implements ColorPickerDialog.OnC
     private final Connection connection;
     private final int id;
     private OnDeleteClickListener onDeleteClickListener;
+    private final List<OnManageVLanClickedListener> onManageVLanClickedListenerList;
 
     public ConnectionRowView(Connection connection, Port otherPort, boolean showTitle) {
         this.colorLabel = new Label();
         this.connection = connection;
         this.id = connection.getId();
+        this.onManageVLanClickedListenerList = new ArrayList<>();
         Port thisPort = connection.getOtherPort(otherPort);
         Engine engine = Engine.getInstance();
+        Device thisDevice = engine.getDeviceByPort(thisPort);
         Label connectedWith = new Label(engine.getDeviceByPort(otherPort).getDeviceName());
         Button deleteConnection = new Button("Remove");
 
@@ -49,12 +54,12 @@ public class ConnectionRowView extends GridPane implements ColorPickerDialog.OnC
                 this.add(label, 0, 0);
             }
             this.add(ipTextField, 0, 1);
-            column1.setMinWidth(110);
-            column1.setMaxWidth(110);
+            column1.setMinWidth(140);
+            column1.setMaxWidth(140);
         }
 
-        column2.setMinWidth(40);
-        column2.setMaxWidth(40);
+        column2.setMinWidth(60);
+        column2.setMaxWidth(60);
         if (showTitle) {
             Label label = new Label("Port:");
             label.getStyleClass().add("boldLabel");
@@ -62,8 +67,7 @@ public class ConnectionRowView extends GridPane implements ColorPickerDialog.OnC
         }
         this.add(new Label(thisPort.getPortName()), 1, 1);
 
-        //TODO: change -> allow only when switch or router on the other side
-        if (thisPort.hasVLan()) {
+        if (thisDevice instanceof Switch && thisPort.hasVLan()) {
             VLanTextField vLanTextField = new VLanTextField();
             vLanTextField.setVLanId(thisPort.getVLanId());
             vLanTextField.setTrunkMode(thisPort.isInTrunkMode());
@@ -76,6 +80,14 @@ public class ConnectionRowView extends GridPane implements ColorPickerDialog.OnC
             bothConnectionEnds2.add(otherPort);
             vLanTextField.setOnChangeModeClickedListenerList(bothConnectionEnds);
             vLanTextField.setOnSaveClickedListener(thisPort);
+            onManageVLanClickedListenerList.add(thisPort);
+            List<OnManageVLanClickedListener> bothConnectionsEnds3 = new ArrayList<>();
+            bothConnectionsEnds3.add(thisPort);
+            if (Engine.getInstance().getDeviceByPort(otherPort) instanceof Switch) {
+                onManageVLanClickedListenerList.add(otherPort);
+                bothConnectionsEnds3.add(otherPort);
+            }
+            vLanTextField.setOnManageVLanClickedListener(bothConnectionsEnds3);
             vLanTextField.setOnAllowedVlanChangeListener(bothConnectionEnds2);
             vLanTextField.show();
             if (showTitle) {
@@ -85,9 +97,25 @@ public class ConnectionRowView extends GridPane implements ColorPickerDialog.OnC
                 this.add(label, 2, 0);
             }
             this.add(vLanTextField, 2, 1);
-            column3.setMinWidth(140);
-            column3.setMaxWidth(140);
-
+            column3.setMinWidth(160);
+            column3.setMaxWidth(160);
+        } else if (thisDevice instanceof Switch) {
+            Button setVLanButton = new Button("Set");
+            setVLanButton.setId(String.valueOf(thisPort.getId()));
+            onManageVLanClickedListenerList.add(thisPort);
+            if (Engine.getInstance().getDeviceByPort(otherPort) instanceof Switch) {
+                onManageVLanClickedListenerList.add(otherPort);
+            }
+            setVLanButton.setOnMouseClicked(this::onSetVLanButtonClicked);
+            if (showTitle) {
+                Label label = new Label("VLAN:");
+                label.getStyleClass().add("boldLabel");
+                label.setTooltip(new Tooltip("1 - 1001"));
+                this.add(label, 2, 0);
+            }
+            this.add(setVLanButton, 2, 1);
+            column3.setMinWidth(160);
+            column3.setMaxWidth(160);
         }
 
         colorLabel.setBackground(new Background(new BackgroundFill(connection.getColor(), CornerRadii.EMPTY, Insets.EMPTY)));
@@ -98,9 +126,8 @@ public class ConnectionRowView extends GridPane implements ColorPickerDialog.OnC
 
         deleteConnection.setOnMouseClicked(this::onMouseClicked);
 
-        //TODO: change to device name
         if (showTitle) {
-            Label label = new Label("Connected with:");
+            Label label = new Label("Connected\nwith:");
             label.getStyleClass().add("boldLabel");
             this.add(label, 3, 0);
         }
@@ -116,10 +143,10 @@ public class ConnectionRowView extends GridPane implements ColorPickerDialog.OnC
         this.setHgap(10);
         column4.setMinWidth(100);
         column4.setMaxWidth(100);
-        column5.setMinWidth(80);
-        column5.setMaxWidth(80);
-        column6.setMinWidth(60);
-        column6.setMaxWidth(60);
+        column5.setMinWidth(100);
+        column5.setMaxWidth(100);
+        column6.setMinWidth(100);
+        column6.setMaxWidth(100);
         this.getColumnConstraints().addAll(column1, column2, column3, column4, column5, column6);
 
         Pane pane = new Pane();
@@ -129,6 +156,13 @@ public class ConnectionRowView extends GridPane implements ColorPickerDialog.OnC
         this.add(pane, 0, 2, 5, 1);
 
         this.setVgap(2);
+    }
+
+    private void onSetVLanButtonClicked(MouseEvent mouseEvent) {
+        for (OnManageVLanClickedListener listener : onManageVLanClickedListenerList) {
+            listener.onSetVLanClicked();
+        }
+        Engine.getInstance().showConnectionList();
     }
 
     private void onColorClicked(MouseEvent mouseEvent) {
@@ -155,5 +189,10 @@ public class ConnectionRowView extends GridPane implements ColorPickerDialog.OnC
 
     public interface OnDeleteClickListener {
         void onClick(int id);
+    }
+
+    public interface OnManageVLanClickedListener {
+        void onSetVLanClicked();
+        void onRemoveVLanClicked();
     }
 }

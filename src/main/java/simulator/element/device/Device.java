@@ -62,23 +62,6 @@ abstract public class Device implements DeviceNameLabel.OnSaveDeviceNameClickedL
         this.name = name;
     }
 
-    public int getNumberOfPorts() {
-        return portList.size();
-    }
-
-    public void setNumberOfPorts(int numberOfPorts) {
-        //TODO: check if function works properly
-        if (portList.size() < numberOfPorts) {
-            for (int i = portList.size(); i < numberOfPorts; i++) {
-                portList.add(new Port(i + 1));
-            }
-        } else if (portList.size() > numberOfPorts) {
-            if (portList.size() > numberOfPorts + 1) {
-                portList.subList(numberOfPorts + 1, portList.size()).clear();
-            }
-        }
-    }
-
     public boolean hasPort(Port port) {
         return portList.contains(port);
     }

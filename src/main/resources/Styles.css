@@ -23,7 +23,7 @@
 
 .rightLayout {
     -fx-background-color: silver;
-    -fx-pref-width: 500px;
+    -fx-pref-width: 600px;
 }
 
 .deviceInfo {

@@ -4,6 +4,7 @@ import simulator.Engine;
 import simulator.element.Connection;
 import simulator.element.Message;
 import simulator.element.device.additionalElements.AssociationTableEntry;
+import simulator.element.device.additionalElements.History;
 import simulator.element.device.additionalElements.Port;
 import simulator.view.SwitchButtonsView;
 import util.Values;
@@ -28,7 +29,6 @@ public class Switch extends Device implements SwitchButtonsView.OnClearMacTableC
     void initPorts() {
         for (int i = 0; i < Values.DEVICE_SWITCH_NUMBER_OF_PORTS; i++) {
             Port port = new Port(i + 1);
-            port.setVLan();
             getPortList().add(port);
         }
     }
@@ -38,12 +38,12 @@ public class Switch extends Device implements SwitchButtonsView.OnClearMacTableC
         setDeviceName(deviceType + nameCounter++);
     }
 
-    //TODO: check if trunk mode works properly
     @Override
     public List<Message> handleMessage(Message message, List<Connection> connectionList) {
         switch (message.getType()) {
             case NORMAL:
                 return handleNormalMessage(message, connectionList);
+            case GENERATE:
             case TEST:
                 return handleTestMessage(message, connectionList);
         }
@@ -74,13 +74,19 @@ public class Switch extends Device implements SwitchButtonsView.OnClearMacTableC
         } else {
             addNewRecord(vLanId, message.getSourceMac(), message.getCurrentDestinationPort());
 
-            List<Port> vLanPortList = getPortListByVLanAndTrunk(vLanId);
-            if (associationTableContainsKey(vLanId, message.getDestinationMac()) && nextHopBelongsToVLan(vLanId, message.getDestinationMac(), message.getCurrentDestinationPort()) && !message.getCurrentDestinationPort().isInTrunkMode()) {
+            List<Port> vLanPortList;
+            if (message.getCurrentDestinationPort().hasVLan()) {
+                vLanPortList = getPortListByVLanAndTrunk(vLanId);
+            } else {
+                vLanPortList = getPortList();
+            }
+
+            if (associationTableContainsKey(vLanId, message.getDestinationMac()) && nextHopBelongsToVLan(vLanId, message.getDestinationMac(), message.getCurrentDestinationPort())) {
                 Port sourcePort = getAssociationTablePort(vLanId, message.getDestinationMac());
                 Connection connection = getConnectionByPort(sourcePort, connectionList);
                 List<Message> messageList = new ArrayList<>();
                 if (connection != null && sourcePort != null) {
-                    messageList.add(new Message(
+                    Message msg = new Message(
                             message,
                             sourcePort,
                             connection.getOtherPort(sourcePort),
@@ -89,7 +95,17 @@ public class Switch extends Device implements SwitchButtonsView.OnClearMacTableC
                             vLanId,
                             "by MAC Address table entry",
                             true
-                    ));
+                    );
+                    History lastHistory = message.getHistoryList().get(message.getHistoryList().size() - 1);
+                    msg.updateLastHistoryPacketInfo(
+                            lastHistory.getPacketInfoSourceIp(),
+                            lastHistory.getPacketInfoDestinationIp()
+                    );
+                    msg.updateLastHistoryFrameInfo(
+                            lastHistory.getFrameInfoSourceMac(),
+                            lastHistory.getFrameInfoDestinationMac()
+                    );
+                    messageList.add(msg);
                 }
                 return messageList;
             } else {
@@ -97,16 +113,26 @@ public class Switch extends Device implements SwitchButtonsView.OnClearMacTableC
                 for (Port sourcePort : vLanPortList) {
                     Connection connection = getConnectionByPort(sourcePort, connectionList);
                     if (connection != null && !sourcePort.equals(message.getCurrentDestinationPort())) {
-                        messageList.add(new Message(
+                        Message msg = new Message(
                                 message,
                                 sourcePort,
                                 connection.getOtherPort(sourcePort),
                                 this,
                                 message.getCurrentIpDestinationAddress(),
                                 vLanId,
-                                "",
+                                "send to all",
                                 true
-                        ));
+                        );
+                        History lastHistory = message.getHistoryList().get(message.getHistoryList().size() - 1);
+                        msg.updateLastHistoryPacketInfo(
+                                lastHistory.getPacketInfoSourceIp(),
+                                lastHistory.getPacketInfoDestinationIp()
+                        );
+                        msg.updateLastHistoryFrameInfo(
+                                lastHistory.getFrameInfoSourceMac(),
+                                lastHistory.getFrameInfoDestinationMac()
+                        );
+                        messageList.add(msg);
                     }
                 }
                 return messageList;
@@ -215,8 +241,9 @@ public class Switch extends Device implements SwitchButtonsView.OnClearMacTableC
         Port sourcePort = getAssociationTablePort(vLanId, destinationMac);
         if (sourcePort != null && sourcePort.hasVLan()) {
             return sourcePort.getVLanId() == currentDestinationPort.getVLanId();
+        } else {
+            return sourcePort != null && !sourcePort.hasVLan();
         }
-        return false;
     }
 
     @Override

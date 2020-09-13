@@ -51,18 +51,10 @@ public class EndDevice extends Device implements IPTextField.OnSaveClickedListen
     }
 
     private List<Message> handleNormalMessage(Message message, List<Connection> connectionList) {
-        if (message.getDestinationIpAddress().equals(getIpAddress())) {
+        if (message.getDestinationIpAddress().equals(getIpAddress()) && message.getHistoryList().get(message.getHistoryList().size() - 1).getFrameInfoDestinationMac().equals(getMacAddress())) {
             if (message.getApplication().equals(Policy.Application.TCP) && !message.isConfirmationMessage()) {
                 List<Message> messageList = new ArrayList<>();
-                List<History> historyList = message.getHistoryList();
-                historyList.add(new History(
-                        message,
-                        this,
-                        "send confirmation",
-                        message.getCurrentDestinationPort(),
-                        message.getCurrentDestinationPort()
-                ));
-                messageList.add(new Message(message.getDestinationIpAddress(),
+                Message msg = new Message(message.getDestinationIpAddress(),
                         message.getSourceIpAddress(),
                         message.getDestinationMac(),
                         message.getSourceMac(),
@@ -73,11 +65,84 @@ public class EndDevice extends Device implements IPTextField.OnSaveClickedListen
                         message.getApplication(),
                         true,
                         Message.Type.NORMAL,
-                        historyList));
+                        message.getHistoryList());
+
+                History history = new History(
+                        msg,
+                        this,
+                        "send confirmation",
+                        message.getCurrentDestinationPort(),
+                        message.getCurrentSourcePort());
+
+                history.setPacketInfo(message.getDestinationIpAddress(), message.getSourceIpAddress());
+                if (Utils.belongToTheSameNetwork(message.getDestinationIpAddress(), message.getSourceIpAddress())) {
+                    history.setFrameInfo(
+                            Engine.getInstance().getDeviceByIPAddress(message.getDestinationIpAddress()).getMacAddress(),
+                            Engine.getInstance().getDeviceByIPAddress(message.getSourceIpAddress()).getMacAddress()
+                    );
+                } else {
+                    history.setFrameInfo(
+                            Engine.getInstance().getDeviceByIPAddress(message.getDestinationIpAddress()).getMacAddress(),
+                            Engine.getInstance().getDeviceByPortIpAddress(getGateway()).getMacAddress()
+                    );
+                }
+                msg.addHistory(history);
+                messageList.add(msg);
+
                 return messageList;
             } else if (message.getApplication().equals(Policy.Application.TCP) && message.isConfirmationMessage()) {
+                Message msg = new Message(message.getDestinationIpAddress(),
+                        message.getSourceIpAddress(),
+                        null,
+                        message.getSourceMac(),
+                        this.getPortList().get(0),
+                        null,
+                        this.getGateway(),
+                        message.getVLanId(),
+                        message.getApplication(),
+                        true,
+                        Message.Type.NORMAL,
+                        message.getHistoryList());
+
+                History lastHistory = message.getHistoryList().get(message.getHistoryList().size() - 1);
+                History history = new History(
+                        msg,
+                        this,
+                        "receive confirmation",
+                        message.getCurrentDestinationPort(),
+                        null);
+                history.setPacketInfo(lastHistory.getPacketInfoSourceIp(), lastHistory.getPacketInfoDestinationIp());
+                history.setFrameInfo(lastHistory.getFrameInfoSourceMac(), lastHistory.getFrameInfoDestinationMac());
+
+                message.addHistory(history);
+
                 Engine.getInstance().finishSimulation(message.getHistoryList());
             } else if (message.getApplication().equals(Policy.Application.UDP)) {
+                Message msg = new Message(message.getDestinationIpAddress(),
+                        message.getSourceIpAddress(),
+                        null,
+                        message.getSourceMac(),
+                        this.getPortList().get(0),
+                        null,
+                        this.getGateway(),
+                        message.getVLanId(),
+                        message.getApplication(),
+                        false,
+                        Message.Type.NORMAL,
+                        message.getHistoryList());
+
+                History lastHistory = message.getHistoryList().get(message.getHistoryList().size() - 1);
+                History history = new History(
+                        msg,
+                        this,
+                        "receive message",
+                        message.getCurrentDestinationPort(),
+                        null);
+                history.setPacketInfo(lastHistory.getPacketInfoSourceIp(), lastHistory.getPacketInfoDestinationIp());
+                history.setFrameInfo(lastHistory.getFrameInfoSourceMac(), lastHistory.getFrameInfoDestinationMac());
+
+                message.addHistory(history);
+
                 Engine.getInstance().finishSimulation(message.getHistoryList());
             }
         }

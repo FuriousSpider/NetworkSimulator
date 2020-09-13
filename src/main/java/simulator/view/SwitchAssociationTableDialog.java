@@ -41,7 +41,9 @@ public class SwitchAssociationTableDialog extends Dialog<String> {
         for (AssociationTableEntry entry : associationTable) {
             int index = associationTable.indexOf(entry) + 2;
             content.add(new Label(String.valueOf(index - 1)), 0, index);
-            content.add(new Label(String.valueOf(entry.getvLanId())), 1, index);
+            if (entry.getvLanId() != 0) {
+                content.add(new Label(String.valueOf(entry.getvLanId())), 1, index);
+            }
             content.add(new Label(entry.getMacAddress()), 2, index);
             content.add(new Label(Engine.getInstance().getPortById(entry.getPortId()).getPortName()), 3,index);
         }

@@ -1,5 +1,6 @@
 package simulator.element.device.additionalElements;
 
+import simulator.view.ConnectionRowView;
 import simulator.view.IPTextField;
 import simulator.view.TrunkModeAllowedVlan;
 import simulator.view.VLanTextField;
@@ -7,7 +8,7 @@ import util.Values;
 
 import java.util.List;
 
-public class Port implements IPTextField.OnSaveClickedListener, VLanTextField.OnSaveClickedListener, VLanTextField.OnChangeModeClickedListener, TrunkModeAllowedVlan.OnAllowedVLanChangeListener {
+public class Port implements IPTextField.OnSaveClickedListener, VLanTextField.OnSaveClickedListener, VLanTextField.OnChangeModeClickedListener, TrunkModeAllowedVlan.OnAllowedVLanChangeListener, ConnectionRowView.OnManageVLanClickedListener {
     private int id;
     private int portNumber;
     private Interface anInterface;
@@ -50,11 +51,19 @@ public class Port implements IPTextField.OnSaveClickedListener, VLanTextField.On
     }
 
     public int getVLanId() {
-        return this.vLan.getId();
+        if (hasVLan()) {
+            return this.vLan.getId();
+        } else {
+            return Values.PORT_EMPTY_VLAN;
+        }
     }
 
     public boolean isInTrunkMode() {
-        return this.vLan.isInTrunkMode();
+        if (hasVLan()) {
+            return this.vLan.isInTrunkMode();
+        } else {
+            return false;
+        }
     }
 
     public void setTrunkMode(boolean isInTrunkMode) {
@@ -150,5 +159,15 @@ public class Port implements IPTextField.OnSaveClickedListener, VLanTextField.On
         if (hasVLan()) {
             vLan.setTrunkModeAllowedIds(allowedVLanList);
         }
+    }
+
+    @Override
+    public void onSetVLanClicked() {
+        setVLan();
+    }
+
+    @Override
+    public void onRemoveVLanClicked() {
+        vLan = null;
     }
 }

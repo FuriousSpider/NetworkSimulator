@@ -4,6 +4,7 @@ import javafx.application.Platform;
 import simulator.Engine;
 import simulator.element.Connection;
 import simulator.element.Message;
+import simulator.element.device.additionalElements.History;
 import simulator.element.device.additionalElements.Port;
 import simulator.view.RoutingTable;
 import util.Utils;
@@ -59,16 +60,27 @@ public class Router extends Device implements RoutingTable.OnRoutingTableChangeL
                     for (Connection connection : connectionList) {
                         if (connection.containsPort(port) && port != message.getCurrentDestinationPort()) {
                             destinationPort = connection.getOtherPort(port);
-                            messageList.add(new Message(
+                            Message msg = new Message(
                                     message,
                                     port,
                                     destinationPort,
                                     this,
-                                    "0.0.0.0",
+                                    message.getDestinationIpAddress(),
                                     null,
                                     "direct connection",
                                     true
-                            ));
+                            );
+                            History lastHistory = message.getHistoryList().get(message.getHistoryList().size() - 1);
+                            msg.updateLastHistoryPacketInfo(
+                                    lastHistory.getPacketInfoSourceIp(),
+                                    lastHistory.getPacketInfoDestinationIp()
+                            );
+                            msg.updateLastHistoryFrameInfo(
+                                    getMacAddress(),
+                                    Engine.getInstance().getDeviceByIPAddress(message.getDestinationIpAddress()).getMacAddress()
+                            );
+
+                            messageList.add(msg);
                             return messageList;
                         }
                     }
@@ -82,7 +94,7 @@ public class Router extends Device implements RoutingTable.OnRoutingTableChangeL
                         if (Utils.belongToTheSameNetwork(port.getIpAddress(), nextHop)) {
                             for (Connection connection : connectionList) {
                                 if (connection.containsPort(port) && port != message.getCurrentDestinationPort()) {
-                                    messageList.add(new Message(
+                                    Message msg = new Message(
                                             message,
                                             port,
                                             connection.getOtherPort(port),
@@ -91,7 +103,18 @@ public class Router extends Device implements RoutingTable.OnRoutingTableChangeL
                                             null,
                                             "by routing table entry",
                                             true
-                                    ));
+                                    );
+                                    History lastHistory = message.getHistoryList().get(message.getHistoryList().size() - 1);
+                                    msg.updateLastHistoryPacketInfo(
+                                            lastHistory.getPacketInfoSourceIp(),
+                                            lastHistory.getPacketInfoDestinationIp()
+                                    );
+                                    msg.updateLastHistoryFrameInfo(
+                                            getMacAddress(),
+                                            Engine.getInstance().getDeviceByPortIpAddress(nextHop).getMacAddress()
+                                    );
+
+                                    messageList.add(msg);
                                     return messageList;
                                 }
                             }
@@ -104,16 +127,28 @@ public class Router extends Device implements RoutingTable.OnRoutingTableChangeL
             List<Message> messageList = new ArrayList<>();
             for (Integer vLanId : message.getCurrentSourcePort().getTrunkModeAllowedIds()) {
                 if (!vLanId.equals(message.getVLanId())) {
-                    messageList.add(new Message(
+                    Message msg = new Message(
                             message,
                             message.getCurrentDestinationPort(),
                             message.getCurrentSourcePort(),
                             this,
-                            "0.0.0.0",
+                            ((EndDevice) Engine.getInstance().getDeviceByMacAddress(message.getDestinationMac())).getIpAddress(),
                             vLanId,
                             "by one-armed router",
                             true
-                    ));
+                    );
+                    History lastHistory = message.getHistoryList().get(message.getHistoryList().size() - 1);
+
+                    msg.updateLastHistoryPacketInfo(
+                            lastHistory.getPacketInfoSourceIp(),
+                            lastHistory.getPacketInfoDestinationIp()
+                    );
+                    msg.updateLastHistoryFrameInfo(
+                            getMacAddress(),
+                            message.getDestinationMac()
+                    );
+
+                    messageList.add(msg);
                 }
             }
             return messageList;
@@ -163,8 +198,7 @@ public class Router extends Device implements RoutingTable.OnRoutingTableChangeL
     private boolean isProperRecipient(Message message) {
         return (!message.getCurrentIpDestinationAddress().isEmpty()
                 && message.getCurrentDestinationPort().getIpAddress().contains(message.getCurrentIpDestinationAddress())
-                && !Utils.belongToTheSameNetwork(message.getDestinationIpAddress(), message.getCurrentDestinationPort().getIpAddress())
-                || message.getCurrentIpDestinationAddress().equals("0.0.0.0"));
+                && !Utils.belongToTheSameNetwork(message.getDestinationIpAddress(), message.getCurrentDestinationPort().getIpAddress()));
     }
 
     @Override

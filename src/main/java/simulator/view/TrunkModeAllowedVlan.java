@@ -65,6 +65,7 @@ public class TrunkModeAllowedVlan extends GridPane implements TrunkModeAllowedVl
             for (OnAllowedVLanChangeListener listener : onAllowedVLanChangeListenerList) {
                 listener.onAllowedVLanChange(allowedVLanList);
             }
+            allowedVlanTextField.setText("");
             reloadVlanList();
         }
     }

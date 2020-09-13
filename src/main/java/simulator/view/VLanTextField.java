@@ -23,6 +23,7 @@ public class VLanTextField extends GridPane {
     private final TrunkModeAllowedVlan trunkModeAllowedVLANS;
     private final Button editButton;
     private final Button cancelButton;
+    private final Button removeButton;
     private final HBox buttonLine;
 
     private String vLanValue;
@@ -30,6 +31,7 @@ public class VLanTextField extends GridPane {
 
     private List<OnChangeModeClickedListener> onChangeModeClickedListenerList;
     private OnSaveClickedListener onSaveClickedListener;
+    private List<ConnectionRowView.OnManageVLanClickedListener> onManageVLanClickedListenerList;
 
     public VLanTextField() {
         this.vLanTextField = new TextField();
@@ -40,6 +42,7 @@ public class VLanTextField extends GridPane {
         this.trunkModeAllowedVLANS = new TrunkModeAllowedVlan();
         this.editButton = new Button("Edit");
         this.cancelButton = new Button("Cancel");
+        this.removeButton = new Button("Remove");
         this.buttonLine = new HBox();
 
         this.vLanTextField.setMaxWidth(50);
@@ -58,11 +61,13 @@ public class VLanTextField extends GridPane {
 
         this.buttonLine.getChildren().add(editButton);
         this.buttonLine.getChildren().add(cancelButton);
+        this.buttonLine.getChildren().add(removeButton);
 
         this.add(buttonLine, 0, 3, 2, 1);
 
         editButton.setOnMouseClicked(this::onEditButtonClicked);
         cancelButton.setOnMouseClicked(this::onCancelButtonClicked);
+        removeButton.setOnMouseClicked(this::onRemoveVLanButtonClicked);
         isInTrunkModeCheckBox.setOnMouseClicked(this::onChangeModeCheckBoxClicked);
 
         this.setHgap(5);
@@ -142,6 +147,13 @@ public class VLanTextField extends GridPane {
         changeState();
     }
 
+    private void onRemoveVLanButtonClicked(MouseEvent mouseEvent) {
+        for (ConnectionRowView.OnManageVLanClickedListener listener : onManageVLanClickedListenerList) {
+            listener.onRemoveVLanClicked();
+        }
+        Engine.getInstance().showConnectionList();
+    }
+
     private void onChangeModeCheckBoxClicked(MouseEvent mouseEvent) {
         for (OnChangeModeClickedListener listener : onChangeModeClickedListenerList) {
             listener.onChangeModeClicked(isInTrunkModeCheckBox.isSelected());
@@ -201,6 +213,10 @@ public class VLanTextField extends GridPane {
 
     public void setOnAllowedVlanChangeListener(List<TrunkModeAllowedVlan.OnAllowedVLanChangeListener> listenerList) {
         trunkModeAllowedVLANS.setOnAllowedVLanChangeListener(listenerList);
+    }
+
+    public void setOnManageVLanClickedListener(List<ConnectionRowView.OnManageVLanClickedListener> listenerList) {
+        this.onManageVLanClickedListenerList = listenerList;
     }
 
     public interface OnChangeModeClickedListener {

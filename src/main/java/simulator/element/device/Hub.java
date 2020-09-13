@@ -3,6 +3,7 @@ package simulator.element.device;
 import simulator.Engine;
 import simulator.element.Connection;
 import simulator.element.Message;
+import simulator.element.device.additionalElements.History;
 import simulator.element.device.additionalElements.Port;
 import util.Values;
 
@@ -36,6 +37,7 @@ public class Hub extends Device {
             case NORMAL:
                 return handleNormalMessage(message, connectionList);
             case TEST:
+            case GENERATE:
                 return handleTestMessage(message, connectionList);
         }
         return new ArrayList<>();
@@ -46,31 +48,47 @@ public class Hub extends Device {
         for (Connection connection : connectionList) {
             if (!connection.containsPort(message.getCurrentDestinationPort())) {
                 if (connection.getFirstElementId() == this.getId()) {
-                    messageList.add(
-                            new Message(
-                                    message,
-                                    Engine.getInstance().getPortById(connection.getPortPair().getKey()),
-                                    Engine.getInstance().getPortById(connection.getPortPair().getValue()),
-                                    this,
-                                    message.getCurrentIpDestinationAddress(),
-                                    message.getVLanId(),
-                                    "",
-                                    true
-                            )
+                    Message msg = new Message(
+                            message,
+                            Engine.getInstance().getPortById(connection.getPortPair().getKey()),
+                            Engine.getInstance().getPortById(connection.getPortPair().getValue()),
+                            this,
+                            message.getCurrentIpDestinationAddress(),
+                            message.getVLanId(),
+                            "send to all",
+                            true
                     );
+                    History lastHistory = message.getHistoryList().get(message.getHistoryList().size() - 1);
+                    msg.updateLastHistoryPacketInfo(
+                            lastHistory.getPacketInfoSourceIp(),
+                            lastHistory.getPacketInfoDestinationIp()
+                            );
+                    msg.updateLastHistoryFrameInfo(
+                            lastHistory.getFrameInfoSourceMac(),
+                            lastHistory.getFrameInfoDestinationMac()
+                    );
+                    messageList.add(msg);
                 } else {
-                    messageList.add(
-                            new Message(
-                                    message,
-                                    Engine.getInstance().getPortById(connection.getPortPair().getValue()),
-                                    Engine.getInstance().getPortById(connection.getPortPair().getKey()),
-                                    this,
-                                    message.getCurrentIpDestinationAddress(),
-                                    message.getVLanId(),
-                                    "",
-                                    true
-                            )
+                    Message msg = new Message(
+                            message,
+                            Engine.getInstance().getPortById(connection.getPortPair().getValue()),
+                            Engine.getInstance().getPortById(connection.getPortPair().getKey()),
+                            this,
+                            message.getCurrentIpDestinationAddress(),
+                            message.getVLanId(),
+                            "send to all",
+                            true
                     );
+                    History lastHistory = message.getHistoryList().get(message.getHistoryList().size() - 1);
+                    msg.updateLastHistoryPacketInfo(
+                            lastHistory.getPacketInfoSourceIp(),
+                            lastHistory.getPacketInfoDestinationIp()
+                    );
+                    msg.updateLastHistoryFrameInfo(
+                            lastHistory.getFrameInfoSourceMac(),
+                            lastHistory.getFrameInfoDestinationMac()
+                    );
+                    messageList.add(msg);
                 }
             }
         }
@@ -81,7 +99,35 @@ public class Hub extends Device {
         if (message.getTestHistory().contains(this)) {
             return new ArrayList<>();
         } else {
-            return handleNormalMessage(message, connectionList);
+            List<Message> messageList = new ArrayList<>();
+            for (Connection connection : connectionList) {
+                if (!connection.containsPort(message.getCurrentDestinationPort())) {
+                    if (connection.getFirstElementId() == this.getId()) {
+                        messageList.add(new Message(
+                                message,
+                                Engine.getInstance().getPortById(connection.getPortPair().getKey()),
+                                Engine.getInstance().getPortById(connection.getPortPair().getValue()),
+                                this,
+                                message.getCurrentIpDestinationAddress(),
+                                message.getVLanId(),
+                                "",
+                                true
+                        ));
+                    } else {
+                        messageList.add(new Message(
+                                message,
+                                Engine.getInstance().getPortById(connection.getPortPair().getValue()),
+                                Engine.getInstance().getPortById(connection.getPortPair().getKey()),
+                                this,
+                                message.getCurrentIpDestinationAddress(),
+                                message.getVLanId(),
+                                "",
+                                true
+                        ));
+                    }
+                }
+            }
+            return messageList;
         }
     }
 }

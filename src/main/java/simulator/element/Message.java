@@ -151,8 +151,25 @@ public class Message {
         return history;
     }
 
+    public void addHistory(List<History> historyList) {
+        this.history.addAll(historyList);
+    }
+
+    public void addHistory(History history) {
+        this.history.add(history);
+    }
+
+    public void updateLastHistoryPacketInfo(String sourceIp, String destinationIp) {
+        history.get(history.size() - 1).setPacketInfo(sourceIp, destinationIp);
+    }
+
+    public void updateLastHistoryFrameInfo(String sourceMac, String destinationMac) {
+        history.get(history.size() - 1).setFrameInfo(sourceMac, destinationMac);
+    }
+
     public enum Type {
         TEST,
-        NORMAL
+        NORMAL,
+        GENERATE
     }
 }

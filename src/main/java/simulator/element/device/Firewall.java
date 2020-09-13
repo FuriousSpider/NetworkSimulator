@@ -1,30 +1,32 @@
 package simulator.element.device;
 
 import javafx.application.Platform;
+import javafx.util.Pair;
 import simulator.Engine;
 import simulator.element.Connection;
 import simulator.element.Message;
+import simulator.element.device.additionalElements.History;
 import simulator.element.device.additionalElements.Policy;
 import simulator.element.device.additionalElements.Port;
 import simulator.view.FirewallPoliciesView;
 import util.Utils;
 import util.Values;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class Firewall extends Device implements FirewallPoliciesView.OnPoliciesListUpdatedListener {
     public static String fileName = "/firewall.png";
     public static String deviceType = "Firewall";
     private final List<Policy> policyList;
     private Policy.Rule defaultRule;
+    private final List<Pair<Port, String>> routingTable;
     public static int nameCounter = 1;
 
     public Firewall(int x, int y) {
         super(fileName, x, y, deviceType);
         this.policyList = new ArrayList<>();
         this.defaultRule = Policy.Rule.DENY;
+        this.routingTable = new ArrayList<>();
     }
 
     @Override
@@ -48,6 +50,8 @@ public class Firewall extends Device implements FirewallPoliciesView.OnPoliciesL
                 return handleNormalMessage(message, connectionList);
             case TEST:
                 return handleTestMessage(message, connectionList);
+            case GENERATE:
+                return handleGenerateMessage(message, connectionList);
         }
         return new ArrayList<>();
     }
@@ -64,11 +68,10 @@ public class Firewall extends Device implements FirewallPoliciesView.OnPoliciesL
                             String destinationNetworkAddress = policy.getDestinationNetworkAddress();
                             Set<Policy.Application> applicationSet = policy.getApplicationSet();
 
-                            //TODO: check if works properly
-                            if (!(sourceNetworkAddress == null || !sourceNetworkAddress.equals(Utils.getNetworkAddressFromIp(message.getSourceIpAddress())))) {
+                            if (!(sourceNetworkAddress == null || sourceNetworkAddress.contains(Utils.getNetworkAddressFromIp(message.getSourceIpAddress())))) {
                                 continue;
                             }
-                            if (!(destinationNetworkAddress == null || !destinationNetworkAddress.equals(Utils.getNetworkAddressFromIp(message.getDestinationIpAddress())))) {
+                            if (!(destinationNetworkAddress == null || destinationNetworkAddress.contains(Utils.getNetworkAddressFromIp(message.getDestinationIpAddress())))) {
                                 continue;
                             }
                             if (!applicationSet.isEmpty() && !applicationSet.contains(message.getApplication())) {
@@ -80,7 +83,7 @@ public class Firewall extends Device implements FirewallPoliciesView.OnPoliciesL
                                     message,
                                     sourcePort,
                                     destinationPort,
-                                    "by policy number :" + policyList.indexOf(policy) + 1);
+                                    "by policy number : " + (policyList.indexOf(policy) + 1));
                         }
                         return executePolicy(
                                 defaultRule,
@@ -121,19 +124,46 @@ public class Firewall extends Device implements FirewallPoliciesView.OnPoliciesL
         return new ArrayList<>();
     }
 
+    private List<Message> handleGenerateMessage(Message message, List<Connection> connectionList) {
+        routingTable.add(new Pair<>(message.getCurrentDestinationPort(), message.getSourceIpAddress()));
+        return new ArrayList<>();
+    }
+
     private List<Message> executePolicy(Policy.Rule rule, Message message, Port sourcePort, Port destinationPort, String decisionValue) {
         if (rule.equals(Policy.Rule.PERMIT)) {
             List<Message> messageList = new ArrayList<>();
-            messageList.add(new Message(
-                    message,
-                    sourcePort,
-                    destinationPort,
-                    this,
-                    "0.0.0.0",
-                    null,
-                    decisionValue,
-                    true
-            ));
+            for (Pair<Port, String> pair : routingTable) {
+                if (pair.getKey().equals(sourcePort)) {
+                    Message msg = new Message(
+                            message,
+                            sourcePort,
+                            destinationPort,
+                            this,
+                            pair.getValue(),
+                            null,
+                            decisionValue,
+                            true
+                    );
+
+                    History lastHistory = message.getHistoryList().get(message.getHistoryList().size() - 1);
+                    msg.updateLastHistoryPacketInfo(
+                            lastHistory.getPacketInfoSourceIp(),
+                            lastHistory.getPacketInfoDestinationIp()
+                    );
+                    String destinationMacAddress;
+                    try {
+                        destinationMacAddress = Engine.getInstance().getDeviceByPortIpAddress(pair.getValue()).getMacAddress();
+                    }catch (Exception e) {
+                        destinationMacAddress = Engine.getInstance().getDeviceByIPAddress(pair.getValue()).getMacAddress();
+                    }
+                    msg.updateLastHistoryFrameInfo(
+                            getMacAddress(),
+                            destinationMacAddress
+                    );
+
+                    messageList.add(msg);
+                }
+            }
             return messageList;
         } else {
             return new ArrayList<>();
@@ -166,11 +196,14 @@ public class Firewall extends Device implements FirewallPoliciesView.OnPoliciesL
         this.defaultRule = defaultRule;
     }
 
+    public void clearRoutingTable() {
+        this.routingTable.clear();
+    }
+
     private boolean isProperRecipient(Message message) {
         return (!message.getCurrentIpDestinationAddress().isEmpty()
                 && message.getCurrentDestinationPort().getIpAddress().contains(message.getCurrentIpDestinationAddress())
-                && !Utils.belongToTheSameNetwork(message.getDestinationIpAddress(), message.getCurrentDestinationPort().getIpAddress())
-                || message.getCurrentIpDestinationAddress().equals("0.0.0.0"));
+                && !Utils.belongToTheSameNetwork(message.getDestinationIpAddress(), message.getCurrentDestinationPort().getIpAddress()));
     }
 
     @Override
