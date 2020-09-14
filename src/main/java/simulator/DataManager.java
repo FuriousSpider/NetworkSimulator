@@ -463,7 +463,7 @@ public class DataManager {
 
                 Files.write(Paths.get(file.toURI()), dataObject.toJSONString().getBytes());
             } catch (Exception e) {
-                e.printStackTrace();
+                Engine.getInstance().logError(Values.ERROR_SAVE_FILE);
             }
         }
     }

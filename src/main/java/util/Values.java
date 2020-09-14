@@ -65,5 +65,6 @@ public class Values {
     public static String ERROR_ADDRESS_IS_NOT_A_HOST_ADDRESS = "Provided address is not a host address";
     public static String ERROR_NO_FREE_PORT_AVAILABLE = " has no free port available";
     public static String ERROR_OPEN_FILE_ERROR = "There was an error while opening a file";
+    public static String ERROR_SAVE_FILE = "There was an error while saving a file";
     public static String ERROR_CANNOT_CONNECT_TO_SAME_DEVICE = "You cannot connect the device with itself";
 }

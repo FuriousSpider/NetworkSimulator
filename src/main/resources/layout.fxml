@@ -73,7 +73,7 @@
             <Button onAction="#handleEndDeviceButtonClick">
                 <graphic>
                     <ImageView fitWidth="50" fitHeight="50">
-                        <Image url="@endDevice.png"/>
+                        <Image url="@endDevice.jpg"/>
                     </ImageView>
                 </graphic>
                 <tooltip>
@@ -83,7 +83,7 @@
             <Button onAction="#handleHubButtonClick">
                 <graphic>
                     <ImageView fitWidth="50" fitHeight="50">
-                        <Image url="@hub.png"/>
+                        <Image url="@hub.jpg"/>
                     </ImageView>
                 </graphic>
                 <tooltip>
@@ -93,7 +93,7 @@
             <Button onAction="#handleSwitchButtonClick">
                 <graphic>
                     <ImageView fitWidth="50" fitHeight="50">
-                        <Image url="@switch.png"/>
+                        <Image url="@switch.jpg"/>
                     </ImageView>
                 </graphic>
                 <tooltip>
@@ -103,7 +103,7 @@
             <Button onAction="#handleRouterButtonClick">
                 <graphic>
                     <ImageView fitWidth="50" fitHeight="50">
-                        <Image url="@router.png"/>
+                        <Image url="@router.jpg"/>
                     </ImageView>
                 </graphic>
                 <tooltip>
@@ -113,7 +113,7 @@
             <Button onAction="#handleFirewallButtonClick">
                 <graphic>
                     <ImageView fitWidth="50" fitHeight="50">
-                        <Image url="@firewall.png"/>
+                        <Image url="@firewall.jpg"/>
                     </ImageView>
                 </graphic>
                 <tooltip>

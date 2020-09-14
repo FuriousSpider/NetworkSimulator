@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Hub extends Device {
-    public static String fileName = "/hub.png";
+    public static String fileName = "/hub.jpg";
     public static String deviceType = "Hub";
     public static int nameCounter = 1;
 

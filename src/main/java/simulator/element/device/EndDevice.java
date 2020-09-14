@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class EndDevice extends Device implements IPTextField.OnSaveClickedListener, DefaultGatewayView.OnDefaultGatewayChangeListener {
-    public static String fileName = "/endDevice.png";
+    public static String fileName = "/endDevice.jpg";
     public static String deviceType = "End Device";
     private final Interface anInterface;
     private final Interface gateway;

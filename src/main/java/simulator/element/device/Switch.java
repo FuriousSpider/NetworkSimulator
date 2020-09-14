@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Switch extends Device implements SwitchButtonsView.OnClearMacTableClickedListener {
-    public static String fileName = "/switch.png";
+    public static String fileName = "/switch.jpg";
     public static String deviceType = "Switch";
     public static int nameCounter = 1;
 

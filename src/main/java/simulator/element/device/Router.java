@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 public class Router extends Device implements RoutingTable.OnRoutingTableChangeListener {
-    public static String fileName = "/router.png";
+    public static String fileName = "/router.jpg";
     public static String deviceType = "Router";
     private final Map<String, String> routingTable;
     public static int nameCounter = 1;

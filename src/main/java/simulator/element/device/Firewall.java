@@ -15,7 +15,7 @@ import util.Values;
 import java.util.*;
 
 public class Firewall extends Device implements FirewallPoliciesView.OnPoliciesListUpdatedListener {
-    public static String fileName = "/firewall.png";
+    public static String fileName = "/firewall.jpg";
     public static String deviceType = "Firewall";
     private final List<Policy> policyList;
     private Policy.Rule defaultRule;
