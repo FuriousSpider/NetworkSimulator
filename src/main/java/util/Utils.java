@@ -1,6 +1,6 @@
 package util;
 
-import simulator.Engine;
+import simulator.Manager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,7 +18,12 @@ public class Utils {
             macAddress = new StringBuilder();
 
             for (int i = 0; i < 6; i++) {
-                macAddress.append(Integer.toHexString(Math.abs(random.nextInt())), 0, 2).append(":");
+                String singlePart = Integer.toHexString(Math.abs(random.nextInt())).substring(0, 2);
+                if (singlePart.contains("ff")) {
+                    i--;
+                } else {
+                    macAddress.append(singlePart).append(":");
+                }
             }
             macAddress.setLength(macAddress.length() - 1);
 
@@ -32,7 +37,7 @@ public class Utils {
     public static String getNetworkAddressFromIp(String ipAddress) {
         String ipAddressWithMask = ipAddress;
         if (Utils.isIpAddressWithoutMask(ipAddressWithMask)) {
-            ipAddressWithMask = Engine.getInstance().getIpWithMaskByIp(ipAddressWithMask);
+            ipAddressWithMask = Manager.getInstance().getIpWithMaskByIp(ipAddressWithMask);
         }
         List<StringBuilder> ipAddressList = new ArrayList<>();
         StringBuilder ipAddressString = new StringBuilder();

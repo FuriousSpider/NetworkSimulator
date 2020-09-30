@@ -6,7 +6,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
-import simulator.Engine;
+import simulator.Manager;
 import util.Utils;
 import util.Values;
 
@@ -81,7 +81,7 @@ public class IPTextField extends GridPane {
     private void onEditButtonClicked(MouseEvent mouseEvent) {
         if (isInEditMode) {
             if (!Utils.isHostAddress(ipAddressTextField.getText())) {
-                Engine.getInstance().logError(Values.ERROR_INVALID_IP_ADDRESS);
+                Manager.getInstance().logError(Values.ERROR_INVALID_IP_ADDRESS);
                 return;
             }
             ipAddressValue = ipAddressTextField.getText();

@@ -6,7 +6,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
-import simulator.Engine;
+import simulator.Manager;
 import util.Utils;
 import util.Values;
 
@@ -91,7 +91,7 @@ public class DefaultGatewayView extends GridPane {
                 changeState();
                 reloadData();
             } else {
-                Engine.getInstance().logError(Values.ERROR_INVALID_IP_ADDRESS);
+                Manager.getInstance().logError(Values.ERROR_INVALID_IP_ADDRESS);
             }
         } else {
             changeState();

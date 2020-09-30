@@ -1,6 +1,6 @@
 package simulator.element.device;
 
-import simulator.Engine;
+import simulator.Manager;
 import simulator.element.Connection;
 import simulator.element.Message;
 import simulator.element.device.additionalElements.History;
@@ -50,8 +50,8 @@ public class Hub extends Device {
                 if (connection.getFirstElementId() == this.getId()) {
                     Message msg = new Message(
                             message,
-                            Engine.getInstance().getPortById(connection.getPortPair().getKey()),
-                            Engine.getInstance().getPortById(connection.getPortPair().getValue()),
+                            Manager.getInstance().getPortById(connection.getPortPair().getKey()),
+                            Manager.getInstance().getPortById(connection.getPortPair().getValue()),
                             this,
                             message.getCurrentIpDestinationAddress(),
                             message.getVLanId(),
@@ -71,8 +71,8 @@ public class Hub extends Device {
                 } else {
                     Message msg = new Message(
                             message,
-                            Engine.getInstance().getPortById(connection.getPortPair().getValue()),
-                            Engine.getInstance().getPortById(connection.getPortPair().getKey()),
+                            Manager.getInstance().getPortById(connection.getPortPair().getValue()),
+                            Manager.getInstance().getPortById(connection.getPortPair().getKey()),
                             this,
                             message.getCurrentIpDestinationAddress(),
                             message.getVLanId(),
@@ -105,8 +105,8 @@ public class Hub extends Device {
                     if (connection.getFirstElementId() == this.getId()) {
                         messageList.add(new Message(
                                 message,
-                                Engine.getInstance().getPortById(connection.getPortPair().getKey()),
-                                Engine.getInstance().getPortById(connection.getPortPair().getValue()),
+                                Manager.getInstance().getPortById(connection.getPortPair().getKey()),
+                                Manager.getInstance().getPortById(connection.getPortPair().getValue()),
                                 this,
                                 message.getCurrentIpDestinationAddress(),
                                 message.getVLanId(),
@@ -116,8 +116,8 @@ public class Hub extends Device {
                     } else {
                         messageList.add(new Message(
                                 message,
-                                Engine.getInstance().getPortById(connection.getPortPair().getValue()),
-                                Engine.getInstance().getPortById(connection.getPortPair().getKey()),
+                                Manager.getInstance().getPortById(connection.getPortPair().getValue()),
+                                Manager.getInstance().getPortById(connection.getPortPair().getKey()),
                                 this,
                                 message.getCurrentIpDestinationAddress(),
                                 message.getVLanId(),

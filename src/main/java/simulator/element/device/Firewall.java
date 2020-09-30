@@ -2,7 +2,7 @@ package simulator.element.device;
 
 import javafx.application.Platform;
 import javafx.util.Pair;
-import simulator.Engine;
+import simulator.Manager;
 import simulator.element.Connection;
 import simulator.element.Message;
 import simulator.element.device.additionalElements.History;
@@ -100,26 +100,26 @@ public class Firewall extends Device implements FirewallPoliciesView.OnPoliciesL
 
     private List<Message> handleTestMessage(Message message, List<Connection> connectionList) {
         if (!Utils.belongToTheSameNetwork(message.getCurrentDestinationPort().getIpAddress(), message.getSourceIpAddress())) {
-            Device otherDevice = Engine.getInstance().getDeviceByMacAddress(message.getSourceMac());
+            Device otherDevice = Manager.getInstance().getDeviceByMacAddress(message.getSourceMac());
             String errorMessage = "Wrong network configuration\n" +
                     getDeviceName() +
                     " and " +
                     otherDevice.getDeviceName() +
                     " should belong to the same network";
-            Platform.runLater(() -> Engine.getInstance().logError(errorMessage));
-            Engine.setTestNetworkSuccessful(false);
+            Platform.runLater(() -> Manager.getInstance().logError(errorMessage));
+            Manager.setTestNetworkSuccessful(false);
         } else if (message.getCurrentDestinationPort().getIpAddress().equals(message.getSourceIpAddress())) {
-            Device otherDevice = Engine.getInstance().getDeviceByIPAddress(message.getSourceIpAddress());
+            Device otherDevice = Manager.getInstance().getDeviceByIPAddress(message.getSourceIpAddress());
             if (otherDevice == null) {
-                otherDevice = Engine.getInstance().getDeviceByPortIpAddress(message.getSourceIpAddress());
+                otherDevice = Manager.getInstance().getDeviceByPortIpAddress(message.getSourceIpAddress());
             }
             String errorMessage = "Wrong network configuration\n" +
                     getDeviceName() +
                     " and " +
                     otherDevice.getDeviceName() +
                     " should not have the same ip address";
-            Platform.runLater(() -> Engine.getInstance().logError(errorMessage));
-            Engine.setTestNetworkSuccessful(false);
+            Platform.runLater(() -> Manager.getInstance().logError(errorMessage));
+            Manager.setTestNetworkSuccessful(false);
         }
         return new ArrayList<>();
     }
@@ -152,9 +152,9 @@ public class Firewall extends Device implements FirewallPoliciesView.OnPoliciesL
                     );
                     String destinationMacAddress;
                     try {
-                        destinationMacAddress = Engine.getInstance().getDeviceByPortIpAddress(pair.getValue()).getMacAddress();
+                        destinationMacAddress = Manager.getInstance().getDeviceByPortIpAddress(pair.getValue()).getMacAddress();
                     }catch (Exception e) {
-                        destinationMacAddress = Engine.getInstance().getDeviceByIPAddress(pair.getValue()).getMacAddress();
+                        destinationMacAddress = Manager.getInstance().getDeviceByIPAddress(pair.getValue()).getMacAddress();
                     }
                     msg.updateLastHistoryFrameInfo(
                             getMacAddress(),

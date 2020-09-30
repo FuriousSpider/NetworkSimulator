@@ -1,6 +1,6 @@
 package simulator.element.device.additionalElements;
 
-import simulator.Engine;
+import simulator.Manager;
 import simulator.element.Message;
 import simulator.element.device.Device;
 import simulator.element.device.EndDevice;
@@ -52,7 +52,7 @@ public class History {
 
     public String getCurrentSourceMacAddress() {
         if (message.getCurrentSourcePort() != null) {
-            return Engine.getInstance().getDeviceByPort(message.getCurrentSourcePort()).getMacAddress();
+            return Manager.getInstance().getDeviceByPort(message.getCurrentSourcePort()).getMacAddress();
         } else {
             return "";
         }
@@ -60,7 +60,7 @@ public class History {
 
     public String getCurrentDestinationMacAddress() {
         if (message.getCurrentDestinationPort() != null) {
-            return Engine.getInstance().getDeviceByPort(message.getCurrentDestinationPort()).getMacAddress();
+            return Manager.getInstance().getDeviceByPort(message.getCurrentDestinationPort()).getMacAddress();
         } else {
             return "";
         }
@@ -70,8 +70,8 @@ public class History {
         if (message.getCurrentSourcePort() != null) {
             if (message.getCurrentSourcePort().hasInterface()) {
                 return message.getCurrentSourcePort().getIpAddress();
-            } else if (Engine.getInstance().getDeviceByPort(message.getCurrentSourcePort()) instanceof EndDevice) {
-                return ((EndDevice) Engine.getInstance().getDeviceByPort(message.getCurrentSourcePort())).getIpAddress();
+            } else if (Manager.getInstance().getDeviceByPort(message.getCurrentSourcePort()) instanceof EndDevice) {
+                return ((EndDevice) Manager.getInstance().getDeviceByPort(message.getCurrentSourcePort())).getIpAddress();
             }
         }
         return "";

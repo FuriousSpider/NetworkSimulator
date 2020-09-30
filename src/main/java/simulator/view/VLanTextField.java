@@ -7,7 +7,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
-import simulator.Engine;
+import simulator.Manager;
 import util.Utils;
 import util.Values;
 
@@ -132,7 +132,7 @@ public class VLanTextField extends GridPane {
     private void onEditButtonClicked(MouseEvent mouseEvent) {
         if (isInEditMode) {
             if (!Utils.isVLanIdValid(vLanTextField.getText())) {
-                Engine.getInstance().logError(Values.ERROR_INVALID_VLAN_ID);
+                Manager.getInstance().logError(Values.ERROR_INVALID_VLAN_ID);
                 return;
             }
             vLanValue = vLanTextField.getText();
@@ -151,7 +151,7 @@ public class VLanTextField extends GridPane {
         for (ConnectionRowView.OnManageVLanClickedListener listener : onManageVLanClickedListenerList) {
             listener.onRemoveVLanClicked();
         }
-        Engine.getInstance().showConnectionList();
+        Manager.getInstance().showConnectionList();
     }
 
     private void onChangeModeCheckBoxClicked(MouseEvent mouseEvent) {

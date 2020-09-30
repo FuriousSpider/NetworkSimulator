@@ -1,7 +1,7 @@
 package simulator.element.device;
 
 import javafx.application.Platform;
-import simulator.Engine;
+import simulator.Manager;
 import simulator.element.Connection;
 import simulator.element.Message;
 import simulator.element.device.additionalElements.History;
@@ -77,7 +77,7 @@ public class Router extends Device implements RoutingTable.OnRoutingTableChangeL
                             );
                             msg.updateLastHistoryFrameInfo(
                                     getMacAddress(),
-                                    Engine.getInstance().getDeviceByIPAddress(message.getDestinationIpAddress()).getMacAddress()
+                                    Manager.getInstance().getDeviceByIPAddress(message.getDestinationIpAddress()).getMacAddress()
                             );
 
                             messageList.add(msg);
@@ -111,7 +111,7 @@ public class Router extends Device implements RoutingTable.OnRoutingTableChangeL
                                     );
                                     msg.updateLastHistoryFrameInfo(
                                             getMacAddress(),
-                                            Engine.getInstance().getDeviceByPortIpAddress(nextHop).getMacAddress()
+                                            Manager.getInstance().getDeviceByPortIpAddress(nextHop).getMacAddress()
                                     );
 
                                     messageList.add(msg);
@@ -132,7 +132,7 @@ public class Router extends Device implements RoutingTable.OnRoutingTableChangeL
                             message.getCurrentDestinationPort(),
                             message.getCurrentSourcePort(),
                             this,
-                            ((EndDevice) Engine.getInstance().getDeviceByMacAddress(message.getDestinationMac())).getIpAddress(),
+                            ((EndDevice) Manager.getInstance().getDeviceByMacAddress(message.getDestinationMac())).getIpAddress(),
                             vLanId,
                             "by one-armed router",
                             true
@@ -158,26 +158,26 @@ public class Router extends Device implements RoutingTable.OnRoutingTableChangeL
 
     private List<Message> handleTestMessage(Message message, List<Connection> connectionList) {
         if (!Utils.belongToTheSameNetwork(message.getCurrentDestinationPort().getIpAddress(), message.getSourceIpAddress())) {
-            Device otherDevice = Engine.getInstance().getDeviceByMacAddress(message.getSourceMac());
+            Device otherDevice = Manager.getInstance().getDeviceByMacAddress(message.getSourceMac());
             String errorMessage = "Wrong network configuration\n" +
                     getDeviceName() +
                     " and " +
                     otherDevice.getDeviceName() +
                     " should belong to the same network";
-            Platform.runLater(() -> Engine.getInstance().logError(errorMessage));
-            Engine.setTestNetworkSuccessful(false);
+            Platform.runLater(() -> Manager.getInstance().logError(errorMessage));
+            Manager.setTestNetworkSuccessful(false);
         } else if (message.getCurrentDestinationPort().getIpAddress().equals(message.getSourceIpAddress())) {
-            Device otherDevice = Engine.getInstance().getDeviceByIPAddress(message.getSourceIpAddress());
+            Device otherDevice = Manager.getInstance().getDeviceByIPAddress(message.getSourceIpAddress());
             if (otherDevice == null) {
-                otherDevice = Engine.getInstance().getDeviceByPortIpAddress(message.getSourceIpAddress());
+                otherDevice = Manager.getInstance().getDeviceByPortIpAddress(message.getSourceIpAddress());
             }
             String errorMessage = "Wrong network configuration\n" +
                     getDeviceName() +
                     " and " +
                     otherDevice.getDeviceName() +
                     " should not have the same ip address";
-            Platform.runLater(() -> Engine.getInstance().logError(errorMessage));
-            Engine.setTestNetworkSuccessful(false);
+            Platform.runLater(() -> Manager.getInstance().logError(errorMessage));
+            Manager.setTestNetworkSuccessful(false);
         }
         return new ArrayList<>();
     }

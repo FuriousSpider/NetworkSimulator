@@ -1,7 +1,6 @@
 package simulator.element.device;
 
 import javafx.scene.image.Image;
-import javafx.util.Pair;
 import simulator.element.Connection;
 import simulator.element.Message;
 import simulator.element.device.additionalElements.AssociationTableEntry;

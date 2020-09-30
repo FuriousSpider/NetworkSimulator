@@ -8,7 +8,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import simulator.Engine;
+import simulator.Manager;
 import util.Utils;
 import util.Values;
 
@@ -62,21 +62,21 @@ public class RoutingTable extends GridPane {
         boolean areEntriesValid = true;
         if (Utils.isIpAddressWithoutMask(newEntryNetworkTextField.getText())) {
             areEntriesValid = false;
-            Engine.getInstance().logError(Values.ERROR_INVALID_NETWORK_IP_ADDRESS);
+            Manager.getInstance().logError(Values.ERROR_INVALID_NETWORK_IP_ADDRESS);
         } else if (!Utils.isNetworkAddress(newEntryNetworkTextField.getText())) {
             areEntriesValid = false;
-            Engine.getInstance().logError(Values.ERROR_ADDRESS_IS_NOT_A_NETWORK_ADDRESS);
+            Manager.getInstance().logError(Values.ERROR_ADDRESS_IS_NOT_A_NETWORK_ADDRESS);
         }
         if (!Utils.isIpAddressWithoutMask(newEntryNextHopTextField.getText())) {
             areEntriesValid = false;
-            Engine.getInstance().logError(Values.ERROR_INVALID_IP_ADDRESS);
+            Manager.getInstance().logError(Values.ERROR_INVALID_IP_ADDRESS);
         }
 
         if (areEntriesValid) {
             this.routingTable.put(newEntryNetworkTextField.getText(), newEntryNextHopTextField.getText());
             this.listener.onRoutingTableChange(routingTable);
             setEntryList(routingTable);
-            Engine.getInstance().log(Values.MESSAGE_RECORD_ADDED);
+            Manager.getInstance().log(Values.MESSAGE_RECORD_ADDED);
         }
     }
 

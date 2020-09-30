@@ -1,6 +1,6 @@
 package simulator.element.device;
 
-import simulator.Engine;
+import simulator.Manager;
 import simulator.element.Connection;
 import simulator.element.Message;
 import simulator.element.device.additionalElements.AssociationTableEntry;
@@ -151,8 +151,8 @@ public class Switch extends Device implements SwitchButtonsView.OnClearMacTableC
                         messageList.add(
                                 new Message(
                                         message,
-                                        Engine.getInstance().getPortById(connection.getPortPair().getKey()),
-                                        Engine.getInstance().getPortById(connection.getPortPair().getValue()),
+                                        Manager.getInstance().getPortById(connection.getPortPair().getKey()),
+                                        Manager.getInstance().getPortById(connection.getPortPair().getValue()),
                                         this,
                                         message.getCurrentIpDestinationAddress(),
                                         0,
@@ -164,8 +164,8 @@ public class Switch extends Device implements SwitchButtonsView.OnClearMacTableC
                         messageList.add(
                                 new Message(
                                         message,
-                                        Engine.getInstance().getPortById(connection.getPortPair().getValue()),
-                                        Engine.getInstance().getPortById(connection.getPortPair().getKey()),
+                                        Manager.getInstance().getPortById(connection.getPortPair().getValue()),
+                                        Manager.getInstance().getPortById(connection.getPortPair().getKey()),
                                         this,
                                         message.getCurrentIpDestinationAddress(),
                                         0,
@@ -210,7 +210,7 @@ public class Switch extends Device implements SwitchButtonsView.OnClearMacTableC
     private Port getAssociationTablePort(int vLanId, String macAddress) {
         for (AssociationTableEntry entry : associationTable) {
             if (entry.getvLanId() == vLanId && entry.getMacAddress().equals(macAddress)) {
-                return Engine.getInstance().getPortById(entry.getPortId());
+                return Manager.getInstance().getPortById(entry.getPortId());
             }
         }
         return null;

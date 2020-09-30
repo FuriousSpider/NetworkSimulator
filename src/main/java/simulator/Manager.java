@@ -28,8 +28,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class Engine implements PortListDialog.OnPortSelectedListener {
-    private static final Engine INSTANCE = new Engine();
+public class Manager implements PortListDialog.OnPortSelectedListener {
+    private static final Manager INSTANCE = new Manager();
     private Controller controller;
     private GraphicsContext ctx;
     private final List<Device> deviceList;
@@ -45,7 +45,7 @@ public class Engine implements PortListDialog.OnPortSelectedListener {
     private static Timeline timeline;
     private static boolean testNetworkSuccessful;
 
-    private Engine() {
+    private Manager() {
         this.deviceList = new ArrayList<>();
         this.connectionList = new ArrayList<>();
         this.messageList = new ArrayList<>();
@@ -57,7 +57,7 @@ public class Engine implements PortListDialog.OnPortSelectedListener {
         testNetworkSuccessful = false;
     }
 
-    public static Engine getInstance() {
+    public static Manager getInstance() {
         return INSTANCE;
     }
 
@@ -557,7 +557,7 @@ public class Engine implements PortListDialog.OnPortSelectedListener {
                         testNetwork();
                         generateFirewallRoutingTable();
                         if (testNetworkSuccessful) {
-                            Platform.runLater(() -> Engine.getInstance().log("Network configured properly"));
+                            Platform.runLater(() -> Manager.getInstance().log("Network configured properly"));
                             prepareSimulation(sourceIPAddress, destinationIPAddress, application);
                             if (runSimulation) {
                                 controller.lockSimulationButton();

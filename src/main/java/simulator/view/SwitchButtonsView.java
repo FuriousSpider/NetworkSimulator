@@ -3,8 +3,7 @@ package simulator.view;
 import javafx.scene.control.Button;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
-import javafx.util.Pair;
-import simulator.Engine;
+import simulator.Manager;
 import simulator.element.device.additionalElements.AssociationTableEntry;
 
 import java.util.ArrayList;
@@ -43,7 +42,7 @@ public class SwitchButtonsView extends GridPane {
             dialog.setData(associationTable);
             dialog.show();
         } else {
-            Engine.getInstance().logError("Nothing to show - MAC Address Table is empty");
+            Manager.getInstance().logError("Nothing to show - MAC Address Table is empty");
         }
 
     }
@@ -52,7 +51,7 @@ public class SwitchButtonsView extends GridPane {
         associationTable.clear();
         if (onClearMacTableClickedListener != null) {
             onClearMacTableClickedListener.onClearMacTableClicked();
-            Engine.getInstance().log("MAC Address Table has been cleared");
+            Manager.getInstance().log("MAC Address Table has been cleared");
         }
     }
 

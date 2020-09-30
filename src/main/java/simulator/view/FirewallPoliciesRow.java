@@ -1,6 +1,5 @@
 package simulator.view;
 
-import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -8,8 +7,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
-import simulator.Engine;
+import simulator.Manager;
 import simulator.element.device.additionalElements.Policy;
 import util.Utils;
 import util.Values;
@@ -164,11 +162,11 @@ public class FirewallPoliciesRow extends GridPane {
             String destination = destinationIpAddressTextField.getText();
 
             if (source != null && !source.isEmpty() && !Utils.isNetworkAddress(source)) {
-                Engine.getInstance().logError(Values.ERROR_INVALID_NETWORK_IP_ADDRESS);
+                Manager.getInstance().logError(Values.ERROR_INVALID_NETWORK_IP_ADDRESS);
                 return;
             }
             if (destination != null && !destination.isEmpty() && !Utils.isNetworkAddress(destination)) {
-                Engine.getInstance().logError(Values.ERROR_INVALID_NETWORK_IP_ADDRESS);
+                Manager.getInstance().logError(Values.ERROR_INVALID_NETWORK_IP_ADDRESS);
                 return;
             }
             sourceIpAddressValue = source;

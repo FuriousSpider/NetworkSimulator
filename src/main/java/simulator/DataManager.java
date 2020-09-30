@@ -277,9 +277,9 @@ public class DataManager {
                         }
                     }
                 }
-                Engine.getInstance().loadData(data);
+                Manager.getInstance().loadData(data);
             } catch (Exception e) {
-                Engine.getInstance().logError(Values.ERROR_OPEN_FILE_ERROR);
+                Manager.getInstance().logError(Values.ERROR_OPEN_FILE_ERROR);
             }
         }
     }
@@ -463,7 +463,7 @@ public class DataManager {
 
                 Files.write(Paths.get(file.toURI()), dataObject.toJSONString().getBytes());
             } catch (Exception e) {
-                Engine.getInstance().logError(Values.ERROR_SAVE_FILE);
+                Manager.getInstance().logError(Values.ERROR_SAVE_FILE);
             }
         }
     }

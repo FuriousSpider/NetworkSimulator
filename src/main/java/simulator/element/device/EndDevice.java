@@ -1,7 +1,7 @@
 package simulator.element.device;
 
 import javafx.application.Platform;
-import simulator.Engine;
+import simulator.Manager;
 import simulator.element.Connection;
 import simulator.element.Message;
 import simulator.element.device.additionalElements.History;
@@ -77,13 +77,13 @@ public class EndDevice extends Device implements IPTextField.OnSaveClickedListen
                 history.setPacketInfo(message.getDestinationIpAddress(), message.getSourceIpAddress());
                 if (Utils.belongToTheSameNetwork(message.getDestinationIpAddress(), message.getSourceIpAddress())) {
                     history.setFrameInfo(
-                            Engine.getInstance().getDeviceByIPAddress(message.getDestinationIpAddress()).getMacAddress(),
-                            Engine.getInstance().getDeviceByIPAddress(message.getSourceIpAddress()).getMacAddress()
+                            Manager.getInstance().getDeviceByIPAddress(message.getDestinationIpAddress()).getMacAddress(),
+                            Manager.getInstance().getDeviceByIPAddress(message.getSourceIpAddress()).getMacAddress()
                     );
                 } else {
                     history.setFrameInfo(
-                            Engine.getInstance().getDeviceByIPAddress(message.getDestinationIpAddress()).getMacAddress(),
-                            Engine.getInstance().getDeviceByPortIpAddress(getGateway()).getMacAddress()
+                            Manager.getInstance().getDeviceByIPAddress(message.getDestinationIpAddress()).getMacAddress(),
+                            Manager.getInstance().getDeviceByPortIpAddress(getGateway()).getMacAddress()
                     );
                 }
                 msg.addHistory(history);
@@ -116,7 +116,7 @@ public class EndDevice extends Device implements IPTextField.OnSaveClickedListen
 
                 message.addHistory(history);
 
-                Engine.getInstance().finishSimulation(message.getHistoryList());
+                Manager.getInstance().finishSimulation(message.getHistoryList());
             } else if (message.getApplication().equals(Policy.Application.UDP)) {
                 Message msg = new Message(message.getDestinationIpAddress(),
                         message.getSourceIpAddress(),
@@ -143,7 +143,7 @@ public class EndDevice extends Device implements IPTextField.OnSaveClickedListen
 
                 message.addHistory(history);
 
-                Engine.getInstance().finishSimulation(message.getHistoryList());
+                Manager.getInstance().finishSimulation(message.getHistoryList());
             }
         }
         return new ArrayList<>();
@@ -151,26 +151,26 @@ public class EndDevice extends Device implements IPTextField.OnSaveClickedListen
 
     private List<Message> handleTestMessage(Message message, List<Connection> connectionList) {
         if (!Utils.belongToTheSameNetwork(getIpAddress(), message.getSourceIpAddress())) {
-            Device otherDevice = Engine.getInstance().getDeviceByIPAddress(message.getSourceIpAddress());
+            Device otherDevice = Manager.getInstance().getDeviceByIPAddress(message.getSourceIpAddress());
             if (otherDevice == null) {
-                otherDevice = Engine.getInstance().getDeviceByPortIpAddress(message.getSourceIpAddress());
+                otherDevice = Manager.getInstance().getDeviceByPortIpAddress(message.getSourceIpAddress());
             }
             String errorMessage = "Wrong network configuration\n" +
                     getDeviceName() +
                     " and " +
                     otherDevice.getDeviceName() +
                     " should belong to the same network";
-            Platform.runLater(() -> Engine.getInstance().logError(errorMessage));
-            Engine.setTestNetworkSuccessful(false);
+            Platform.runLater(() -> Manager.getInstance().logError(errorMessage));
+            Manager.setTestNetworkSuccessful(false);
         } else if (getIpAddress().equals(message.getSourceIpAddress())) {
-            Device otherDevice = Engine.getInstance().getDeviceByMacAddress(message.getSourceMac());
+            Device otherDevice = Manager.getInstance().getDeviceByMacAddress(message.getSourceMac());
             String errorMessage = "Wrong network configuration\n" +
                     getDeviceName() +
                     " and " +
                     otherDevice.getDeviceName() +
                     " should not have the same ip address";
-            Platform.runLater(() -> Engine.getInstance().logError(errorMessage));
-            Engine.setTestNetworkSuccessful(false);
+            Platform.runLater(() -> Manager.getInstance().logError(errorMessage));
+            Manager.setTestNetworkSuccessful(false);
         }
         return new ArrayList<>();
     }

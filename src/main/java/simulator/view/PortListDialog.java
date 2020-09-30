@@ -8,7 +8,7 @@ import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import simulator.Engine;
+import simulator.Manager;
 import simulator.element.device.additionalElements.Port;
 import util.Values;
 
@@ -44,7 +44,7 @@ public class PortListDialog extends Dialog<String> {
         }
         switch (emptyPortList.size()) {
             case 0:
-                Engine.getInstance().logError(Values.ERROR_NO_FREE_PORT_AVAILABLE);
+                Manager.getInstance().logError(Values.ERROR_NO_FREE_PORT_AVAILABLE);
                 break;
             case 1:
                 if (onPortSelectedListener != null) {

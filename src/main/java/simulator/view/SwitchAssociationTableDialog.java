@@ -6,7 +6,7 @@ import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import simulator.Engine;
+import simulator.Manager;
 import simulator.element.device.additionalElements.AssociationTableEntry;
 
 import java.util.List;
@@ -45,7 +45,7 @@ public class SwitchAssociationTableDialog extends Dialog<String> {
                 content.add(new Label(String.valueOf(entry.getvLanId())), 1, index);
             }
             content.add(new Label(entry.getMacAddress()), 2, index);
-            content.add(new Label(Engine.getInstance().getPortById(entry.getPortId()).getPortName()), 3,index);
+            content.add(new Label(Manager.getInstance().getPortById(entry.getPortId()).getPortName()), 3,index);
         }
     }
 }

@@ -1,7 +1,7 @@
 package simulator.element;
 
 import javafx.scene.image.Image;
-import simulator.Engine;
+import simulator.Manager;
 import simulator.element.device.Device;
 import simulator.element.device.additionalElements.History;
 import simulator.element.device.additionalElements.Policy;
@@ -50,7 +50,7 @@ public class Message {
         this.isConfirmationMessage = isConfirmationMessage;
         this.type = type;
         this.testHistory = new ArrayList<>();
-        this.testHistory.add(Engine.getInstance().getDeviceByPort(currentSourcePort));
+        this.testHistory.add(Manager.getInstance().getDeviceByPort(currentSourcePort));
     }
 
     public Message(Message message, Port currentSourcePort, Port currentDestinationPort, Device device, String currentIpDestinationAddress, Integer vLanId, String decisionValue, boolean registerDecision) {
@@ -72,18 +72,18 @@ public class Message {
             history.add(new History(this, device, decisionValue, message.getCurrentDestinationPort(), currentSourcePort));
         }
         this.testHistory = message.testHistory;
-        testHistory.add(Engine.getInstance().getDeviceByPort(message.getCurrentSourcePort()));
+        testHistory.add(Manager.getInstance().getDeviceByPort(message.getCurrentSourcePort()));
     }
 
     public int getX() {
-        Device from = Engine.getInstance().getDeviceByPort(currentSourcePort);
-        Device to = Engine.getInstance().getDeviceByPort(currentDestinationPort);
+        Device from = Manager.getInstance().getDeviceByPort(currentSourcePort);
+        Device to = Manager.getInstance().getDeviceByPort(currentDestinationPort);
         return from.getX() + (to.getX() - from.getX()) * progress / Values.MESSAGE_PROGRESS_MAX;
     }
 
     public int getY() {
-        Device from = Engine.getInstance().getDeviceByPort(currentSourcePort);
-        Device to = Engine.getInstance().getDeviceByPort(currentDestinationPort);
+        Device from = Manager.getInstance().getDeviceByPort(currentSourcePort);
+        Device to = Manager.getInstance().getDeviceByPort(currentDestinationPort);
         return from.getY() + (to.getY() - from.getY()) * progress / Values.MESSAGE_PROGRESS_MAX;
     }
 

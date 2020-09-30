@@ -2,7 +2,7 @@ package simulator.element;
 
 import javafx.scene.paint.Color;
 import javafx.util.Pair;
-import simulator.Engine;
+import simulator.Manager;
 import simulator.element.device.additionalElements.Port;
 
 import java.util.List;
@@ -28,11 +28,11 @@ public class Connection {
     }
 
     public int getFirstElementId() {
-        return Engine.getInstance().getDeviceByPortId(portPair.getKey()).getId();
+        return Manager.getInstance().getDeviceByPortId(portPair.getKey()).getId();
     }
 
     public int getSecondElementId() {
-        return Engine.getInstance().getDeviceByPortId(portPair.getValue()).getId();
+        return Manager.getInstance().getDeviceByPortId(portPair.getValue()).getId();
     }
 
     public Color getColor() {
@@ -49,19 +49,19 @@ public class Connection {
 
     public Port getOtherPort(Port port) {
         if (port.getId() == portPair.getKey()) {
-            return Engine.getInstance().getPortById(portPair.getValue());
+            return Manager.getInstance().getPortById(portPair.getValue());
         } else {
-            return Engine.getInstance().getPortById(portPair.getKey());
+            return Manager.getInstance().getPortById(portPair.getKey());
         }
     }
 
     public Port getOtherPort(List<Port> portList) {
         for (Port port : portList) {
             if (port.getId() == portPair.getKey()) {
-                return Engine.getInstance().getPortById(portPair.getValue());
+                return Manager.getInstance().getPortById(portPair.getValue());
             }
         }
-        return Engine.getInstance().getPortById(portPair.getKey());
+        return Manager.getInstance().getPortById(portPair.getKey());
     }
 
     public static int getIdCounter() {

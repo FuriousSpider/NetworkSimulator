@@ -7,7 +7,7 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import simulator.Engine;
+import simulator.Manager;
 import simulator.element.Connection;
 import simulator.element.device.Device;
 import simulator.element.device.Switch;
@@ -30,7 +30,7 @@ public class ConnectionRowView extends GridPane implements ColorPickerDialog.OnC
         this.id = connection.getId();
         this.onManageVLanClickedListenerList = new ArrayList<>();
         Port thisPort = connection.getOtherPort(otherPort);
-        Engine engine = Engine.getInstance();
+        Manager engine = Manager.getInstance();
         Device thisDevice = engine.getDeviceByPort(thisPort);
         Label connectedWith = new Label(engine.getDeviceByPort(otherPort).getDeviceName());
         Button deleteConnection = new Button("Remove");
@@ -83,7 +83,7 @@ public class ConnectionRowView extends GridPane implements ColorPickerDialog.OnC
             onManageVLanClickedListenerList.add(thisPort);
             List<OnManageVLanClickedListener> bothConnectionsEnds3 = new ArrayList<>();
             bothConnectionsEnds3.add(thisPort);
-            if (Engine.getInstance().getDeviceByPort(otherPort) instanceof Switch) {
+            if (Manager.getInstance().getDeviceByPort(otherPort) instanceof Switch) {
                 onManageVLanClickedListenerList.add(otherPort);
                 bothConnectionsEnds3.add(otherPort);
             }
@@ -103,7 +103,7 @@ public class ConnectionRowView extends GridPane implements ColorPickerDialog.OnC
             Button setVLanButton = new Button("Set");
             setVLanButton.setId(String.valueOf(thisPort.getId()));
             onManageVLanClickedListenerList.add(thisPort);
-            if (Engine.getInstance().getDeviceByPort(otherPort) instanceof Switch) {
+            if (Manager.getInstance().getDeviceByPort(otherPort) instanceof Switch) {
                 onManageVLanClickedListenerList.add(otherPort);
             }
             setVLanButton.setOnMouseClicked(this::onSetVLanButtonClicked);
@@ -162,7 +162,7 @@ public class ConnectionRowView extends GridPane implements ColorPickerDialog.OnC
         for (OnManageVLanClickedListener listener : onManageVLanClickedListenerList) {
             listener.onSetVLanClicked();
         }
-        Engine.getInstance().showConnectionList();
+        Manager.getInstance().showConnectionList();
     }
 
     private void onColorClicked(MouseEvent mouseEvent) {

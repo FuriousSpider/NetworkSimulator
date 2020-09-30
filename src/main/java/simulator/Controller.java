@@ -9,7 +9,6 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import simulator.element.Connection;
@@ -57,15 +56,15 @@ public class Controller implements Initializable, PortListDialog.OnPortSelectedL
     private SimulationView simulationView;
     @FXML
     private LogPanel logPanel;
-    private Engine engine;
+    private Manager manager;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         CanvasPane canvas = new CanvasPane(canvasPane.getWidth(), canvasPane.getHeight());
         canvasPane.getChildren().add(canvas);
-        engine = Engine.getInstance();
-        engine.setController(this);
-        engine.setGraphicsContext(canvas.getCanvas().getGraphicsContext2D());
+        manager = Manager.getInstance();
+        manager.setController(this);
+        manager.setGraphicsContext(canvas.getCanvas().getGraphicsContext2D());
 
         canvas.getCanvas().setOnMouseDragged(this::canvasMouseDragged);
         canvas.getCanvas().setOnMousePressed(this::canvasMousePressed);
@@ -83,37 +82,37 @@ public class Controller implements Initializable, PortListDialog.OnPortSelectedL
 
     @FXML
     private void handleEndDeviceButtonClick() {
-        engine.addDevice(new EndDevice(Values.DEVICE_DEFAULT_POSITION, Values.DEVICE_DEFAULT_POSITION));
+        manager.addDevice(new EndDevice(Values.DEVICE_DEFAULT_POSITION, Values.DEVICE_DEFAULT_POSITION));
     }
 
     @FXML
     private void handleHubButtonClick() {
-        engine.addDevice(new Hub(Values.DEVICE_DEFAULT_POSITION, Values.DEVICE_DEFAULT_POSITION));
+        manager.addDevice(new Hub(Values.DEVICE_DEFAULT_POSITION, Values.DEVICE_DEFAULT_POSITION));
     }
 
     @FXML
     private void handleSwitchButtonClick() {
-        engine.addDevice(new Switch(Values.DEVICE_DEFAULT_POSITION, Values.DEVICE_DEFAULT_POSITION));
+        manager.addDevice(new Switch(Values.DEVICE_DEFAULT_POSITION, Values.DEVICE_DEFAULT_POSITION));
     }
 
     @FXML
     private void handleRouterButtonClick() {
-        engine.addDevice(new Router(Values.DEVICE_DEFAULT_POSITION, Values.DEVICE_DEFAULT_POSITION));
+        manager.addDevice(new Router(Values.DEVICE_DEFAULT_POSITION, Values.DEVICE_DEFAULT_POSITION));
     }
 
     @FXML
     private void handleFirewallButtonClick() {
-        engine.addDevice(new Firewall(Values.DEVICE_DEFAULT_POSITION, Values.DEVICE_DEFAULT_POSITION));
+        manager.addDevice(new Firewall(Values.DEVICE_DEFAULT_POSITION, Values.DEVICE_DEFAULT_POSITION));
     }
 
     @FXML
     private void handleRemoveElementButtonClick() {
-        engine.removeSelectedElement();
+        manager.removeSelectedElement();
     }
 
     @FXML
     private void handleConnectElementsButtonClick() {
-        Device selectedDevice = engine.getSelectedDevice();
+        Device selectedDevice = manager.getSelectedDevice();
         if (selectedDevice != null) {
             PortListDialog dialog = new PortListDialog();
             dialog.setPortList(selectedDevice.getPortList());
@@ -124,7 +123,7 @@ public class Controller implements Initializable, PortListDialog.OnPortSelectedL
 
     @FXML
     private void handleElementInfoMacAddressClick() {
-        engine.copyToClipboard(elementInfoMacAddress.getText());
+        manager.copyToClipboard(elementInfoMacAddress.getText());
     }
 
     @FXML
@@ -136,7 +135,7 @@ public class Controller implements Initializable, PortListDialog.OnPortSelectedL
             if (type.getText().equals(ButtonType.YES.getText())) {
                 DataManager.resetFile();
                 logPanel.clear();
-                engine.startNewProject();
+                manager.startNewProject();
             }
         });
     }
@@ -156,12 +155,12 @@ public class Controller implements Initializable, PortListDialog.OnPortSelectedL
 
     @FXML
     private void handleMenuSaveClick() {
-        engine.saveData();
+        manager.saveData();
     }
 
     @FXML
     private void handleMenuExitClick() {
-        Engine.stopEngine();
+        Manager.stopEngine();
         Platform.exit();
     }
 
@@ -172,38 +171,38 @@ public class Controller implements Initializable, PortListDialog.OnPortSelectedL
 
     private void canvasMousePressed(MouseEvent mouseEvent) {
         releaseFocus();
-        engine.onMousePressed((int) mouseEvent.getX(), (int) mouseEvent.getY());
+        manager.onMousePressed((int) mouseEvent.getX(), (int) mouseEvent.getY());
         if (mouseEvent.getButton() == MouseButton.PRIMARY) {
-            engine.selectDevice((int) mouseEvent.getX(), (int) mouseEvent.getY());
+            manager.selectDevice((int) mouseEvent.getX(), (int) mouseEvent.getY());
         }
     }
 
     private void canvasMouseDragged(MouseEvent mouseEvent) {
         if (mouseEvent.getButton() == MouseButton.PRIMARY) {
-            engine.moveElement((int) mouseEvent.getX(), (int) mouseEvent.getY());
+            manager.moveElement((int) mouseEvent.getX(), (int) mouseEvent.getY());
         } else if (mouseEvent.getButton() == MouseButton.MIDDLE) {
-            engine.moveAll((int) mouseEvent.getX(), (int) mouseEvent.getY());
+            manager.moveAll((int) mouseEvent.getX(), (int) mouseEvent.getY());
         }
     }
 
     private void canvasMouseReleased(MouseEvent mouseEvent) {
-        engine.onMouseReleased();
+        manager.onMouseReleased();
         if (mouseEvent.getButton() == MouseButton.PRIMARY) {
-            engine.deselectDevice();
+            manager.deselectDevice();
         }
     }
 
     private void canvasMouseMoved(MouseEvent mouseEvent) {
-        if (engine.isInConnectionMode()) {
-            engine.changeConnectMousePosition((int) mouseEvent.getX(), (int) mouseEvent.getY());
+        if (manager.isInConnectionMode()) {
+            manager.changeConnectMousePosition((int) mouseEvent.getX(), (int) mouseEvent.getY());
         }
     }
 
     private void keyPressed(KeyEvent keyEvent) {
         if (keyEvent.getCode() == KeyCode.DELETE) {
-            engine.removeSelectedElement();
+            manager.removeSelectedElement();
         } else if (keyEvent.getCode() == KeyCode.ESCAPE) {
-            engine.dropSelection();
+            manager.dropSelection();
         } else if (keyEvent.getCode() == KeyCode.C) {
             handleConnectElementsButtonClick();
         }
@@ -301,7 +300,7 @@ public class Controller implements Initializable, PortListDialog.OnPortSelectedL
     }
 
     private void onDeleteConnection(int id) {
-        engine.removeConnection(id);
+        manager.removeConnection(id);
     }
 
     public void log(String text) {
@@ -326,12 +325,12 @@ public class Controller implements Initializable, PortListDialog.OnPortSelectedL
 
     @Override
     public void onPortSelected(int portId) {
-        engine.onConnectClicked(portId);
+        manager.onConnectClicked(portId);
     }
 
     @Override
     public void onStartSimulationClicked() {
-        engine.startSimulation(
+        manager.startSimulation(
                 simulationView.getSourceIpAddress(),
                 simulationView.getDestinationIpAddress(),
                 simulationView.getApplication()
@@ -340,6 +339,6 @@ public class Controller implements Initializable, PortListDialog.OnPortSelectedL
 
     @Override
     public void onStopSimulationClicked() {
-        engine.stopSimulation();
+        manager.stopSimulation();
     }
 }
